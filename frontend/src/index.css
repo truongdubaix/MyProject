@@ -1,7 +1,7 @@
+@import "leaflet/dist/leaflet.css";
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
-@import "leaflet/dist/leaflet.css";
 
 html,
 body,
@@ -101,4 +101,51 @@ body,
 }
 .spin-bounce {
   animation: spinBounce 0.45s ease-out;
+}
+
+.radar-wrapper {
+  position: relative;
+  width: 16px;
+  height: 16px;
+}
+
+.radar-core {
+  width: 12px;
+  height: 12px;
+  background: #22c55e;
+  border-radius: 999px;
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  box-shadow: 0 0 12px #22c55e;
+}
+
+.radar-wave {
+  position: absolute;
+  inset: 0;
+  border-radius: 999px;
+  background: #22c55e55;
+  animation: wave 2s ease-out infinite;
+}
+
+.radar-wave:nth-child(2) {
+  animation-delay: 0.5s;
+}
+.radar-wave:nth-child(3) {
+  animation-delay: 1s;
+}
+
+@keyframes wave {
+  0% {
+    transform: scale(0.6);
+    opacity: 0.8;
+  }
+  60% {
+    transform: scale(2.6);
+    opacity: 0.1;
+  }
+  100% {
+    transform: scale(3.2);
+    opacity: 0;
+  }
 }

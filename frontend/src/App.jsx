@@ -2,6 +2,7 @@ import { Routes, Route } from "react-router-dom";
 import Navbar from "./components/Navbar.jsx";
 import Footer from "./components/Footer.jsx";
 import ProtectedRoute from "./components/ProtectedRoute.jsx";
+import "leaflet/dist/leaflet.css";
 
 // 🌍 Public pages
 import Home from "./pages/Home.jsx";
@@ -60,130 +61,134 @@ import PaymentFail from "./pages/customer/PaymentFail.jsx";
 import CustomerFeedback from "./pages/customer/CustomerFeedback.jsx";
 //import CustomerTrackDetail from "./pages/customer/CustomerTrackDetail.jsx";
 
+import { ChatProvider } from "./context/ChatContext";
+
 export default function App() {
   return (
-    <div className="bg-gray-50 text-gray-800 min-h-screen flex flex-col">
-      <Routes>
-        {/* 🌍 Public routes */}
-        {[
-          { path: "/", element: <Home /> },
-          { path: "/tracking", element: <Tracking /> },
-          { path: "/about", element: <About /> },
-          { path: "/services", element: <Services /> },
-          { path: "/contact", element: <Contact /> },
-          { path: "/login", element: <Login /> },
-          { path: "/register", element: <Register /> },
+    <ChatProvider>
+      <div className="bg-gray-50 text-gray-800 min-h-screen flex flex-col">
+        <Routes>
+          {/* 🌍 Public routes */}
+          {[
+            { path: "/", element: <Home /> },
+            { path: "/tracking", element: <Tracking /> },
+            { path: "/about", element: <About /> },
+            { path: "/services", element: <Services /> },
+            { path: "/contact", element: <Contact /> },
+            { path: "/login", element: <Login /> },
+            { path: "/register", element: <Register /> },
 
-          // ✅ Trang tuyển dụng tài xế mới
-          { path: "/apply-driver", element: <ApplyDriver /> },
-        ].map(({ path, element }) => (
+            // ✅ Trang tuyển dụng tài xế mới
+            { path: "/apply-driver", element: <ApplyDriver /> },
+          ].map(({ path, element }) => (
+            <Route
+              key={path}
+              path={path}
+              element={
+                <>
+                  <Navbar />
+                  <main className="flex-1">{element}</main>
+                  <Footer />
+                </>
+              }
+            />
+          ))}
+
+          {/* 🚪 Logout + Unauthorized */}
+          <Route path="/logout" element={<Logout />} />
+          <Route path="/unauthorized" element={<Unauthorized />} />
+          <Route path="/forgot-password" element={<ForgotPassword />} />
+          {/* 🧭 Admin */}
           <Route
-            key={path}
-            path={path}
+            path="/admin"
             element={
-              <>
-                <Navbar />
-                <main className="flex-1">{element}</main>
-                <Footer />
-              </>
+              <ProtectedRoute allowedRoles={["admin"]}>
+                <AdminLayout />
+              </ProtectedRoute>
             }
-          />
-        ))}
+          >
+            <Route index element={<AdminDashboard />} />
+            <Route path="shipments" element={<AdminShipments />} />
+            <Route path="drivers" element={<AdminDrivers />} />
+            <Route path="users" element={<AdminUsers />} />
+            <Route path="customers" element={<AdminCustomers />} />
+            <Route path="payments" element={<AdminPayments />} />
+            <Route path="feedbacks" element={<AdminFeedbacks />} />
+            <Route path="contact" element={<AdminContacts />} />
+          </Route>
 
-        {/* 🚪 Logout + Unauthorized */}
-        <Route path="/logout" element={<Logout />} />
-        <Route path="/unauthorized" element={<Unauthorized />} />
-        <Route path="/forgot-password" element={<ForgotPassword />} />
-        {/* 🧭 Admin */}
-        <Route
-          path="/admin"
-          element={
-            <ProtectedRoute allowedRoles={["admin"]}>
-              <AdminLayout />
-            </ProtectedRoute>
-          }
-        >
-          <Route index element={<AdminDashboard />} />
-          <Route path="shipments" element={<AdminShipments />} />
-          <Route path="drivers" element={<AdminDrivers />} />
-          <Route path="users" element={<AdminUsers />} />
-          <Route path="customers" element={<AdminCustomers />} />
-          <Route path="payments" element={<AdminPayments />} />
-          <Route path="feedbacks" element={<AdminFeedbacks />} />
-          <Route path="contact" element={<AdminContacts />} />
-        </Route>
-
-        {/* 🧩 Dispatcher */}
-        <Route
-          path="/dispatcher"
-          element={
-            <ProtectedRoute allowedRoles={["dispatcher", "admin"]}>
-              <DispatcherLayout />
-            </ProtectedRoute>
-          }
-        >
-          <Route index element={<DispatcherDashboard />} />
-          <Route path="assignments" element={<DispatcherAssignments />} />
-          <Route path="tracking" element={<DispatcherTracking />} />
-          <Route path="tracking/:id" element={<DispatcherTrackingDetail />} />
-          <Route path="chat" element={<DispatcherChat />} />
-          <Route path="contacts" element={<DispatcherContacts />} />
-        </Route>
-
-        {/* 🚚 Driver */}
-        <Route
-          path="/driver/:id"
-          element={
-            <ProtectedRoute allowedRoles={["driver", "admin"]}>
-              <DriverLayout />
-            </ProtectedRoute>
-          }
-        >
-          <Route index element={<DriverDashboard />} />
-          <Route path="assignments" element={<DriverAssignments />} />
-          <Route path="history" element={<DriverHistory />} />
-          <Route path="profile" element={<DriverProfile />} />
+          {/* 🧩 Dispatcher */}
           <Route
-            path="shipments/:shipmentId"
-            element={<DriverShipmentDetail />}
-          />
-        </Route>
+            path="/dispatcher"
+            element={
+              <ProtectedRoute allowedRoles={["dispatcher", "admin"]}>
+                <DispatcherLayout />
+              </ProtectedRoute>
+            }
+          >
+            <Route index element={<DispatcherDashboard />} />
+            <Route path="assignments" element={<DispatcherAssignments />} />
+            <Route path="tracking" element={<DispatcherTracking />} />
+            <Route path="tracking/:id" element={<DispatcherTrackingDetail />} />
+            <Route path="chat" element={<DispatcherChat />} />
+            <Route path="contacts" element={<DispatcherContacts />} />
+          </Route>
 
-        {/* 👤 Customer */}
-        <Route
-          path="/customer"
-          element={
-            <ProtectedRoute allowedRoles={["customer", "admin"]}>
-              <CustomerLayout />
-            </ProtectedRoute>
-          }
-        >
-          <Route index element={<CustomerDashboard />} />
-          <Route path="create" element={<CustomerCreateShipment />} />
-          <Route path="track" element={<CustomerTrack />} />
-          <Route path="history" element={<CustomerHistory />} />
-          <Route path="profile" element={<CustomerProfile />} />
-          <Route path="history/:id" element={<CustomerShipmentDetail />} />
-          <Route path="payment" element={<CustomerPayment />} />
-          <Route path="payment-success" element={<PaymentSuccess />} />
-          <Route path="payment-fail" element={<PaymentFail />} />
-          <Route path="feedback" element={<CustomerFeedback />} />
-          {/* <Route
+          {/* 🚚 Driver */}
+          <Route
+            path="/driver/:id"
+            element={
+              <ProtectedRoute allowedRoles={["driver", "admin"]}>
+                <DriverLayout />
+              </ProtectedRoute>
+            }
+          >
+            <Route index element={<DriverDashboard />} />
+            <Route path="assignments" element={<DriverAssignments />} />
+            <Route path="history" element={<DriverHistory />} />
+            <Route path="profile" element={<DriverProfile />} />
+            <Route
+              path="shipments/:shipmentId"
+              element={<DriverShipmentDetail />}
+            />
+          </Route>
+
+          {/* 👤 Customer */}
+          <Route
+            path="/customer"
+            element={
+              <ProtectedRoute allowedRoles={["customer", "admin"]}>
+                <CustomerLayout />
+              </ProtectedRoute>
+            }
+          >
+            <Route index element={<CustomerDashboard />} />
+            <Route path="create" element={<CustomerCreateShipment />} />
+            <Route path="track" element={<CustomerTrack />} />
+            <Route path="history" element={<CustomerHistory />} />
+            <Route path="profile" element={<CustomerProfile />} />
+            <Route path="history/:id" element={<CustomerShipmentDetail />} />
+            <Route path="payment" element={<CustomerPayment />} />
+            <Route path="payment-success" element={<PaymentSuccess />} />
+            <Route path="payment-fail" element={<PaymentFail />} />
+            <Route path="feedback" element={<CustomerFeedback />} />
+            {/* <Route
             path="/customer/track/:code"
             element={<CustomerTrackDetail />}
           /> */}
-        </Route>
+          </Route>
 
-        {/* ❌ 404 fallback */}
-        <Route
-          path="*"
-          element={
-            <p className="p-10 text-center text-red-600">
-              404 - Không tìm thấy trang
-            </p>
-          }
-        />
-      </Routes>
-    </div>
+          {/* ❌ 404 fallback */}
+          <Route
+            path="*"
+            element={
+              <p className="p-10 text-center text-red-600">
+                404 - Không tìm thấy trang
+              </p>
+            }
+          />
+        </Routes>
+      </div>
+    </ChatProvider>
   );
 }
