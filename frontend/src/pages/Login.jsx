@@ -76,9 +76,12 @@ export default function Login() {
         className="bg-white/95 backdrop-blur-md p-10 rounded-2xl shadow-2xl w-full max-w-md border border-blue-100"
       >
         <div className="flex flex-col items-center mb-6">
-          <div className="bg-blue-600 text-white w-16 h-16 flex items-center justify-center rounded-full shadow-md text-3xl">
-            🚀
-          </div>
+          <img
+            src="/assets/logo/logoSpeedyShip.png"
+            alt="SpeedyShip Logo"
+            className="w-40 h-40 mx-auto mb-6 rounded-full object-cover drop-shadow-2xl border-4 border-white"
+            data-aos="zoom-in"
+          />
           <h1 className="text-3xl font-extrabold text-blue-700 mt-3">
             SpeedyShip
           </h1>
@@ -111,7 +114,7 @@ export default function Login() {
               className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
             />
 
-            {/* ⭐ Nút quên mật khẩu */}
+            {/*  Nút quên mật khẩu */}
             <div className="flex justify-end">
               <span
                 onClick={() => navigate("/forgot-password")}

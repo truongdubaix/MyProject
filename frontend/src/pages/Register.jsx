@@ -137,9 +137,14 @@ export default function Register() {
             initial={{ scale: 0.8, rotate: -15 }}
             animate={{ scale: 1, rotate: 0 }}
             transition={{ duration: 0.5 }}
-            className="bg-blue-600 text-white w-16 h-16 flex items-center justify-center rounded-full shadow-md text-3xl"
+            // className="bg-blue-600 text-white w-16 h-16 flex items-center justify-center rounded-full shadow-md text-3xl"
           >
-            🚀
+            <img
+              src="/assets/logo/logoSpeedyShip.png"
+              alt="SpeedyShip Logo"
+              className="w-40 h-40 mx-auto mb-6 rounded-full object-cover drop-shadow-2xl border-4 border-white"
+              data-aos="zoom-in"
+            />
           </motion.div>
           <h1 className="text-3xl font-extrabold text-blue-700 mt-3">
             SpeedyShip

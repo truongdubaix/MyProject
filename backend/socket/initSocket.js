@@ -1,117 +1,123 @@
-let onlineDrivers = {}; // { driverId: socketId }
-let activeChats = {}; // { customerId: chatId }
+// constants.js
+const SYSTEM_ID = 0; // ID của hệ thống/bot
+const WELCOME_CONTENT =
+  "Xin chào 👋! Chúng tôi là đội ngũ hỗ trợ SpeedyShip. Bạn cần giúp gì hôm nay?";
+
+// Biến lưu trữ tạm thời (RAM)
+let onlineDrivers = {};
+let activeChats = {}; // Map: customerId -> chatId
 
 export default function initSocket(io, pool) {
   io.on("connection", (socket) => {
-    // 🟢 Khi tài xế đăng ký
-    socket.on("registerDriver", (driverId) => {
-      onlineDrivers[driverId] = socket.id;
-    });
+    // console.log(`⚡ Kết nối mới: ${socket.id}`);
 
-    // 🟣 Dispatcher vào hệ thống chat chung
+    // ============================================
+    // 🛡️ 1. DISPATCHER: ĐĂNG KÝ (QUAN TRỌNG)
+    // ============================================
+    // Phải có đoạn này Dispatcher mới nhận được thông báo từ các phòng khác
     socket.on("joinDispatcher", () => {
       socket.join("dispatcherRoom");
+      console.log(`🛡️ Dispatcher ${socket.id} đã vào phòng điều phối`);
     });
 
-    // 🟣 Dispatcher tham gia chat cụ thể
-    socket.on("joinChat", async (chatId) => {
-      const room = `chat_${chatId}`;
-      socket.join(room);
-
-      try {
-        // Kiểm tra nếu chat chưa có tin nhắn nào → gửi lại welcomeMsg
-        const [msgs] = await pool.query(
-          "SELECT COUNT(*) AS total FROM messages WHERE chat_id = ?",
-          [chatId]
-        );
-        if (msgs[0].total === 0) {
-          const welcomeMsg = {
-            chatId,
-            senderId: 0,
-            role: "dispatcher",
-            content:
-              "Xin chào 👋! Chúng tôi là đội ngũ hỗ trợ SpeedyShip. Bạn cần giúp gì hôm nay?",
-            created_at: new Date(),
-          };
-
-          await pool.query(
-            "INSERT INTO messages (chat_id, sender_id, role, content, created_at) VALUES (?, ?, ?, ?, ?)",
-            [
-              chatId,
-              welcomeMsg.senderId,
-              welcomeMsg.role,
-              welcomeMsg.content,
-              welcomeMsg.created_at,
-            ]
-          );
-
-          io.to(room).emit("newMessage", welcomeMsg);
-        }
-      } catch (err) {
-        console.error("❌ Lỗi joinChat:", err.message);
-      }
+    // ============================================
+    // 🚚 2. TÀI XẾ: ĐĂNG KÝ
+    // ============================================
+    socket.on("registerDriver", (driverId) => {
+      onlineDrivers[driverId] = socket.id;
+      console.log(`🛵 Tài xế ${driverId} đã online`);
     });
 
-    // 💬 Khi khách hàng bắt đầu chat
+    // ============================================
+    // 🟢 3. KHÁCH HÀNG: BẮT ĐẦU CHAT
+    // ============================================
     socket.on("startChat", async (customerId) => {
       try {
-        let [rows] = await pool.query(
-          "SELECT * FROM chats WHERE customer_id=? AND status='active'",
+        // 1. Tìm hoặc tạo Chat Session
+        let chatId;
+        const [existingChats] = await pool.query(
+          "SELECT id FROM chats WHERE customer_id = ? AND status = 'active' LIMIT 1",
           [customerId]
         );
 
-        let chatId;
-        if (rows.length > 0) chatId = rows[0].id;
-        else {
-          const [res] = await pool.query(
+        if (existingChats.length > 0) {
+          chatId = existingChats[0].id;
+        } else {
+          const [result] = await pool.query(
             "INSERT INTO chats (customer_id, status) VALUES (?, 'active')",
             [customerId]
           );
-          chatId = res.insertId;
+          chatId = result.insertId;
         }
 
+        // 2. Lưu cache & Join phòng
         activeChats[customerId] = chatId;
         const room = `chat_${chatId}`;
         socket.join(room);
 
-        // 📢 Báo cho Dispatcher có khách hàng mới
+        // 3. Phản hồi ngay lập tức để Client mở khóa UI
+        io.to(socket.id).emit("chatStarted", chatId);
+
+        // 4. Thông báo cho Dispatcher
         io.to("dispatcherRoom").emit("newChat", { chatId, customerId });
 
-        // ⏳ Tạo và gửi tin nhắn chào một cách chắc chắn
+        // 5. XỬ LÝ TIN NHẮN CHÀO MỪNG (LOGIC AN TOÀN)
         setTimeout(async () => {
-          const welcomeMsg = {
-            chatId,
-            senderId: 0,
-            role: "dispatcher",
-            content:
-              "Xin chào 👋! Chúng tôi là đội ngũ hỗ trợ SpeedyShip. Bạn cần giúp gì hôm nay?",
-            created_at: new Date(),
-          };
-
-          await pool.query(
-            "INSERT INTO messages (chat_id, sender_id, role, content, created_at) VALUES (?, ?, ?, ?, ?)",
-            [
-              chatId,
-              welcomeMsg.senderId,
-              welcomeMsg.role,
-              welcomeMsg.content,
-              welcomeMsg.created_at,
-            ]
+          // Kiểm tra lại DB bên trong timeout để chắc chắn chưa có tin nhắn nào
+          const [msgCheck] = await pool.query(
+            "SELECT id FROM messages WHERE chat_id = ? LIMIT 1",
+            [chatId]
           );
 
-          // Gửi đến phòng chat + dispatcher + chính customer
-          io.to(room).emit("newMessage", welcomeMsg);
-          io.to("dispatcherRoom").emit("welcomeMessage", welcomeMsg);
-          io.to(socket.id).emit("chatStarted", chatId);
-        }, 800); // delay nhẹ để đảm bảo dispatcher kịp join room
+          if (msgCheck.length === 0) {
+            const time = new Date();
+            // Insert tin nhắn chào
+            await pool.query(
+              "INSERT INTO messages (chat_id, sender_id, role, content, created_at) VALUES (?, ?, ?, ?, ?)",
+              [chatId, SYSTEM_ID, "dispatcher", WELCOME_CONTENT, time]
+            );
+
+            const welcomeMsg = {
+              chatId,
+              senderId: SYSTEM_ID,
+              role: "dispatcher",
+              content: WELCOME_CONTENT,
+              created_at: time,
+            };
+
+            // Gửi cho khách
+            io.to(room).emit("newMessage", welcomeMsg);
+            // Gửi cho Dispatcher (để hiện preview tin nhắn cuối)
+            io.to("dispatcherRoom").emit("welcomeMessage", welcomeMsg);
+          }
+        }, 500);
       } catch (err) {
-        console.error("❌ Lỗi startChat:", err.message);
+        console.error(
+          `❌ Lỗi startChat [Customer ${customerId}]:`,
+          err.message
+        );
+        socket.emit("error", "Không thể khởi tạo cuộc trò chuyện");
       }
     });
 
-    // ✉️ Khi có tin nhắn mới
+    // ============================================
+    // 🟣 4. DISPATCHER: THAM GIA CHAT
+    // ============================================
+    socket.on("joinChat", async (chatId) => {
+      const room = `chat_${chatId}`;
+      socket.join(room);
+      console.log(`👀 Dispatcher đang xem chat #${chatId}`);
+    });
+
+    // ============================================
+    // ✉️ 5. GỬI TIN NHẮN
+    // ============================================
     socket.on("sendMessage", async (msg) => {
       const { chatId, senderId, role, content } = msg;
+
+      // Validate cơ bản
+      if (!content || !content.trim()) return;
+
       const time = new Date();
       const room = `chat_${chatId}`;
 
@@ -121,45 +127,61 @@ export default function initSocket(io, pool) {
           [chatId, senderId, role, content, time]
         );
 
-        io.to(room).emit("newMessage", {
+        const messageData = {
           chatId,
           senderId,
           role,
           content,
           created_at: time,
-        });
+        };
 
-        // Nếu khách gửi → báo Dispatcher
+        // Gửi cho người trong phòng (Bao gồm cả người gửi)
+        io.to(room).emit("newMessage", messageData);
+
+        // 🔥 QUAN TRỌNG: Nếu khách gửi, báo riêng cho Dispatcher Room
         if (role === "customer") {
-          io.to("dispatcherRoom").emit("customerMessage", {
-            chatId,
-            senderId,
-            role,
-            content,
-            created_at: time,
-          });
+          io.to("dispatcherRoom").emit("customerMessage", messageData);
         }
       } catch (err) {
         console.error("❌ Lỗi sendMessage:", err.message);
       }
     });
 
-    // 🔴 Khi khách hàng kết thúc chat
+    // ============================================
+    // 🔴 6. KẾT THÚC CHAT
+    // ============================================
     socket.on("endChat", async (userId) => {
       try {
+        // Cập nhật DB trước
         await pool.query(
           "UPDATE chats SET status='closed', ended_at=NOW() WHERE customer_id=? AND status='active'",
           [userId]
         );
-        const chatId = activeChats[userId];
-        delete activeChats[userId];
 
-        if (chatId) {
-          io.to(`chat_${chatId}`).emit("chatEnded");
-          io.to("dispatcherRoom").emit("chatEnded", { chatId, userId });
+        // Lấy chatId từ Cache HOẶC DB (Fallback)
+        let chatId = activeChats[userId];
+
+        // Nếu Server bị restart, activeChats sẽ rỗng, cần query lại DB để lấy ID chat vừa đóng
+        if (!chatId) {
+          const [lastClosed] = await pool.query(
+            "SELECT id FROM chats WHERE customer_id=? AND status='closed' ORDER BY ended_at DESC LIMIT 1",
+            [userId]
+          );
+          if (lastClosed.length > 0) chatId = lastClosed[0].id;
         }
 
-        console.log(`💬 Chat của khách hàng #${userId} đã kết thúc.`);
+        if (chatId) {
+          const room = `chat_${chatId}`;
+          // Báo cho 2 bên
+          io.to(room).emit("chatEnded", { chatId });
+          io.to("dispatcherRoom").emit("chatEnded", { chatId, userId });
+
+          // Clean up memory
+          delete activeChats[userId];
+
+          // Cho tất cả rời phòng
+          io.in(room).socketsLeave(room);
+        }
       } catch (err) {
         console.error("❌ Lỗi endChat:", err.message);
       }
@@ -174,7 +196,7 @@ export default function initSocket(io, pool) {
   });
 
   // ======================================================
-  // 🔔 Gửi thông báo cho DRIVER và DISPATCHER
+  // 🔔 Helper Functions (API gọi vào đây)
   // ======================================================
   return {
     sendNotificationToDriver: async (driverId, shipmentId, message) => {
@@ -197,6 +219,7 @@ export default function initSocket(io, pool) {
           "INSERT INTO notifications (receiver_id, target_role, shipment_id, message) VALUES (?, 'dispatcher', ?, ?)",
           [dispatcherId, shipmentId, message]
         );
+        // Gửi vào room chung
         io.to("dispatcherRoom").emit("newDispatcherNotification", {
           shipmentId,
           message,

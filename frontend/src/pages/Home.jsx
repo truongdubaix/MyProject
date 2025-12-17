@@ -12,11 +12,17 @@ import ChatPopupTop from "../components/ChatPopupTop";
 import FloatingActions from "../components/FloatingActions";
 
 import { useChat } from "../hooks/useChat";
+import UtilitySidebar from "../components/UtilitySidebar";
+import AboutSection from "../components/homepage/AboutSection";
+import PartnerCarousel from "../components/homepage/PartnerCarousel";
+import CommitmentSection from "../components/homepage/CommitmentSection";
+import ServicesSection from "../components/homepage/ServicesSection";
+import PricingAboutSection from "../components/homepage/PricingAboutSection";
+import OrderProcessSection from "../components/homepage/OrderProcessSection";
 
 export default function Home() {
   const navigate = useNavigate();
 
-  // ⭐ LẤY GLOBAL popup state từ context
   const {
     aiOpen,
     supportOpen,
@@ -28,11 +34,26 @@ export default function Home() {
 
   return (
     <>
+      {/* <UtilitySidebar /> */}
+      {/* Slide 1,2,3 */}
       <HeroBanner />
 
-      <WhySection />
+      <AboutSection />
 
-      <ServicePlans onCreate={() => navigate("/customer/create")} />
+      <PartnerCarousel />
+
+      <ServicesSection />
+
+      <OrderProcessSection />
+
+      <PricingAboutSection />
+
+      <CommitmentSection />
+
+      {/* Tại sao nên chọn SpeedyShip? */}
+      {/* <WhySection /> */}
+      {/*  Chọn gói dịch vụ phù hợp */}
+      {/* <ServicePlans onCreate={() => navigate("/customer/create")} /> */}
 
       {/* mở AI */}
       <RealtimeSection onChatAI={openAIChat} />

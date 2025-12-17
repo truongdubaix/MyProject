@@ -1,4 +1,4 @@
-import { Routes, Route } from "react-router-dom";
+import { Routes, Route, useLocation } from "react-router-dom";
 import Navbar from "./components/Navbar.jsx";
 import Footer from "./components/Footer.jsx";
 import ProtectedRoute from "./components/ProtectedRoute.jsx";
@@ -62,11 +62,20 @@ import CustomerFeedback from "./pages/customer/CustomerFeedback.jsx";
 //import CustomerTrackDetail from "./pages/customer/CustomerTrackDetail.jsx";
 
 import { ChatProvider } from "./context/ChatContext";
+import ChatLayout from "./components/ChatLayout.jsx";
 
 export default function App() {
+  // 🟢 Logic để ẩn chat ở các trang quản trị
+  const location = useLocation();
+  const hiddenPaths = ["/admin", "/dispatcher", "/driver"];
+  // Nếu đường dẫn hiện tại bắt đầu bằng các từ khóa trên -> Ẩn chat
+  const shouldShowChat = !hiddenPaths.some((path) =>
+    location.pathname.startsWith(path)
+  );
+
   return (
     <ChatProvider>
-      <div className="bg-gray-50 text-gray-800 min-h-screen flex flex-col">
+      <div className="bg-gray-50 text-gray-800 min-h-screen flex flex-col relative">
         <Routes>
           {/* 🌍 Public routes */}
           {[
@@ -172,6 +181,7 @@ export default function App() {
             <Route path="payment-success" element={<PaymentSuccess />} />
             <Route path="payment-fail" element={<PaymentFail />} />
             <Route path="feedback" element={<CustomerFeedback />} />
+
             {/* <Route
             path="/customer/track/:code"
             element={<CustomerTrackDetail />}
@@ -189,6 +199,7 @@ export default function App() {
           />
         </Routes>
       </div>
+      {shouldShowChat && <ChatLayout />}
     </ChatProvider>
   );
 }

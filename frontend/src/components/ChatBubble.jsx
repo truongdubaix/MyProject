@@ -1,170 +1,346 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import io from "socket.io-client";
-
-const socket = io("http://localhost:5000");
+import { motion, AnimatePresence } from "framer-motion";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import {
+  faMinus,
+  faExpand,
+  faTimes,
+  faPaperPlane,
+  faUserTie,
+  faInfoCircle,
+} from "@fortawesome/free-solid-svg-icons";
 
 export default function ChatBubble({ onClose }) {
   const [collapsed, setCollapsed] = useState(false);
   const [chatId, setChatId] = useState(null);
-  const [messages, setMessages] = useState([]);
+
+  // Thêm state để quản lý Toast thông báo
+  const [showToast, setShowToast] = useState(false);
+
+  // Tin nhắn ban đầu
+  const [messages, setMessages] = useState([
+    {
+      role: "system",
+      content:
+        "Xin chào! 👋 Cảm ơn bạn đã liên hệ SpeedyShip. Chúng tôi có thể giúp gì cho bạn hôm nay?",
+    },
+  ]);
+
   const [input, setInput] = useState("");
-  const [ready, setReady] = useState(false);
+  const [ready, setReady] = useState(false); // Trạng thái kết nối
+  const messagesEndRef = useRef(null);
+
+  // Ref để giữ instance của socket
+  const socketRef = useRef(null);
 
   const userId = localStorage.getItem("userId");
   const role = localStorage.getItem("role");
 
-  // 🟢 Auto start chat khi mở component
+  // Auto scroll
+  useEffect(() => {
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  }, [messages, collapsed]);
+
+  // 🟢 LOGIC KẾT NỐI SOCKET
   useEffect(() => {
     if (!userId || role !== "customer") {
-      alert("⚠ Vui lòng đăng nhập bằng tài khoản khách hàng!");
+      alert("⚠ Vui lòng đăng nhập để chat!");
       onClose();
       return;
     }
 
-    socket.emit("startChat", userId);
+    if (!socketRef.current) {
+      console.log("🔌 Client: Đang khởi tạo Socket...");
+      socketRef.current = io("http://localhost:5000", {
+        transports: ["websocket"],
+        reconnectionAttempts: 5,
+      });
+    }
 
-    socket.on("chatStarted", (id) => {
+    const socket = socketRef.current;
+
+    const onChatStarted = (id) => {
+      console.log("✅ Client: Chat Started! ID:", id);
       setChatId(id);
       setReady(true);
       socket.emit("joinChat", id);
-    });
 
-    socket.on("newMessage", (msg) => {
-      setMessages((prev) => [...prev, msg]);
-    });
+      setMessages((prev) => {
+        if (
+          prev.length > 0 &&
+          prev[prev.length - 1].content.includes("kết nối")
+        ) {
+          return prev;
+        }
+        return [
+          ...prev,
+          { role: "system", content: "Đã kết nối với nhân viên hỗ trợ." },
+        ];
+      });
+    };
 
-    socket.on("chatEnded", () => {
-      alert("💬 Cuộc trò chuyện đã kết thúc");
-      setCollapsed(false);
-      setChatId(null);
-      setMessages([]);
+    const onNewMessage = (msg) => {
+      console.log("📩 New Message:", msg);
+      setMessages((prev) => {
+        const exists = prev.some(
+          (m) =>
+            m.content === msg.content &&
+            m.role === msg.role &&
+            (Math.abs(new Date(m.created_at) - new Date(msg.created_at)) <
+              2000 ||
+              !m.created_at)
+        );
+        if (exists) return prev;
+        return [...prev, msg];
+      });
+    };
+
+    // 🔥 SỬA ĐỔI QUAN TRỌNG: Thay alert bằng Toast
+    const onChatEnded = () => {
+      // 1. Hiển thị Toast
+      setShowToast(true);
+      // 2. Khóa chat
       setReady(false);
-      onClose();
+      // 3. Đảm bảo cửa sổ đang mở để người dùng thấy thông báo
+      setCollapsed(false);
+
+      // 4. Đợi 4 giây rồi mới đóng hẳn
+      setTimeout(() => {
+        onClose();
+      }, 4000);
+    };
+
+    const onConnectError = (err) => {
+      console.error("❌ Socket Error:", err);
+    };
+
+    socket.on("connect", () => {
+      console.log("🌐 Socket Connected:", socket.id);
+      socket.emit("startChat", userId);
     });
+
+    socket.on("chatStarted", onChatStarted);
+    socket.on("newMessage", onNewMessage);
+    socket.on("chatEnded", onChatEnded);
+    socket.on("connect_error", onConnectError);
+
+    if (socket.connected) {
+      socket.emit("startChat", userId);
+    }
 
     return () => {
-      socket.off("chatStarted");
-      socket.off("newMessage");
-      socket.off("chatEnded");
+      console.log("🛑 Client: Cleanup Socket...");
+      socket.off("connect");
+      socket.off("chatStarted", onChatStarted);
+      socket.off("newMessage", onNewMessage);
+      socket.off("chatEnded", onChatEnded);
+      socket.off("connect_error", onConnectError);
+      socket.disconnect();
+      socketRef.current = null;
     };
-  }, []);
+  }, [userId, role, onClose]);
 
+  // 🟢 HÀM GỬI TIN NHẮN
   const sendMessage = () => {
-    if (!ready || !chatId || !input.trim()) return;
+    if (!input.trim()) return;
 
-    socket.emit("sendMessage", {
-      chatId,
-      senderId: userId,
+    const tempMsg = {
       role: "customer",
-      content: input,
-    });
+      content: input.trim(),
+      created_at: new Date().toISOString(),
+    };
+    setMessages((prev) => [...prev, tempMsg]);
 
+    if (socketRef.current && chatId) {
+      socketRef.current.emit("sendMessage", {
+        chatId,
+        senderId: userId,
+        role: "customer",
+        content: input.trim(),
+      });
+    }
     setInput("");
   };
 
   const endChat = () => {
-    if (chatId) socket.emit("endChat", userId);
+    if (socketRef.current && chatId) {
+      socketRef.current.emit("endChat", userId);
+    }
     onClose();
   };
 
-  // ========== EFFECT SIZE ==========
-  const baseSize = "w-[420px] h-[520px]";
-  const collapsedSize = "w-[420px] h-[50px]";
-  const finalSize = collapsed ? collapsedSize : baseSize;
-
   return (
-    <div
-      className={`fixed bottom-6 right-[110px] ${finalSize} z-[9998] animate-zoom-pop`}
+    <motion.div
+      initial={{ opacity: 0, scale: 0.9 }}
+      animate={{
+        opacity: 1,
+        scale: 1,
+        width: 400,
+        height: collapsed ? 50 : 600,
+      }}
+      exit={{ opacity: 0, scale: 0.9 }}
+      transition={{ type: "spring", stiffness: 300, damping: 30 }}
+      className="bg-white rounded-t-xl shadow-2xl flex flex-col overflow-hidden border border-gray-200 font-sans relative" // Thêm relative để định vị Toast
     >
-      <div className="w-full h-full bg-white shadow-2xl rounded-2xl border flex flex-col overflow-hidden">
-        {/* HEADER */}
-        <div className="bg-blue-600 text-white px-3 py-2 flex justify-between items-center rounded-t-2xl">
-          <span className="font-semibold text-sm">💬 Hỗ trợ khách hàng</span>
-          <div className="flex items-center gap-3">
-            {/* Thu gọn */}
-            {collapsed ? (
-              <svg
-                onClick={() => setCollapsed(false)}
-                className="cursor-pointer hover:text-gray-200"
-                width="16"
-                height="16"
-                fill="currentColor"
-              >
-                <path d="M2 6h12v4H2z" />
-              </svg>
-            ) : (
-              <svg
-                onClick={() => setCollapsed(true)}
-                className="cursor-pointer hover:text-gray-200"
-                width="16"
-                height="16"
-                fill="currentColor"
-              >
-                <rect x="2" y="7" width="12" height="2" />
-              </svg>
-            )}
+      {/* --- 🔥 TOAST THÔNG BÁO KẾT THÚC --- */}
+      <AnimatePresence>
+        {showToast && (
+          <motion.div
+            initial={{ opacity: 0, y: -20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0 }}
+            className="absolute top-16 left-0 right-0 mx-auto w-max z-50 flex items-center gap-2 bg-black/80 text-white px-4 py-2 rounded-full text-xs shadow-lg backdrop-blur-sm"
+          >
+            <FontAwesomeIcon icon={faInfoCircle} className="text-yellow-400" />
+            <span>Cuộc trò chuyện đã kết thúc</span>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
-            {/* Đóng */}
-            <svg
-              onClick={endChat}
-              className="cursor-pointer hover:text-gray-200"
-              width="18"
-              height="18"
-              fill="currentColor"
-            >
-              <path d="M2 2l12 12M14 2L2 14" stroke="white" strokeWidth="2" />
-            </svg>
+      {/* HEADER */}
+      <div
+        className="bg-gradient-to-r from-orange-600 to-blue-500 text-white px-4 py-3 flex justify-between items-center cursor-pointer select-none"
+        onClick={() => setCollapsed(!collapsed)}
+      >
+        <div className="flex items-center gap-3">
+          <div className="w-8 h-8 rounded-full bg-white/20 flex items-center justify-center relative">
+            <div
+              className={`absolute bottom-0 right-0 w-2.5 h-2.5 border-2 border-blue-600 rounded-full ${
+                ready ? "bg-green-400" : "bg-yellow-400"
+              }`}
+            ></div>
+            <FontAwesomeIcon icon={faUserTie} />
+          </div>
+          <div>
+            <h3 className="font-bold text-base leading-tight">
+              HỖ TRỢ TRỰC TUYẾN
+            </h3>
+            {!collapsed && (
+              <p className="text-[11px] text-blue-100 opacity-90">
+                {ready ? "Đang trực tuyến" : "Đang kết nối..."}
+              </p>
+            )}
           </div>
         </div>
 
-        {/* BODY */}
-        {!collapsed && (
-          <>
-            <div className="flex-1 p-3 overflow-y-auto bg-gray-50">
-              {messages.map((m, i) => (
-                <div
-                  key={i}
-                  className={`mb-2 flex ${
-                    m.role === "customer" ? "justify-end" : "justify-start"
-                  } msg-anim`}
-                >
-                  <div
-                    className={`px-3 py-2 rounded-lg max-w-[70%] text-sm ${
-                      m.role === "customer"
-                        ? "bg-blue-600 text-white"
-                        : "bg-gray-200 text-gray-800"
-                    }`}
-                  >
-                    {m.content}
-                  </div>
-                </div>
-              ))}
+        <div className="flex items-center gap-3 text-white/80">
+          <FontAwesomeIcon
+            icon={collapsed ? faExpand : faMinus}
+            className="hover:text-white transition-colors text-sm"
+            title={collapsed ? "Mở rộng" : "Thu nhỏ"}
+          />
+          <FontAwesomeIcon
+            icon={faTimes}
+            onClick={(e) => {
+              e.stopPropagation();
+              endChat();
+            }}
+            className="hover:text-red-200 transition-colors ml-1 text-sm"
+            title="Kết thúc chat"
+          />
+        </div>
+      </div>
+
+      {/* BODY */}
+      {!collapsed && (
+        <>
+          <div className="flex-1 p-4 overflow-y-auto bg-slate-50 scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-transparent">
+            <div className="text-center mb-6">
+              <p className="text-[10px] text-gray-400 uppercase font-semibold">
+                Cuộc trò chuyện được bảo mật
+              </p>
             </div>
 
-            <div className="p-2 border-t flex">
+            <AnimatePresence>
+              {messages.map((m, i) => (
+                <motion.div
+                  key={i}
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  className={`flex w-full mb-4 ${
+                    m.role === "customer"
+                      ? "justify-end"
+                      : m.role === "system"
+                      ? "justify-center"
+                      : "justify-start"
+                  }`}
+                >
+                  {m.role !== "customer" && m.role !== "system" && (
+                    <div className="w-8 h-8 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center mr-2 mt-1 flex-shrink-0 text-xs border border-blue-200">
+                      <FontAwesomeIcon icon={faUserTie} />
+                    </div>
+                  )}
+
+                  {m.role === "system" ? (
+                    <div className="max-w-[85%] text-center">
+                      <span className="text-[10px] text-gray-500 bg-gray-100 px-3 py-1 rounded-full inline-block border border-gray-200">
+                        {m.content}
+                      </span>
+                    </div>
+                  ) : (
+                    <div
+                      className={`p-3 rounded-2xl text-sm max-w-[75%] leading-relaxed shadow-sm ${
+                        m.role === "customer"
+                          ? "bg-blue-600 text-white rounded-br-none"
+                          : "bg-white text-gray-800 border border-gray-100 rounded-bl-none"
+                      }`}
+                    >
+                      {m.content}
+                    </div>
+                  )}
+                </motion.div>
+              ))}
+            </AnimatePresence>
+            <div ref={messagesEndRef} />
+          </div>
+
+          {/* INPUT */}
+          <div className="p-3 bg-white border-t border-gray-100 relative z-20">
+            <div
+              className={`relative flex items-center bg-gray-100 rounded-full px-4 py-2 border border-transparent transition-all duration-300 ${
+                ready
+                  ? "focus-within:bg-white focus-within:ring-1 focus-within:ring-blue-500"
+                  : "opacity-70 cursor-not-allowed"
+              }`}
+            >
               <input
+                className="flex-1 bg-transparent border-none outline-none text-sm text-gray-700 placeholder-gray-400 disabled:cursor-not-allowed"
+                placeholder={ready ? "Nhập tin nhắn..." : "Đang kết nối..."}
                 value={input}
                 onChange={(e) => setInput(e.target.value)}
+                onKeyDown={(e) => e.key === "Enter" && sendMessage()}
                 disabled={!ready}
-                placeholder={ready ? "Nhập tin nhắn..." : "⏳ Đang kết nối..."}
-                className="flex-1 border rounded-lg p-2 text-sm outline-none"
+                autoFocus
               />
-
               <button
                 onClick={sendMessage}
-                disabled={!ready}
-                className={`ml-2 px-4 rounded-lg ${
-                  ready
+                disabled={!ready || !input.trim()}
+                className={`ml-2 w-8 h-8 shrink-0 flex items-center justify-center rounded-full transition-all duration-300 shadow-sm ${
+                  ready && input.trim()
                     ? "bg-blue-600 text-white hover:bg-blue-700"
-                    : "bg-gray-400 text-gray-200"
+                    : "bg-gray-300 text-gray-500 cursor-not-allowed"
                 }`}
               >
-                ➤
+                <FontAwesomeIcon
+                  icon={faPaperPlane}
+                  className="text-xs pr-[2px]"
+                />
               </button>
             </div>
-          </>
-        )}
-      </div>
-    </div>
+            <div className="text-center mt-2">
+              <p className="text-[10px] text-gray-400 flex items-center justify-center gap-1">
+                <span
+                  className={`w-1.5 h-1.5 rounded-full ${
+                    ready ? "bg-green-500" : "bg-yellow-500 animate-pulse"
+                  }`}
+                ></span>
+                {ready ? "Kết nối ổn định" : "Đang kết nối server..."}
+              </p>
+            </div>
+          </div>
+        </>
+      )}
+    </motion.div>
   );
 }

@@ -35,7 +35,7 @@ const iconDelivery = new L.Icon({
   iconAnchor: [20, 40],
 });
 
-// 🗺️ Tự động zoom map
+// 🗺️ Auto zoom
 function FitBounds({ points }) {
   const map = useMap();
   useEffect(() => {
@@ -49,79 +49,81 @@ export default function Tracking() {
   const initialCode = searchParams.get("code") || "";
 
   const [code, setCode] = useState(initialCode);
-  const [last4, setLast4] = useState(""); // ✅ cho khách vãng lai
+  const [last4, setLast4] = useState(""); // public
   const [shipment, setShipment] = useState(null);
+
   const [error, setError] = useState("");
+  const [success, setSuccess] = useState("");
   const [loading, setLoading] = useState(false);
+
   const [driverPos, setDriverPos] = useState(null);
 
+  // init animation
   useEffect(() => {
     AOS.init({ duration: 800, once: true });
   }, []);
 
+  // auto-search khi có tham số từ Home
   useEffect(() => {
     if (initialCode) handleSearch();
   }, [initialCode]);
 
-  // 🔍 Tra cứu đơn hàng
-  // 🔍 Tra cứu đơn hàng
-  // Thêm state mới
-  const [success, setSuccess] = useState("");
-
+  // ==========================
+  // ⭐⭐ HÀM TRA CỨU CHUẨN ⭐⭐
+  // ==========================
   const handleSearch = async () => {
-    setSuccess(""); // reset thông báo thành công
+    setError("");
+    setSuccess("");
+    setShipment(null);
 
-    // ❌ Không nhập mã vận đơn
     if (!code.trim()) {
       setError("⚠️ Vui lòng nhập mã vận đơn!");
-      setShipment(null);
       return;
     }
 
-    const customerId = localStorage.getItem("customer_id");
-
-    // ❌ Khách vãng lai nhưng không nhập 4 số cuối
-    if (!customerId) {
-      if (!last4 || last4.length !== 4) {
-        setError("⚠️ Vui lòng nhập 4 số cuối SĐT người nhận!");
-        setShipment(null);
-        return;
-      }
-    }
+    const role = localStorage.getItem("role");
+    const isCustomer = role === "customer";
 
     setLoading(true);
-    setError("");
-    setSuccess("");
 
     try {
-      let url = `/customers/track/${code.trim()}`;
+      let res;
 
-      if (customerId) {
-        url += `?customer_id=${customerId}`;
-      } else {
-        url += `?last4=${last4}`;
+      // ── 🔐 CUSTOMER LOGIN ──
+      if (isCustomer) {
+        res = await API.get(`/customer/track/${code.trim()}`);
       }
 
-      const res = await API.get(url);
+      // ── 🌍 GUEST (PUBLIC) ──
+      else {
+        if (!last4 || last4.length !== 4) {
+          setError("⚠️ Nhập 4 số cuối SĐT người nhận!");
+          return;
+        }
 
-      // ❌ Nếu BE trả về null hoặc rỗng → mã không hợp lệ
-      if (!res.data || Object.keys(res.data).length === 0) {
-        setError("❌ Mã vận đơn không hợp lệ!");
-        setShipment(null);
+        res = await API.get(
+          `/tracking?code=${code.trim()}&last4=${last4.trim()}`
+        );
+      }
+
+      if (!res.data) {
+        setError("❌ Không tìm thấy đơn hàng!");
         return;
       }
 
-      // ⭐ Thành công
       setShipment(res.data);
-      setSuccess("✅ Tra cứu thành công!");
+      setSuccess("🎉 Tra cứu thành công!");
     } catch (err) {
-      setError("❌ Mã vận đơn không hợp lệ!");
-      setShipment(null);
+      console.log(err);
+      setError("❌ Mã đơn không hợp lệ hoặc bạn không có quyền!");
     } finally {
       setLoading(false);
     }
   };
 
+  // ==========================
+  // Map data
+  // ==========================
   const pickup =
     shipment?.pickup_lat && shipment?.pickup_lng
       ? [Number(shipment.pickup_lat), Number(shipment.pickup_lng)]
@@ -130,13 +132,14 @@ export default function Tracking() {
   const delivery =
     shipment?.delivery_lat && shipment?.delivery_lng
       ? [Number(shipment.delivery_lat), Number(shipment.delivery_lng)]
-      : [10.7769, 106.7009]; // TP.HCM
+      : [10.7769, 106.7009]; // HCM
 
   const routePoints = [pickup, delivery];
 
-  // 🚛 Giả lập tài xế di chuyển chậm mượt
+  // render tài xế chạy giả lập
   useEffect(() => {
     if (!shipment) return;
+
     let progress = 0;
     const interval = setInterval(() => {
       progress += 0.002;
@@ -145,6 +148,7 @@ export default function Tracking() {
       const lng = pickup[1] + (delivery[1] - pickup[1]) * progress;
       setDriverPos([lat, lng]);
     }, 600);
+
     return () => clearInterval(interval);
   }, [shipment]);
 
@@ -166,59 +170,40 @@ export default function Tracking() {
           <input
             value={code}
             onChange={(e) => setCode(e.target.value)}
-            type="text"
-            placeholder="Nhập mã vận đơn (VD: SP123456)"
+            placeholder="VD: SP123456"
             className="w-full md:w-3/4 p-3 rounded text-gray-700 focus:outline-none shadow"
           />
 
-          {/* ✅ Chỉ hiện khi KHÔNG đăng nhập */}
-          {!localStorage.getItem("customer_id") && (
+          {/* public only */}
+          {!localStorage.getItem("role") && (
             <input
               value={last4}
-              onChange={(e) => {
-                const value = e.target.value.replace(/\D/g, ""); // chỉ cho nhập số
-                setLast4(value); // ✅ đúng state
-              }}
-              type="text"
+              onChange={(e) => setLast4(e.target.value.replace(/\D/g, ""))}
               maxLength={4}
               placeholder="4 số cuối SĐT"
-              className="w-full md:w-1/2 p-3 rounded text-gray-700 focus:outline-none shadow
-               appearance-none
-               [&::-webkit-inner-spin-button]:hidden
-               [&::-webkit-outer-spin-button]:hidden"
+              className="w-full md:w-1/2 p-3 rounded text-gray-700 focus:outline-none shadow"
             />
           )}
+
           <button
             onClick={handleSearch}
             disabled={loading}
-            className={`
-    px-6 py-3 rounded-lg font-semibold text-white
-    whitespace-nowrap           // ✅ Không cho xuống dòng
-    flex items-center justify-center
-    transition-all duration-300
-    ${
-      loading
-        ? "bg-gray-400 cursor-not-allowed"
-        : "bg-orange-500 hover:bg-orange-600"
-    }
-  `}
+            className={`px-6 py-3 rounded-lg font-semibold text-white
+              ${loading ? "bg-gray-400" : "bg-orange-500 hover:bg-orange-600"}`}
           >
             {loading ? "Đang tra cứu..." : "Tra cứu"}
           </button>
         </div>
 
-        {error && (
-          <p className="mt-4 text-red-200 font-medium animate-pulse">{error}</p>
+        {error && <p className="mt-4 text-red-200 font-medium">{error}</p>}
+        {success && (
+          <p className="mt-4 text-green-200 font-medium">{success}</p>
         )}
       </section>
 
-      {/* Kết quả tra cứu */}
+      {/* Kết quả */}
       {shipment && (
-        <section
-          className="max-w-5xl mx-auto py-16 px-6"
-          data-aos="fade-up"
-          data-aos-delay="100"
-        >
+        <section className="max-w-5xl mx-auto py-16 px-6" data-aos="fade-up">
           <div className="bg-white rounded-lg shadow-lg p-6 mb-10">
             <h3 className="text-2xl font-bold text-gray-700 mb-4">
               📦 Thông tin đơn hàng
@@ -240,10 +225,7 @@ export default function Tracking() {
               </div>
               <div>
                 <p>
-                  <b>Trạng thái:</b>{" "}
-                  <span className="text-blue-600 font-semibold">
-                    {shipment.status}
-                  </span>
+                  <b>Trạng thái:</b> {shipment.status}
                 </p>
                 <p>
                   <b>COD:</b> ₫{shipment.cod_amount?.toLocaleString("vi-VN")}
@@ -256,11 +238,7 @@ export default function Tracking() {
             </div>
           </div>
 
-          {/* Bản đồ */}
-          <div
-            className="bg-white rounded-lg shadow-lg p-6 mb-10"
-            data-aos="fade-up"
-          >
+          <div className="bg-white rounded-lg shadow-lg p-6">
             <h3 className="text-2xl font-bold text-gray-700 mb-4">
               🗺️ Bản đồ hành trình
             </h3>
