@@ -1,186 +1,214 @@
+import React, { useEffect } from "react";
+import { Link } from "react-router-dom";
+import {
+  FaTruckMoving,
+  FaWarehouse,
+  FaBolt,
+  FaShieldAlt,
+  FaUserSecret,
+  FaArrowRight,
+  FaPhoneAlt,
+} from "react-icons/fa";
 import AOS from "aos";
 import "aos/dist/aos.css";
-import { useEffect } from "react";
 
-export default function About() {
+export default function Service() {
   useEffect(() => {
     AOS.init({ duration: 800, once: true });
+    window.scrollTo(0, 0);
   }, []);
 
+  // Danh sách dịch vụ từ yêu cầu của bạn
+  const services = [
+    {
+      id: "01",
+      title: "Vận chuyển hàng hóa",
+      desc: "Cam kết đúng giờ, an toàn và tối ưu chi phí cho mọi doanh nghiệp. Mạng lưới phủ sóng 63 tỉnh thành.",
+      icon: <FaTruckMoving />,
+      link: "/services/road", // Link đến trang Đường bộ
+      color: "blue",
+    },
+    {
+      id: "02",
+      title: "Lưu trữ kho bãi",
+      desc: "Hệ thống kho bãi rộng rãi, lưu trữ hàng hóa thông minh và cẩn trọng với công nghệ WMS hiện đại.",
+      icon: <FaWarehouse />,
+      link: "/services/warehouse", // Link đến trang Kho bãi
+      color: "orange",
+    },
+    {
+      id: "03",
+      title: "Giao hàng hỏa tốc",
+      desc: "Giải pháp vận chuyển nội thành siêu tốc độ. Cam kết giao nhận đúng hẹn từng phút cho đơn hàng gấp.",
+      icon: <FaBolt />,
+      link: "/services/express", // Link đến trang Hỏa tốc
+      color: "red",
+    },
+    {
+      id: "04",
+      title: "Bảo hiểm hàng hóa",
+      desc: "Bảo vệ 100% giá trị hàng hóa trước mọi rủi ro mất mát, hư hỏng trong quá trình vận chuyển.",
+      icon: <FaShieldAlt />,
+      link: "/policy/claims", // Link đến trang Khiếu nại/Bồi thường
+      color: "green",
+    },
+    {
+      id: "05",
+      title: "Chính sách bảo mật",
+      desc: "Cam kết của SpeedyShip về việc bảo vệ dữ liệu và quyền riêng tư của khách hàng tuyệt đối.",
+      icon: <FaUserSecret />,
+      link: "/policy/privacy", // Link đến trang Bảo mật
+      color: "slate",
+    },
+  ];
+
   return (
-    <>
-      {/* Hero */}
-      <section className="pt-28 pb-16 bg-gradient-to-r from-blue-600 to-sky-500 text-white text-center">
-        <img
-          src="/assets/logo/logoSpeedyShip.png"
-          alt="SpeedyShip Logo"
-          className="w-40 h-40 mx-auto mb-6 rounded-full object-cover drop-shadow-2xl border-4 border-white"
-          data-aos="zoom-in"
-        />
+    <div className="font-sans bg-slate-50 text-slate-700">
+      {/* 1. HERO SECTION */}
+      <section className="relative py-24 bg-[#113e48] text-white overflow-hidden">
+        {/* Background Pattern */}
+        <div
+          className="absolute inset-0 opacity-10"
+          style={{
+            backgroundImage: "radial-gradient(#ffffff 1px, transparent 1px)",
+            backgroundSize: "30px 30px",
+          }}
+        ></div>
 
-        <h2 className="text-4xl font-extrabold mb-4" data-aos="fade-down">
-          Về chúng tôi
-        </h2>
-        <p
-          className="text-blue-100 max-w-2xl mx-auto text-lg"
-          data-aos="fade-up"
-        >
-          SpeedyShip là nền tảng giao hàng thông minh có trụ sở tại{" "}
-          <strong>Đà Nẵng</strong>, kết nối khách hàng, tài xế và doanh nghiệp
-          trong một hệ sinh thái vận chuyển nhanh, an toàn, minh bạch.
-        </p>
-      </section>
-
-      {/* Vision & Mission */}
-      <section className="max-w-6xl mx-auto py-20 px-6 grid md:grid-cols-2 gap-10 items-center">
-        <div className="relative" data-aos="fade-right">
-          <img
-            src="https://sp-ao.shortpixel.ai/client/to_avif,q_lossless,ret_img,w_1024/https://phulinh.vn/wp-content/uploads/2020/07/kh-1024x683.jpg"
-            alt="SpeedyShip logistics Da Nang"
-            className="rounded-lg shadow-lg hover:scale-[1.02] transition-transform duration-300"
-          />
-          <img
-            src="/assets/logo/logoSpeedyShip.png"
-            alt="SpeedyShip Logo"
-            className="absolute bottom-4 right-4 w-14 h-14 rounded-full bg-white p-1 shadow-md"
-          />
-        </div>
-
-        <div data-aos="fade-left">
-          <h3 className="text-3xl font-bold mb-4 text-gray-800">
-            💡 Tầm nhìn & Sứ mệnh
-          </h3>
-
-          <p className="text-gray-600 mb-4 leading-relaxed">
-            Với trung tâm hoạt động tại <strong>TP. Đà Nẵng</strong> – thành phố
-            năng động nhất miền Trung, SpeedyShip hướng đến mục tiêu trở thành
-            nền tảng logistics hàng đầu Việt Nam.
-          </p>
-          <p className="text-gray-600 mb-6 leading-relaxed">
-            Ứng dụng công nghệ GPS, AI và Cloud để tối ưu vận hành, giúp doanh
-            nghiệp tiết kiệm chi phí, đồng thời mang đến trải nghiệm giao hàng
-            nhanh chóng, minh bạch và an toàn cho người dùng.
-          </p>
-          <a
-            href="/services"
-            className="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition font-semibold"
+        <div className="relative z-10 max-w-7xl mx-auto px-6 text-center">
+          <span
+            className="inline-block py-1.5 px-4 rounded-full bg-white/10 border border-white/20 text-orange-400 text-sm font-bold mb-6 uppercase tracking-wider backdrop-blur-md"
+            data-aos="fade-down"
           >
-            Khám phá dịch vụ
-          </a>
+            Hệ sinh thái Logistics
+          </span>
+          <h1
+            className="text-4xl md:text-6xl font-extrabold mb-6 leading-tight"
+            data-aos="fade-up"
+          >
+            Giải Pháp Vận Chuyển <br />
+            <span className="text-transparent bg-clip-text bg-gradient-to-r from-orange-400 to-yellow-300">
+              Toàn Diện & Hiệu Quả
+            </span>
+          </h1>
+          <p
+            className="text-lg md:text-xl text-blue-100 max-w-3xl mx-auto mb-10 leading-relaxed"
+            data-aos="fade-up"
+            data-aos-delay="100"
+          >
+            SpeedyShip cung cấp đa dạng các dịch vụ từ vận chuyển, kho bãi đến
+            bảo hiểm hàng hóa, giúp doanh nghiệp tối ưu hóa chuỗi cung ứng.
+          </p>
         </div>
       </section>
 
-      {/* Core Values */}
-      <section className="bg-blue-50 py-20">
-        <h3
-          className="text-3xl font-bold text-center mb-12 text-gray-800"
-          data-aos="fade-up"
-        >
-          🌟 Giá trị cốt lõi
-        </h3>
-
-        <div className="max-w-6xl mx-auto grid md:grid-cols-3 gap-8 px-6 text-center">
-          {[
-            {
-              icon: "⚡",
-              title: "Tốc độ",
-              desc: "Tối ưu thời gian xử lý và giao hàng với công nghệ hiện đại.",
-            },
-            {
-              icon: "💬",
-              title: "Minh bạch",
-              desc: "Cập nhật trạng thái và chi phí rõ ràng, dễ theo dõi từng bước.",
-            },
-            {
-              icon: "🤝",
-              title: "Tin cậy",
-              desc: "Đội ngũ tận tâm, đảm bảo hàng hóa đến đúng nơi, đúng thời gian.",
-            },
-          ].map((v, i) => (
+      {/* 2. SERVICES GRID */}
+      <section className="py-20 px-6 max-w-7xl mx-auto -mt-20 relative z-20">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+          {services.map((item, index) => (
             <div
-              key={i}
-              className="bg-white p-8 rounded-xl shadow-lg hover:shadow-2xl transition duration-300"
-              data-aos="zoom-in"
-              data-aos-delay={i * 150}
+              key={index}
+              className="bg-white rounded-3xl p-8 shadow-xl border border-gray-100 hover:shadow-2xl hover:-translate-y-2 transition-all duration-300 group flex flex-col h-full"
+              data-aos="fade-up"
+              data-aos-delay={index * 100}
             >
-              <div className="text-4xl mb-3">{v.icon}</div>
-              <h4 className="font-semibold text-blue-600 text-xl mb-2">
-                {v.title}
-              </h4>
-              <p className="text-gray-600">{v.desc}</p>
+              {/* Header Card */}
+              <div className="flex items-center justify-between mb-6">
+                <div
+                  className={`w-14 h-14 rounded-2xl flex items-center justify-center text-3xl transition-colors duration-300
+                  ${
+                    item.color === "blue"
+                      ? "bg-blue-50 text-blue-600 group-hover:bg-blue-600 group-hover:text-white"
+                      : ""
+                  }
+                  ${
+                    item.color === "orange"
+                      ? "bg-orange-50 text-orange-600 group-hover:bg-orange-600 group-hover:text-white"
+                      : ""
+                  }
+                  ${
+                    item.color === "red"
+                      ? "bg-red-50 text-red-600 group-hover:bg-red-600 group-hover:text-white"
+                      : ""
+                  }
+                  ${
+                    item.color === "green"
+                      ? "bg-green-50 text-green-600 group-hover:bg-green-600 group-hover:text-white"
+                      : ""
+                  }
+                  ${
+                    item.color === "slate"
+                      ? "bg-slate-100 text-slate-600 group-hover:bg-slate-600 group-hover:text-white"
+                      : ""
+                  }
+                `}
+                >
+                  {item.icon}
+                </div>
+                <span className="text-4xl font-black text-gray-100 select-none group-hover:text-gray-200 transition-colors">
+                  {item.id}
+                </span>
+              </div>
+
+              {/* Content */}
+              <h3 className="text-xl font-bold text-[#113e48] mb-3 group-hover:text-orange-600 transition-colors">
+                {item.title}
+              </h3>
+              <p className="text-gray-500 text-sm leading-relaxed mb-6 flex-grow">
+                {item.desc}
+              </p>
+
+              {/* Button */}
+              <Link
+                to={item.link}
+                className="inline-flex items-center gap-2 font-bold text-sm text-[#113e48] hover:text-orange-600 hover:gap-3 transition-all mt-auto"
+              >
+                Xem chi tiết <FaArrowRight />
+              </Link>
             </div>
           ))}
-        </div>
-      </section>
 
-      {/* Achievements / Stats */}
-      <section className="bg-gradient-to-r from-sky-100 to-blue-50 py-20">
-        <h3
-          className="text-3xl font-bold text-center mb-12 text-gray-800"
-          data-aos="fade-up"
-        >
-          🎯 Thành tựu & Số liệu nổi bật
-        </h3>
-
-        <div className="max-w-6xl mx-auto grid md:grid-cols-4 gap-8 text-center">
-          {[
-            { num: "10.000+", label: "Đơn hàng đã giao" },
-            { num: "99%", label: "Tỷ lệ giao đúng hẹn" },
-            { num: "50+", label: "Đối tác doanh nghiệp" },
-            { num: "24/7", label: "Hỗ trợ khách hàng" },
-          ].map((s, i) => (
-            <div
-              key={i}
-              className="bg-white rounded-xl p-8 shadow-lg hover:shadow-xl transition"
-              data-aos="zoom-in"
-              data-aos-delay={i * 150}
+          {/* CTA Card (Thẻ cuối cùng kêu gọi hành động) */}
+          <div
+            className="bg-gradient-to-br from-orange-500 to-red-500 rounded-3xl p-8 shadow-xl text-white flex flex-col justify-center items-center text-center group h-full"
+            data-aos="fade-up"
+            data-aos-delay="500"
+          >
+            <h3 className="text-2xl font-bold mb-4">Bạn cần tư vấn riêng?</h3>
+            <p className="text-white/90 text-sm mb-8">
+              Liên hệ ngay với đội ngũ chuyên gia của chúng tôi để nhận giải
+              pháp tối ưu nhất cho doanh nghiệp của bạn.
+            </p>
+            <Link
+              to="/contact"
+              className="px-8 py-3 bg-white text-orange-600 font-bold rounded-full shadow-lg hover:bg-gray-100 transition-all w-full flex items-center justify-center gap-2"
             >
-              <h4 className="text-4xl font-extrabold text-blue-600 mb-2">
-                {s.num}
-              </h4>
-              <p className="text-gray-600 font-medium">{s.label}</p>
-            </div>
-          ))}
+              <FaPhoneAlt /> Liên hệ ngay
+            </Link>
+          </div>
         </div>
       </section>
 
-      {/* Team / Contact */}
-      <section className="py-20 bg-white text-center px-6">
-        <h3
-          className="text-3xl font-bold mb-6 text-gray-800"
-          data-aos="fade-up"
-        >
-          {" "}
-          {/* Logo thương hiệu */}
-          <img
-            src="/assets/logo/logoSpeedyShip.png"
-            alt="SpeedyShip Logo"
-            className="w-24 h-24 mx-auto mb-6 rounded-full object-cover drop-shadow-md"
-            data-aos="zoom-in"
-          />
-          👨‍💻 Đội ngũ SpeedyShip Đà Nẵng
-        </h3>
-        <p
-          className="max-w-3xl mx-auto text-gray-600 mb-10"
-          data-aos="fade-up"
-          data-aos-delay="100"
-        >
-          SpeedyShip được vận hành bởi những kỹ sư trẻ đam mê công nghệ và
-          logistics tại <strong>Đà Nẵng</strong> – thành phố đáng sống nhất Việt
-          Nam.
-          <br />
-          Chúng tôi không ngừng cải tiến để mang lại dịch vụ vận chuyển nhanh,
-          an toàn và tiện lợi cho mọi khách hàng trên toàn quốc.
-        </p>
-
-        <a
-          href="/contact"
-          className="inline-block bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition font-semibold"
-          data-aos="zoom-in"
-        >
-          Liên hệ với chúng tôi
-        </a>
+      {/* 3. BOTTOM BANNER */}
+      <section className="py-20 bg-white border-t border-gray-100">
+        <div className="max-w-4xl mx-auto px-6 text-center">
+          <h2 className="text-3xl font-extrabold text-[#113e48] mb-6">
+            Đồng hành cùng sự phát triển của bạn
+          </h2>
+          <p className="text-gray-500 mb-8 max-w-2xl mx-auto">
+            Hàng ngàn doanh nghiệp đã tin tưởng lựa chọn SpeedyShip làm đối tác
+            vận chuyển chiến lược. Còn bạn thì sao?
+          </p>
+          <div className="flex justify-center gap-4">
+            <Link
+              to="/customer/create"
+              className="px-10 py-3 bg-[#113e48] text-white font-bold rounded-full hover:bg-orange-500 transition-all shadow-lg"
+            >
+              Đăng ký ngay
+            </Link>
+          </div>
+        </div>
       </section>
-    </>
+    </div>
   );
 }

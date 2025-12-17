@@ -41,7 +41,12 @@ export default function Home() {
 
       <AboutSection />
 
-      <PartnerCarousel />
+      <PartnerCarousel
+        // 1. Padding dày hơn cho thoáng (giống bản gốc py-10)
+        className="py-10 bg-white"
+        // 2. Kích thước logo to (Mobile: rộng 120px, PC: rộng 160px)
+        logoSize="w-32 h-16 md:w-40 md:h-20"
+      />
 
       <ServicesSection />
 

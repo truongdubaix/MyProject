@@ -63,6 +63,15 @@ import CustomerFeedback from "./pages/customer/CustomerFeedback.jsx";
 
 import { ChatProvider } from "./context/ChatContext";
 import ChatLayout from "./components/ChatLayout.jsx";
+import PrivacyPolicy from "./pages/policy/PrivacyPolicy.jsx";
+import Claims from "./pages/policy/Claims.jsx";
+import Terms from "./pages/policy/Terms.jsx";
+import ShippingRules from "./pages/policy/ShippingRules.jsx";
+import ComingSoon from "./pages/service/ComingSoon.jsx";
+import RoadFreight from "./pages/service/RoadFreight.jsx";
+import Warehouse from "./pages/service/Warehourse.jsx";
+import ExpressDelivery from "./pages/service/ExpressDelivery.jsx";
+import PriceList from "./pages/service/PriceList.jsx";
 
 export default function App() {
   // 🟢 Logic để ẩn chat ở các trang quản trị
@@ -83,12 +92,21 @@ export default function App() {
             { path: "/tracking", element: <Tracking /> },
             { path: "/about", element: <About /> },
             { path: "/services", element: <Services /> },
+            { path: "/services/air", element: <ComingSoon /> },
+            { path: "/services/road", element: <RoadFreight /> },
+            { path: "/services/warehouse", element: <Warehouse /> },
+            { path: "/services/express", element: <ExpressDelivery /> },
+            { path: "/services/price-list", element: <PriceList /> },
             { path: "/contact", element: <Contact /> },
             { path: "/login", element: <Login /> },
             { path: "/register", element: <Register /> },
 
             // ✅ Trang tuyển dụng tài xế mới
             { path: "/apply-driver", element: <ApplyDriver /> },
+            { path: "/policy/privacy", element: <PrivacyPolicy /> },
+            { path: "/policy/claims", element: <Claims /> },
+            { path: "/policy/terms", element: <Terms /> },
+            { path: "/policy/shipping-rules", element: <ShippingRules /> },
           ].map(({ path, element }) => (
             <Route
               key={path}
@@ -97,6 +115,7 @@ export default function App() {
                 <>
                   <Navbar />
                   <main className="flex-1">{element}</main>
+
                   <Footer />
                 </>
               }

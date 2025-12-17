@@ -10,6 +10,7 @@ import {
   faChevronLeft,
   faChevronRight,
 } from "@fortawesome/free-solid-svg-icons";
+import { Link } from "react-router-dom";
 
 // --- 1. KHAI BÁO BỘ ICON SVG ---
 const ServiceIcons = {
@@ -262,19 +263,19 @@ const servicesData = [
   {
     id: "01",
     title: "Vận chuyển hàng hóa",
-    desc: "Đảm bảo chuyển hàng an toàn và đúng thời gian cam kết.",
+    desc: "Cam kết đúng giờ, an toàn và tối ưu chi phí cho mọi doanh nghiệp",
     icon: <ServiceIcons.Transport />,
   },
   {
     id: "02",
     title: "Lưu trữ kho bãi",
-    desc: "Hệ thống kho bãi rộng rãi, quản lý thông minh với công nghệ cao.",
+    desc: "Hệ thống kho bãi rộng rãi, lưu trữ hàng hóa thông minh và cẩn trọng.",
     icon: <ServiceIcons.Warehouse />,
   },
   {
     id: "03",
-    title: "Chuỗi cung ứng",
-    desc: "Tối ưu hóa luồng hàng hóa và thông tin liên tục.",
+    title: "Giao hàng hỏa tốc - Nhanh như chớp",
+    desc: "Giải pháp vận chuyển nội thành siêu tốc độ. Cam kết giao nhận đúng hẹn từng phút.",
     icon: <ServiceIcons.SupplyChain />,
   },
   {
@@ -285,8 +286,8 @@ const servicesData = [
   },
   {
     id: "05",
-    title: "Thủ tục hải quan",
-    desc: "Xử lý nhanh gọn, chính xác và đúng pháp luật.",
+    title: "Chính sách bảo mật",
+    desc: "Cam kết của SpeedyShip về việc bảo vệ dữ liệu và quyền riêng tư của khách hàng.",
     icon: <ServiceIcons.Customs />,
   },
 ];
@@ -391,7 +392,7 @@ export default function ServicesCarouselSection() {
 
                     <div className="mt-4 pt-4 border-t border-gray-100 group-hover:border-white/20">
                       <a
-                        href="#"
+                        href="/services"
                         className="inline-flex items-center text-[#113e48] group-hover:text-orange-500 font-bold text-xs uppercase tracking-wide transition-colors"
                       >
                         Xem chi tiết

@@ -153,26 +153,58 @@ export default function Navbar() {
                 Dịch vụ{" "}
                 <ChevronDownIcon className="w-5 h-5 ml-1 opacity-70 group-hover:rotate-180 transition" />
               </span>
-              <div className="absolute top-full left-1/2 -translate-x-1/2 w-64 bg-white rounded-xl shadow-xl border border-gray-100 opacity-0 invisible translate-y-2 group-hover:opacity-100 group-hover:visible group-hover:translate-y-0 transition-all duration-300 z-50 mt-2 overflow-hidden">
+
+              {/* Dropdown Content - Tăng chiều rộng lên w-72 để chứa đủ nội dung */}
+              <div className="absolute top-full left-1/2 -translate-x-1/2 w-80 bg-white rounded-xl shadow-xl border border-gray-100 opacity-0 invisible translate-y-2 group-hover:opacity-100 group-hover:visible group-hover:translate-y-0 transition-all duration-300 z-50 mt-2 overflow-hidden">
                 <div className="h-1 bg-orange-500"></div>
                 <div className="p-1">
-                  <Link
-                    to="/services/air"
-                    className="block px-4 py-3 hover:bg-orange-50 rounded-lg text-sm font-medium text-slate-700 hover:text-orange-600 transition-colors"
-                  >
-                    ✈️ Vận chuyển Hàng không
-                  </Link>
+                  {/* 2. Đường bộ */}
                   <Link
                     to="/services/road"
-                    className="block px-4 py-3 hover:bg-orange-50 rounded-lg text-sm font-medium text-slate-700 hover:text-orange-600 transition-colors"
+                    className="flex items-center justify-between px-4 py-3 hover:bg-orange-50 rounded-lg text-sm font-medium text-slate-700 hover:text-orange-600 transition-colors group/item"
                   >
-                    🚛 Vận chuyển Đường bộ
+                    {" "}
+                    <span className="flex items-center gap-2">
+                      🚛 Vận chuyển Đường bộ
+                    </span>
+                    <span className=" text-[10px] font-bold bg-red-500 text-white px-2 py-0 rounded border border-gray-200 group-hover/item:bg-orange-100 group-hover/item:text-orange-600 group-hover/item:border-orange-200 transition-all whitespace-nowrap">
+                      Hot
+                    </span>
                   </Link>
+                  {/* 1. Hàng không (Coming Soon Link) */}
                   <Link
-                    to="/services/cod"
+                    to="/services/air"
+                    className="flex items-center justify-between px-4 py-3 hover:bg-orange-50 rounded-lg text-sm font-medium text-slate-700 hover:text-orange-600 transition-colors group/item"
+                  >
+                    <span className="flex items-center gap-2">
+                      ✈️ Vận chuyển Hàng không
+                    </span>
+                    <span className="text-[10px] font-bold bg-gray-100 text-gray-500 px-2 py-0.5 rounded border border-gray-200 group-hover/item:bg-orange-100 group-hover/item:text-orange-600 group-hover/item:border-orange-200 transition-all whitespace-nowrap">
+                      Sắp ra mắt
+                    </span>
+                  </Link>
+                  {/* 3. Kho bãi */}
+                  <Link
+                    to="/services/warehouse"
                     className="block px-4 py-3 hover:bg-orange-50 rounded-lg text-sm font-medium text-slate-700 hover:text-orange-600 transition-colors"
                   >
-                    💰 Ship COD Thu hộ
+                    🏭 Kho bãi & Lưu trữ
+                  </Link>
+
+                  {/* 4. Hỏa tốc */}
+                  <Link
+                    to="/services/express"
+                    className="block px-4 py-3 hover:bg-orange-50 rounded-lg text-sm font-medium text-slate-700 hover:text-orange-600 transition-colors"
+                  >
+                    ⚡ Giao hàng hỏa tốc
+                  </Link>
+
+                  {/* 5. Bảng giá */}
+                  <Link
+                    to="/services/price-list"
+                    className="block px-4 py-3 hover:bg-orange-50 rounded-lg text-sm font-semibold text-slate-700 hover:text-orange-600 transition-colors"
+                  >
+                    💸 Bảng giá dịch vụ
                   </Link>
                 </div>
               </div>
@@ -368,23 +400,44 @@ export default function Navbar() {
               Dịch vụ
             </p>
             <div className="space-y-1 border-l-2 border-gray-100 pl-3">
-              <Link
-                to="/services/air"
-                className="block py-1.5 text-sm text-slate-600 hover:text-orange-600"
-              >
-                ✈️ Hàng không
-              </Link>
+              {/* 1. Hàng không (Coming Soon) - Dùng div thay vì Link để không click được */}
+              <div className="flex items-center justify-between py-1.5 pr-2 text-sm text-gray-400 cursor-not-allowed select-none">
+                <span className="flex items-center gap-1">✈️ Hàng không</span>
+                <span className="text-[10px] font-bold bg-gray-100 text-gray-500 px-2 py-0.5 rounded-full border border-gray-200">
+                  Sắp ra mắt
+                </span>
+              </div>
+
+              {/* 2. Đường bộ */}
               <Link
                 to="/services/road"
-                className="block py-1.5 text-sm text-slate-600 hover:text-orange-600"
+                className="block py-1.5 text-sm text-slate-600 hover:text-orange-600 transition-colors"
               >
-                🚛 Đường bộ
+                🚛 Vận chuyển Đường bộ
               </Link>
+
+              {/* 3. Kho bãi (Mới thêm) */}
               <Link
-                to="/services/cod"
-                className="block py-1.5 text-sm text-slate-600 hover:text-orange-600"
+                to="/services/warehouse"
+                className="block py-1.5 text-sm text-slate-600 hover:text-orange-600 transition-colors"
               >
-                💰 Ship COD
+                🏭 Kho bãi & Lưu trữ
+              </Link>
+
+              {/* 4. Hỏa tốc (Mới thêm) */}
+              <Link
+                to="/services/express"
+                className="block py-1.5 text-sm text-slate-600 hover:text-orange-600 transition-colors"
+              >
+                ⚡ Giao hàng hỏa tốc
+              </Link>
+
+              {/* 5. Bảng giá (Sửa từ Ship COD) */}
+              <Link
+                to="/services/price-list"
+                className="block py-1.5 text-sm font-semibold text-slate-700 hover:text-orange-600 transition-colors"
+              >
+                💸 Bảng giá dịch vụ
               </Link>
             </div>
           </div>

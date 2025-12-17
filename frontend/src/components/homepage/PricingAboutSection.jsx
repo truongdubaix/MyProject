@@ -1,4 +1,5 @@
 import React from "react";
+import { Link } from "react-router-dom";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faTruckFast,
@@ -106,17 +107,20 @@ export default function PricingAboutSection() {
             </div>
 
             {/* Button */}
-            <div className="mt-10">
-              <button className="relative overflow-hidden group inline-flex items-center gap-2 bg-[#113e48] text-white px-8 py-3.5 rounded-full font-bold uppercase text-sm tracking-wide hover:bg-orange-500 transition-all duration-300 shadow-xl shadow-[#113e48]/20 hover:shadow-orange-500/30 transform hover:-translate-y-1">
-                <span className="relative z-10 flex items-center gap-2">
-                  Xem chi tiết
-                  <FontAwesomeIcon icon={faPaperPlane} />
-                </span>
 
-                {/* === HIỆU ỨNG SÁNG CHO BUTTON === */}
-                {/* Chuẩn theo mẫu: skew 45 độ, 0.7s, trắng 20% */}
-                <div className="absolute top-0 -left-[100%] w-full h-full bg-white/20 skew-x-[45deg] group-hover:left-[100%] transition-all duration-700 ease-in-out"></div>
-              </button>
+            <div className="mt-10">
+              <Link to="/services/price-list">
+                <button className="relative overflow-hidden group inline-flex items-center gap-2 bg-[#113e48] text-white px-8 py-3.5 rounded-full font-bold uppercase text-sm tracking-wide hover:bg-orange-500 transition-all duration-300 shadow-xl shadow-[#113e48]/20 hover:shadow-orange-500/30 transform hover:-translate-y-1">
+                  <span className="relative z-10 flex items-center gap-2">
+                    Xem chi tiết
+                    <FontAwesomeIcon icon={faPaperPlane} />
+                  </span>
+
+                  {/* === HIỆU ỨNG SÁNG CHO BUTTON === */}
+                  {/* Chuẩn theo mẫu: skew 45 độ, 0.7s, trắng 20% */}
+                  <div className="absolute top-0 -left-[100%] w-full h-full bg-white/20 skew-x-[45deg] group-hover:left-[100%] transition-all duration-700 ease-in-out"></div>
+                </button>
+              </Link>
             </div>
           </div>
 
