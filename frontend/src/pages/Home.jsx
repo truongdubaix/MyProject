@@ -19,7 +19,7 @@ import CommitmentSection from "../components/homepage/CommitmentSection";
 import ServicesSection from "../components/homepage/ServicesSection";
 import PricingAboutSection from "../components/homepage/PricingAboutSection";
 import OrderProcessSection from "../components/homepage/OrderProcessSection";
-import NewsSection from "../components/homepage/news";
+import NewsSection from "../components/homepage/News";
 
 export default function Home() {
   const navigate = useNavigate();
