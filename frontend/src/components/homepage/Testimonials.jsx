@@ -1,46 +1,119 @@
-import { useState } from "react";
+import React from "react";
+import { FaStar, FaQuoteLeft, FaBoxOpen } from "react-icons/fa";
 
-export default function Testimonials() {
-  const list = [
-    { n: "Shop LUNA", c: "Giao nội thành siêu nhanh." },
-    { n: "Anh Minh", c: "Realtime giảm hỏi khách rất nhiều." },
-    { n: "Chị Hương", c: "Hỏa tốc 2–4h là chân ái." },
-  ];
+// Dữ liệu mẫu
+const testimonialsData = [
+  {
+    id: 1,
+    title: "Dịch vụ chất lượng",
+    content:
+      "Tôi rất hài lòng với dịch vụ của bạn! Nhân viên hỗ trợ rất nhiệt tình và thân thiện. Họ đã giải đáp mọi thắc mắc của tôi một cách chi tiết và dễ hiểu.",
+    name: "Lê Hảo",
+    role: "Khách hàng",
+    avatar: "https://randomuser.me/api/portraits/women/44.jpg",
+    rating: 5,
+  },
+  {
+    id: 2,
+    title: "Chất lượng cao",
+    content:
+      "Giao hàng siêu nhanh, đúng hẹn. Từ lúc dùng SpeedyShip, tỷ lệ hoàn hàng của shop mình giảm hẳn. Chắc chắn sẽ ủng hộ lâu dài!",
+    name: "Nguyễn Sâm",
+    role: "Khách hàng",
+    avatar: "https://randomuser.me/api/portraits/men/32.jpg",
+    rating: 5,
+  },
+  {
+    id: 3,
+    title: "Uy tín tuyệt đối",
+    content:
+      "Ứng dụng dễ dùng, đặt đơn nhanh chóng. Tài xế lịch sự, gọi điện trước khi giao. Giá cả lại rất hợp lý so với các bên khác.",
+    name: "Bạch Ngân",
+    role: "Khách hàng",
+    avatar: "https://randomuser.me/api/portraits/women/68.jpg",
+    rating: 5,
+  },
+];
 
+// Component hiển thị sao (Đã sửa thành MÀU VÀNG)
+const RatingStars = ({ rating }) => (
+  <div className="flex gap-1 text-yellow-400 mb-3 text-sm">
+    {" "}
+    {/* 🔥 Sửa text-[#113e48] thành text-yellow-400 */}
+    {[...Array(5)].map((_, i) => (
+      <FaStar
+        key={i}
+        // Nếu số sao < rating thì hiện màu vàng, ngược lại hiện màu xám mờ
+        className={i < rating ? "opacity-100" : "text-gray-300"}
+      />
+    ))}
+  </div>
+);
+
+export default function TestimonialsSection() {
   return (
-    <section className="py-20 bg-white">
-      <div className="max-w-6xl mx-auto px-6">
-        <h3 className="text-3xl font-bold text-center mb-10" data-aos="fade-up">
-          Khách hàng nói gì về <span className="text-blue-600">SpeedyShip</span>
-          ?
-        </h3>
+    <section className="py-20 bg-white font-sans">
+      <div className="max-w-7xl mx-auto px-6">
+        {/* HEADER SECTION */}
+        <div className="mb-12" data-aos="fade-up">
+          {/* Nút Tag "Phản hồi" màu cam */}
+          <div className="inline-flex items-center gap-2 bg-orange-100 text-orange-600 px-4 py-2 rounded-full font-bold text-sm uppercase tracking-wide mb-4 shadow-sm border border-orange-200">
+            <FaBoxOpen /> <span>Phản hồi</span>
+          </div>
 
+          {/* Tiêu đề lớn */}
+          <h2 className="text-3xl md:text-5xl font-extrabold text-[#113e48] mb-4 uppercase tracking-tight">
+            ĐÁNH GIÁ TỪ KHÁCH HÀNG
+          </h2>
+
+          {/* Mô tả */}
+          <p className="text-gray-500 max-w-2xl text-lg">
+            Những chia sẻ chân thực từ khách hàng đã sử dụng dịch vụ SpeedyShip
+            là minh chứng rõ nhất cho chất lượng và cam kết của chúng tôi.
+          </p>
+        </div>
+
+        {/* GRID CARDS */}
         <div className="grid md:grid-cols-3 gap-8">
-          {[
-            {
-              name: "Shop thời trang LUNA",
-              content:
-                "Giao nội thành trong ngày, đơn COD đối soát rõ ràng. Tụi mình đã chuyển hết đơn sang SpeedyShip.",
-            },
-            {
-              name: "Anh Minh – Chủ cửa hàng điện tử",
-              content:
-                "Thích nhất là tracking realtime, khách không còn hỏi 'Đơn em đâu rồi?' liên tục nữa.",
-            },
-            {
-              name: "Chị Hương – Chủ cửa hàng bánh",
-              content:
-                "Giao bánh tươi cần đúng giờ. Dịch vụ hỏa tốc 2–4h giúp mình yên tâm giao trong nội thành.",
-            },
-          ].map((t, i) => (
+          {testimonialsData.map((item, i) => (
             <div
-              key={t.name}
-              className="bg-gray-50 rounded-2xl p-6"
+              key={item.id}
+              className="bg-gray-50 p-8 rounded-sm hover:shadow-xl transition-all duration-300 group hover:-translate-y-1"
               data-aos="fade-up"
               data-aos-delay={i * 100}
             >
-              <p className="text-sm text-gray-700 mb-4">“{t.content}”</p>
-              <p className="text-sm font-semibold text-gray-900">{t.name}</p>
+              {/* Header Card: Ảnh + Tiêu đề + Sao */}
+              <div className="flex items-start gap-4 mb-4">
+                {/* Quote icon mờ làm nền trang trí */}
+                <FaQuoteLeft className="text-4xl text-gray-200 shrink-0 group-hover:text-orange-200 transition-colors" />
+
+                <div>
+                  <h3 className="font-bold text-lg text-slate-800 leading-tight mb-1 group-hover:text-orange-600 transition-colors">
+                    {item.title}
+                  </h3>
+                  <RatingStars rating={item.rating} />
+                </div>
+              </div>
+
+              {/* Nội dung đánh giá */}
+              <p className="text-gray-600 text-sm leading-relaxed mb-8 min-h-[80px]">
+                "{item.content}"
+              </p>
+
+              {/* User Info (Avatar + Tên) */}
+              <div className="flex items-center gap-3 pt-6 border-t border-gray-200">
+                <img
+                  src={item.avatar}
+                  alt={item.name}
+                  className="w-10 h-10 rounded-full object-cover border-2 border-white shadow-sm"
+                />
+                <div>
+                  <h4 className="font-bold text-sm text-slate-900">
+                    {item.name}
+                  </h4>
+                  <p className="text-xs text-gray-500">{item.role}</p>
+                </div>
+              </div>
             </div>
           ))}
         </div>

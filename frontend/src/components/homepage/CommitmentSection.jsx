@@ -4,9 +4,12 @@ import {
   faCheck,
   faArrowRight,
   faBox,
+  faMedal,
+  faHandHoldingDollar,
+  faHeadset,
 } from "@fortawesome/free-solid-svg-icons";
 
-// Dữ liệu danh sách cam kết
+// Dữ liệu danh sách cam kết (Phần trên - Giữ nguyên)
 const commitmentList = [
   {
     title: "Chất lượng hàng đầu",
@@ -22,9 +25,32 @@ const commitmentList = [
   },
 ];
 
+// Dữ liệu 3 Cards (Phần dưới - Cập nhật thêm thuộc tính màu và highlight)
+const featureCards = [
+  {
+    icon: faMedal,
+    title: "Tối ưu chất lượng",
+    desc: "Tính đúng đắn, đầy đủ, an toàn và phù hợp với mục đích sử dụng.",
+    theme: "teal", // Tông màu Xanh
+  },
+  {
+    icon: faHandHoldingDollar,
+    title: "Đảm bảo và bảo hành",
+    desc: "Điều này có thể bao gồm chính sách bảo hành, đổi trả hoặc hoàn tiền.",
+    theme: "orange",
+    highlight: true,
+  },
+  {
+    icon: faHeadset,
+    title: "Trợ giúp và hỗ trợ",
+    desc: "Khách hàng có quyền lợi được nhận sự hỗ trợ từ nhà cung cấp và trợ lý AI 24/24",
+    theme: "teal",
+  },
+];
+
 const CommitmentSection = () => {
   return (
-    <section className="py-24 bg-white overflow-hidden relative">
+    <section className="py-24 bg-white overflow-hidden relative font-sans">
       {/* Họa tiết trang trí chấm bi */}
       <div className="absolute top-10 left-0 opacity-30 pointer-events-none">
         <div
@@ -37,11 +63,11 @@ const CommitmentSection = () => {
       </div>
 
       <div className="max-w-[1400px] mx-auto px-6 relative z-10">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
-          {/* --- CỘT TRÁI: NỘI DUNG --- */}
+        {/* --- PHẦN 1: CAM KẾT & ẢNH (GIỮ NGUYÊN) --- */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center mb-24">
+          {/* CỘT TRÁI: NỘI DUNG */}
           <div>
             <div className="mb-10">
-              {/* Badge */}
               <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-orange-100 text-orange-600 mb-4 border border-orange-200">
                 <FontAwesomeIcon
                   icon={faBox}
@@ -51,35 +77,26 @@ const CommitmentSection = () => {
                   Cam kết
                 </span>
               </div>
-
-              {/* Heading */}
               <h2 className="text-2xl md:text-3xl font-extrabold text-[#113e48] uppercase leading-tight">
                 Cam kết của chúng tôi
               </h2>
-              <p className="text-slate-600 max-w-lg">
+              <p className="text-slate-600 max-w-lg mt-4">
                 Các cam kết này giúp xây dựng lòng tin và đảm bảo chất lượng
                 dịch vụ, đồng thời tạo sự hài lòng và trải nghiệm tốt cho khách
                 hàng.
               </p>
             </div>
 
-            {/* Danh sách cam kết */}
             <div className="space-y-6 mb-10">
               {commitmentList.map((item, index) => (
                 <div
                   key={index}
                   className="flex gap-5 group p-4 rounded-xl hover:bg-slate-50 transition-colors duration-300 relative overflow-hidden"
                 >
-                  {/* === HIỆU ỨNG SÁNG CHO LIST ITEM (Mới thêm) === */}
-                  {/* Màu nhẹ (slate-400/10) để không làm chói mắt trên nền trắng */}
                   <div className="absolute top-0 -left-[100%] w-full h-full bg-gradient-to-r from-transparent via-slate-400/10 to-transparent skew-x-[45deg] group-hover:left-[100%] transition-all duration-700 ease-in-out z-0"></div>
-
-                  {/* Icon Check màu cam */}
                   <div className="relative z-10 flex-shrink-0 w-6 h-6 mt-1 flex items-center justify-center text-orange-500 text-xl group-hover:scale-110 transition-transform duration-300">
                     <FontAwesomeIcon icon={faCheck} />
                   </div>
-
-                  {/* Nội dung text */}
                   <div className="relative z-10">
                     <h3 className="text-lg font-bold text-[#113e48] mb-2 group-hover:text-orange-600 transition-colors">
                       {item.title}
@@ -92,29 +109,24 @@ const CommitmentSection = () => {
               ))}
             </div>
 
-            {/* Button */}
             <div className="mt-6">
               <a href="/about/">
                 <button className="relative overflow-hidden group inline-flex items-center gap-2 bg-[#113e48] text-white px-8 py-3.5 rounded-full font-bold uppercase text-sm tracking-wide hover:bg-orange-500 transition-all duration-300 shadow-xl shadow-[#113e48]/20 hover:shadow-orange-500/30 transform hover:-translate-y-1">
                   <span className="relative z-10 flex items-center gap-2">
-                    Khám phá
+                    Khám phá{" "}
                     <FontAwesomeIcon
                       icon={faArrowRight}
                       className="transform group-hover:translate-x-1 transition-transform"
                     />
                   </span>
-
-                  {/* === HIỆU ỨNG SÁNG CHO BUTTON === */}
-                  {/* Chuẩn: skew 45 độ, duration 0.7s */}
                   <div className="absolute top-0 -left-[100%] w-full h-full bg-white/20 skew-x-[45deg] group-hover:left-[100%] transition-all duration-700 ease-in-out"></div>
                 </button>
               </a>
             </div>
           </div>
 
-          {/* --- CỘT PHẢI: HÌNH ẢNH GHÉP (COLLAGE) --- */}
+          {/* CỘT PHẢI: HÌNH ẢNH GHÉP */}
           <div className="relative h-full min-h-[500px] flex gap-4">
-            {/* Cột ảnh 1 (Bên trái) */}
             <div className="w-1/2 relative flex flex-col justify-end">
               <div className="relative h-[85%] w-full overflow-hidden rounded-lg shadow-md group cursor-pointer">
                 <img
@@ -122,17 +134,10 @@ const CommitmentSection = () => {
                   alt="Kỹ sư Logistics"
                   className="w-full h-full object-cover transform group-hover:scale-105 transition-transform duration-700"
                 />
-                {/* Overlay tối khi hover */}
                 <div className="absolute inset-0 bg-[#113e48]/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300 mix-blend-multiply"></div>
-
-                {/* === HIỆU ỨNG SÁNG CHO ẢNH 1 === */}
                 <div className="absolute top-0 -left-[100%] w-full h-full bg-white/20 skew-x-[45deg] group-hover:left-[100%] transition-all duration-700 ease-in-out z-20"></div>
-
-                {/* Overlay Box 10+ Năm - Có hiệu ứng Auto Shimmer */}
                 <div className="absolute bottom-0 left-0 right-0 bg-[#113e48] text-white p-6 md:p-8 flex flex-col items-center justify-center text-center overflow-hidden relative z-30">
-                  {/* Hiệu ứng lấp lánh tự động chạy */}
                   <div className="absolute top-0 -left-[150%] w-full h-full bg-gradient-to-r from-transparent via-white/10 to-transparent skew-x-[45deg] animate-[shimmer_4s_infinite]"></div>
-
                   <h3 className="text-4xl md:text-5xl font-black mb-1 relative z-10">
                     10+
                   </h3>
@@ -142,8 +147,6 @@ const CommitmentSection = () => {
                 </div>
               </div>
             </div>
-
-            {/* Cột ảnh 2 (Bên phải) */}
             <div className="w-1/2 relative">
               <div className="h-full w-full overflow-hidden rounded-lg shadow-md group cursor-pointer relative">
                 <img
@@ -151,14 +154,68 @@ const CommitmentSection = () => {
                   alt="Tàu vận chuyển Container"
                   className="w-full h-full object-cover transform group-hover:scale-105 transition-transform duration-700"
                 />
-                {/* Overlay tối khi hover */}
                 <div className="absolute inset-0 bg-[#113e48]/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300 mix-blend-multiply"></div>
-
-                {/* === HIỆU ỨNG SÁNG CHO ẢNH 2 === */}
                 <div className="absolute top-0 -left-[100%] w-full h-full bg-white/20 skew-x-[45deg] group-hover:left-[100%] transition-all duration-700 ease-in-out z-20"></div>
               </div>
             </div>
           </div>
+        </div>
+
+        {/* --- PHẦN 2: 3 CARDS THÔNG TIN (ĐÃ NÂNG CẤP) --- */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 items-start">
+          {featureCards.map((card, index) => {
+            // Xác định style dựa trên theme và highlight
+            const isHighlight = card.highlight;
+            const themeClass = isHighlight ? "orange" : "teal";
+
+            return (
+              <div
+                key={index}
+                className={`
+                  relative rounded-2xl flex items-start gap-6 transition-all duration-300 group cursor-pointer hover:shadow-xl hover:bg-white hover:border-transparent
+                  border border-dashed
+                  ${
+                    isHighlight
+                      ? `bg-orange-50 border-orange-300 p-10 md:mt-6 md:mb-6 z-10 shadow-md` // Card giữa: Lớn hơn, nổi lên
+                      : `bg-teal-50 border-teal-300 p-8` // Card bên: Nhỏ hơn
+                  }
+                `}
+              >
+                {/* Icon Box */}
+                <div
+                  className={`
+                  w-14 h-14 bg-white rounded-full flex items-center justify-center shadow-sm text-2xl transition-colors duration-300 shrink-0
+                  ${
+                    isHighlight
+                      ? `text-orange-500 group-hover:bg-orange-500 group-hover:text-white`
+                      : `text-teal-600 group-hover:bg-teal-600 group-hover:text-white`
+                  }
+                `}
+                >
+                  <FontAwesomeIcon icon={card.icon} />
+                </div>
+
+                {/* Content */}
+                <div>
+                  <h4
+                    className={`
+                    font-bold mb-3 transition-colors
+                    ${
+                      isHighlight
+                        ? "text-xl text-[#113e48] group-hover:text-orange-600"
+                        : "text-lg text-[#113e48] group-hover:text-teal-700"
+                    }
+                  `}
+                  >
+                    {card.title}
+                  </h4>
+                  <p className="text-sm text-slate-600 leading-relaxed">
+                    {card.desc}
+                  </p>
+                </div>
+              </div>
+            );
+          })}
         </div>
       </div>
     </section>

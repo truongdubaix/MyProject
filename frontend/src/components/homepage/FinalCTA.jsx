@@ -1,38 +1,93 @@
 import { Link } from "react-router-dom";
-import ChatBubble from "../ChatBubble.jsx";
+import ChatBubble from "../ChatBubble.jsx"; // Import cũ của bạn
 import { useState } from "react";
+import { FaRocket, FaComments, FaArrowRight } from "react-icons/fa";
 
 export default function FinalCTA({ onChat }) {
-  const [showChatSupport, setShowChatSupport] = useState(false); // chat tư vấn
+  const [showChatSupport, setShowChatSupport] = useState(false);
+
+  // Hàm xử lý khi bấm nút Chat
+  const handleChatClick = () => {
+    if (onChat) {
+      // Nếu cha truyền hàm onChat (để mở ChatLayout toàn cục) -> Gọi nó
+      onChat();
+    } else {
+      // Nếu không, mở chat nội bộ tại chỗ
+      setShowChatSupport(true);
+    }
+  };
+
   return (
-    <section className="py-16 bg-gradient-to-r from-blue-600 via-blue-500 to-indigo-600 text-white">
-      <div className="max-w-6xl mx-auto px-6 flex flex-col md:flex-row items-center justify-between gap-6">
-        <div>
-          <h3 className="text-3xl md:text-4xl font-bold mb-3">
-            Sẵn sàng tăng tốc cùng SpeedyShip?
-          </h3>
-          <p className="text-sm md:text-base text-blue-100">
-            Tạo đơn chỉ mất chưa đến 30 giây. Giao hàng nhanh, minh bạch, hỗ trợ
-            tận tâm.
-          </p>
-        </div>
-        <div className="flex flex-col sm:flex-row gap-3">
-          <Link
-            to="/customer/create"
-            className="px-6 py-3 rounded-xl bg-white text-blue-700 font-semibold hover:bg-blue-50 text-center"
+    <section className="relative py-24 overflow-hidden bg-[#113e48]">
+      {/* --- BACKGROUND DECORATION --- */}
+      {/* Họa tiết vòng tròn mờ tạo chiều sâu */}
+      <div className="absolute top-0 left-0 w-full h-full overflow-hidden pointer-events-none">
+        <div className="absolute -top-24 -left-24 w-96 h-96 bg-blue-500/20 rounded-full blur-3xl"></div>
+        <div className="absolute top-1/2 right-0 w-64 h-64 bg-orange-500/10 rounded-full blur-3xl"></div>
+        {/* Pattern lưới mờ */}
+        <svg
+          className="absolute inset-0 w-full h-full opacity-5"
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <pattern
+            id="grid-cta"
+            width="40"
+            height="40"
+            patternUnits="userSpaceOnUse"
           >
-            🚀 Tạo đơn ngay
-          </Link>
-          <button
-            type="button"
-            onClick={() => setShowChatSupport(true)}
-            className="px-6 py-3 rounded-xl border border-white/60 text-white font-semibold hover:bg-white/10 text-center"
-          >
-            💬 Chat tư vấn
-          </button>
+            <path
+              d="M0 40L40 0H20L0 20M40 40V20L20 40"
+              stroke="currentColor"
+              strokeWidth="1"
+              fill="none"
+              className="text-white"
+            />
+          </pattern>
+          <rect width="100%" height="100%" fill="url(#grid-cta)" />
+        </svg>
+      </div>
+
+      <div className="max-w-7xl mx-auto px-6 relative z-10">
+        <div className="flex flex-col lg:flex-row items-center justify-between gap-10 text-center lg:text-left">
+          {/* CỘT TEXT */}
+          <div className="max-w-2xl">
+            <h3 className="text-3xl md:text-5xl font-extrabold text-white mb-6 leading-tight">
+              Sẵn sàng bứt phá doanh thu <br />
+              <span className="text-orange-400">cùng SpeedyShip?</span>
+            </h3>
+            <p className="text-lg text-blue-100/90 font-medium leading-relaxed">
+              Tạo đơn hàng loạt chỉ trong 30 giây. Hệ thống quản lý thông minh,
+              giao hàng siêu tốc và đối soát COD minh bạch mỗi ngày.
+            </p>
+          </div>
+
+          {/* CỘT BUTTONS */}
+          <div className="flex flex-col sm:flex-row gap-4 shrink-0">
+            {/* Nút Tạo Đơn (Màu Cam - Điểm nhấn chính) */}
+            <Link
+              to="/customer/create"
+              className="group inline-flex items-center justify-center gap-3 px-8 py-4 rounded-full bg-orange-500 hover:bg-orange-600 text-white font-bold text-lg shadow-xl shadow-orange-500/30 transition-all transform hover:-translate-y-1"
+            >
+              <FaRocket className="group-hover:animate-pulse" />
+              <span>Tạo đơn ngay</span>
+              <FaArrowRight className="text-sm opacity-70 group-hover:translate-x-1 transition-transform" />
+            </Link>
+
+            {/* Nút Chat (Trong suốt - Điểm nhấn phụ) */}
+            <button
+              type="button"
+              onClick={handleChatClick}
+              className="inline-flex items-center justify-center gap-3 px-8 py-4 rounded-full border-2 border-white/20 hover:border-white hover:bg-white hover:text-[#113e48] text-white font-bold text-lg transition-all backdrop-blur-sm"
+            >
+              <FaComments />
+              <span>Chat tư vấn</span>
+            </button>
+          </div>
         </div>
       </div>
-      {showChatSupport && (
+
+      {/* CHAT LOCAL (Chỉ hiện nếu không dùng Global Chat và state = true) */}
+      {showChatSupport && !onChat && (
         <ChatBubble onClose={() => setShowChatSupport(false)} />
       )}
     </section>

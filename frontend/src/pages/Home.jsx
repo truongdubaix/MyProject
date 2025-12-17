@@ -1,8 +1,8 @@
 import { useNavigate } from "react-router-dom";
 
 import HeroBanner from "../components/homepage/HeroBanner";
-import WhySection from "../components/homepage/WhySection";
-import ServicePlans from "../components/homepage/ServicePlans";
+// import WhySection from "../components/homepage/WhySection";
+// import ServicePlans from "../components/homepage/ServicePlans";
 import RealtimeSection from "../components/homepage/RealtimeSection";
 import Testimonials from "../components/homepage/Testimonials";
 import FinalCTA from "../components/homepage/FinalCTA";
@@ -12,13 +12,14 @@ import ChatPopupTop from "../components/ChatPopupTop";
 import FloatingActions from "../components/FloatingActions";
 
 import { useChat } from "../hooks/useChat";
-import UtilitySidebar from "../components/UtilitySidebar";
+// import UtilitySidebar from "../components/UtilitySidebar";
 import AboutSection from "../components/homepage/AboutSection";
 import PartnerCarousel from "../components/homepage/PartnerCarousel";
 import CommitmentSection from "../components/homepage/CommitmentSection";
 import ServicesSection from "../components/homepage/ServicesSection";
 import PricingAboutSection from "../components/homepage/PricingAboutSection";
 import OrderProcessSection from "../components/homepage/OrderProcessSection";
+import NewsSection from "../components/homepage/news";
 
 export default function Home() {
   const navigate = useNavigate();
@@ -61,7 +62,10 @@ export default function Home() {
       <Testimonials />
 
       {/* mở support */}
+
       <FinalCTA onChat={openSupportChat} />
+
+      <NewsSection />
 
       {/* ============= POPUP CHAT RENDER ============= */}
 

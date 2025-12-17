@@ -181,11 +181,6 @@ export default function App() {
             <Route path="payment-success" element={<PaymentSuccess />} />
             <Route path="payment-fail" element={<PaymentFail />} />
             <Route path="feedback" element={<CustomerFeedback />} />
-
-            {/* <Route
-            path="/customer/track/:code"
-            element={<CustomerTrackDetail />}
-          /> */}
           </Route>
 
           {/* ❌ 404 fallback */}
