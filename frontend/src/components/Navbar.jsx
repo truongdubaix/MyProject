@@ -158,6 +158,19 @@ export default function Navbar() {
               <div className="absolute top-full left-1/2 -translate-x-1/2 w-80 bg-white rounded-xl shadow-xl border border-gray-100 opacity-0 invisible translate-y-2 group-hover:opacity-100 group-hover:visible group-hover:translate-y-0 transition-all duration-300 z-50 mt-2 overflow-hidden">
                 <div className="h-1 bg-orange-500"></div>
                 <div className="p-1">
+                  {/* 1. Tra cứu vận đơn  */}
+                  <Link
+                    to="/tracking"
+                    className="flex items-center justify-between px-4 py-3 hover:bg-orange-50 rounded-lg text-sm font-medium text-slate-700 hover:text-orange-600 transition-colors group/item"
+                  >
+                    {" "}
+                    <span className="flex items-center gap-2">
+                      🔍 Tra cứu vận đơn
+                    </span>
+                    <span className=" text-[10px] font-bold bg-red-500 text-white px-2 py-0 rounded border border-gray-200 group-hover/item:bg-orange-100 group-hover/item:text-orange-600 group-hover/item:border-orange-200 transition-all whitespace-nowrap">
+                      Hot
+                    </span>
+                  </Link>
                   {/* 2. Đường bộ */}
                   <Link
                     to="/services/road"
@@ -171,7 +184,7 @@ export default function Navbar() {
                       Hot
                     </span>
                   </Link>
-                  {/* 1. Hàng không (Coming Soon Link) */}
+                  {/* 3. Hàng không (Coming Soon Link) */}
                   <Link
                     to="/services/air"
                     className="flex items-center justify-between px-4 py-3 hover:bg-orange-50 rounded-lg text-sm font-medium text-slate-700 hover:text-orange-600 transition-colors group/item"

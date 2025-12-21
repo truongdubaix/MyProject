@@ -4,33 +4,36 @@ import { FaUser, FaComments, FaArrowRight, FaBox } from "react-icons/fa";
 const newsData = [
   {
     id: 1,
+    // Ảnh minh họa: Vận chuyển đường biển/quốc tế
     image:
       "https://ship-fast.monamedia.net/wp-content/uploads/2023/04/blog-s-1-2-414x273.jpg",
-    date: { day: "11", month: "Th4" },
-    author: "By-Monamedia",
-    comments: 0,
-    title: "Moving your products across all borders.",
-    desc: "Vận chuyển hàng hóa xuyên biên giới dễ dàng hơn bao giờ hết với giải pháp của chúng tôi.",
+    date: { day: "20", month: "Th12" },
+    author: "Admin",
+    comments: 5,
+    title: "Giải pháp vận chuyển hàng hóa xuyên biên giới tối ưu 2024",
+    desc: "Khám phá các phương thức vận tải đa phương thức giúp tiết kiệm chi phí và thời gian cho doanh nghiệp xuất nhập khẩu.",
   },
   {
     id: 2,
+    // Ảnh minh họa: Xe tải/Giao hàng
     image:
       "https://ship-fast.monamedia.net/wp-content/uploads/2023/04/blog-s-1-3-414x273.jpg",
-    date: { day: "11", month: "Th4" },
-    author: "By-Monamedia",
-    comments: 0,
-    title: "Don’t get stuck with the rest, truck with SpeedyShip.",
-    desc: "Đừng để hàng hóa bị kẹt lại. Hãy chọn đội xe tải chuyên nghiệp của chúng tôi.",
+    date: { day: "18", month: "Th12" },
+    author: "SpeedyTeam",
+    comments: 12,
+    title: "Đừng để hàng hóa bị kẹt: Chọn đội xe tải SpeedyShip",
+    desc: "Với đội xe hùng hậu và công nghệ định vị GPS real-time, chúng tôi cam kết giao hàng đúng hẹn bất chấp mọi điều kiện.",
   },
   {
     id: 3,
+    // Ảnh minh họa: Kho bãi/Logistics
     image:
       "https://ship-fast.monamedia.net/wp-content/uploads/2023/04/blog-s-1-4-414x273.jpg",
-    date: { day: "11", month: "Th4" },
-    author: "By-Monamedia",
-    comments: 0,
-    title: "The perfect logistics partner for your business.",
-    desc: "Đối tác logistics hoàn hảo giúp doanh nghiệp của bạn bứt phá doanh thu.",
+    date: { day: "15", month: "Th12" },
+    author: "Ban Biên Tập",
+    comments: 8,
+    title: "Đối tác Logistics hoàn hảo: Chìa khóa bứt phá doanh thu",
+    desc: "Tìm hiểu cách một hệ thống logistics chuyên nghiệp có thể giúp bạn giảm 30% chi phí vận hành và tăng trải nghiệm khách hàng.",
   },
 ];
 
