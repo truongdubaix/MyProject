@@ -204,31 +204,35 @@ export const getShipmentByCode = async (req, res) => {
 // ==========================
 // ✅ GUEST tracking (PUBLIC)
 // ==========================
-export const publicTracking = async (req, res) => {
+export const getShipmentByCodePublic = async (req, res) => {
   try {
-    const { code, last4 } = req.query;
+    const { code } = req.params;
+    const { last4 } = req.query;
 
-    if (!code || !last4) {
-      return res.status(400).json({ message: "Thiếu dữ liệu tra cứu" });
+    if (!code) {
+      return res.status(400).json({ message: "Thiếu mã vận đơn" });
     }
 
-    const [rows] = await db.query(
-      `
-      SELECT *
-      FROM shipments
-      WHERE tracking_code = ?
-        AND RIGHT(receiver_phone, 4) = ?
-      `,
-      [code, last4]
+    const [[shipment]] = await db.query(
+      "SELECT * FROM shipments WHERE tracking_code = ?",
+      [code]
     );
 
-    if (!rows.length) {
+    if (!shipment) {
       return res.status(404).json({ message: "Không tìm thấy đơn hàng" });
     }
 
-    res.json(rows[0]);
+    // Nếu có last4 → xác thực cho khách vãng lai
+    if (last4) {
+      const phone = shipment.receiver_phone || "";
+      if (!phone.endsWith(last4)) {
+        return res.status(403).json({ message: "Sai thông tin xác thực" });
+      }
+    }
+
+    res.json(shipment);
   } catch (err) {
-    console.error("❌ Lỗi tracking public:", err);
-    res.status(500).json({ message: "Không thể tra cứu vận đơn" });
+    console.error("❌ Lỗi tra cứu đơn công khai:", err);
+    res.status(500).json({ message: "Lỗi server" });
   }
 };

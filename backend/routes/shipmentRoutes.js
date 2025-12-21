@@ -7,7 +7,7 @@ import {
   deleteShipment,
   assignShipment,
   getShipmentByCode,
-  publicTracking,
+  getShipmentByCodePublic,
 } from "../controllers/shipmentController.js";
 
 const router = express.Router();
@@ -26,6 +26,6 @@ router.post("/assign", assignShipment);
 router.get("/track/:code", getShipmentByCode);
 
 // ✅ Guest tracking (PUBLIC)
-router.get("/tracking", publicTracking);
+router.get("/code/:code", getShipmentByCodePublic);
 
 export default router;
