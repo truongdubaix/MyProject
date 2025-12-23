@@ -72,6 +72,9 @@ import RoadFreight from "./pages/service/RoadFreight.jsx";
 import Warehouse from "./pages/service/Warehourse.jsx";
 import ExpressDelivery from "./pages/service/ExpressDelivery.jsx";
 import PriceList from "./pages/service/PriceList.jsx";
+import CustomerAddress from "./pages/customer/CustomerAddress.jsx";
+import CustomerWallet from "./pages/customer/CustomerWallet.jsx";
+import CustomerSupport from "./pages/customer/CustomerSupport.jsx";
 
 export default function App() {
   // 🟢 Logic để ẩn chat ở các trang quản trị
@@ -200,6 +203,9 @@ export default function App() {
             <Route path="payment-success" element={<PaymentSuccess />} />
             <Route path="payment-fail" element={<PaymentFail />} />
             <Route path="feedback" element={<CustomerFeedback />} />
+            <Route path="addresses" element={<CustomerAddress />} />
+            <Route path="wallet" element={<CustomerWallet />} />
+            <Route path="support" element={<CustomerSupport />} />
           </Route>
 
           {/* ❌ 404 fallback */}
