@@ -1,15 +1,18 @@
 import express from "express";
 import {
   getAllVehicles,
-  getAvailableVehicles,
+  getAvailableVehicles, // Thêm hàm này vào route nếu cần dùng riêng
+  createVehicle,
+  updateVehicle,
+  deleteVehicle,
 } from "../controllers/vehicleController.js";
 
 const router = express.Router();
 
-// Lấy tất cả xe
 router.get("/", getAllVehicles);
-
-//  Lấy các xe còn trống (chưa gán cho tài xế)
-router.get("/available", getAvailableVehicles);
+router.get("/available", getAvailableVehicles); // API lấy xe rảnh
+router.post("/", createVehicle);
+router.put("/:id", updateVehicle);
+router.delete("/:id", deleteVehicle);
 
 export default router;

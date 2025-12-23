@@ -1,14 +1,18 @@
 import { useEffect, useState } from "react";
 import API from "../../services/api";
 import toast from "react-hot-toast";
+import { CreditCard, Search, Trash2, DollarSign, Wallet } from "lucide-react";
+import Pagination from "../../components/Pagination";
 
 export default function AdminPayments() {
   const [payments, setPayments] = useState([]);
+  const [filtered, setFiltered] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [search, setSearch] = useState("");
 
-  // 🧭 Phân trang
-  const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 10;
+  // 🧭 State Phân trang
+  const [page, setPage] = useState(1);
+  const perPage = 8; // Số lượng item mỗi trang
 
   // 🧾 Lấy danh sách thanh toán
   const fetchPayments = async () => {
@@ -16,6 +20,7 @@ export default function AdminPayments() {
     try {
       const res = await API.get("/payments");
       setPayments(res.data);
+      setFiltered(res.data);
     } catch {
       toast.error("❌ Lỗi khi tải danh sách thanh toán");
     } finally {
@@ -26,6 +31,18 @@ export default function AdminPayments() {
   useEffect(() => {
     fetchPayments();
   }, []);
+
+  // 🔍 Filter Logic
+  useEffect(() => {
+    const keyword = search.toLowerCase();
+    const result = payments.filter(
+      (p) =>
+        p.tracking_code?.toLowerCase().includes(keyword) ||
+        p.customer_name?.toLowerCase().includes(keyword)
+    );
+    setFiltered(result);
+    setPage(1); // ✅ Sửa: Reset về trang 1 khi tìm kiếm
+  }, [search, payments]);
 
   // ✏️ Cập nhật trạng thái
   const handleUpdate = async (id, status) => {
@@ -40,7 +57,7 @@ export default function AdminPayments() {
 
   // 🗑️ Xóa thanh toán
   const handleDelete = async (id) => {
-    if (confirm("Bạn có chắc muốn xóa thanh toán này không?")) {
+    if (confirm("Bạn có chắc muốn xóa lịch sử thanh toán này không?")) {
       try {
         await API.delete(`/payments/${id}`);
         toast.success("🗑️ Đã xóa thanh toán");
@@ -51,145 +68,156 @@ export default function AdminPayments() {
     }
   };
 
-  if (loading)
-    return <p className="p-6 text-gray-500 text-center">Đang tải dữ liệu...</p>;
+  // 📦 Logic phân trang (Đã sửa tên biến cho khớp với state)
+  const totalPages = Math.ceil(filtered.length / perPage);
+  const startIndex = (page - 1) * perPage;
+  const currentPayments = filtered.slice(startIndex, startIndex + perPage);
 
-  // 📦 Logic phân trang
-  const totalPages = Math.ceil(payments.length / itemsPerPage);
-  const startIndex = (currentPage - 1) * itemsPerPage;
-  const currentPayments = payments.slice(startIndex, startIndex + itemsPerPage);
+  // 🎨 Helper Render
+  const getMethodBadge = (method) => {
+    const m = method?.toLowerCase();
+    if (m === "momo")
+      return (
+        <span className="flex items-center gap-1 text-pink-600 font-bold bg-pink-50 px-2 py-1 rounded border border-pink-200 text-xs">
+          <Wallet size={12} /> MoMo
+        </span>
+      );
+    if (m === "banktransfer" || m === "banking")
+      return (
+        <span className="flex items-center gap-1 text-blue-600 font-bold bg-blue-50 px-2 py-1 rounded border border-blue-200 text-xs">
+          <CreditCard size={12} /> Chuyển khoản
+        </span>
+      );
+    return (
+      <span className="flex items-center gap-1 text-green-600 font-bold bg-green-50 px-2 py-1 rounded border border-green-200 text-xs">
+        <DollarSign size={12} /> Tiền mặt
+      </span>
+    );
+  };
 
   return (
-    <div className="p-6 space-y-6">
-      {/* HEADER */}
-      <div className="flex justify-between items-center">
-        <h1 className="text-2xl font-bold text-blue-700">
-          💳 Quản lý thanh toán
-        </h1>
-        <p className="text-gray-500 text-sm">
-          Tổng: <strong>{payments.length}</strong> giao dịch
-        </p>
+    <div className="space-y-6 animate-in fade-in duration-500 font-sans">
+      {/* 1. Header & Search */}
+      <div className="bg-white p-5 rounded-xl shadow-sm border border-gray-100 flex flex-col sm:flex-row justify-between items-center gap-4">
+        <div>
+          <h1 className="text-xl font-bold text-[#113e48] flex items-center gap-2">
+            <CreditCard className="text-orange-500" size={24} /> Quản lý thanh
+            toán
+          </h1>
+          <p className="text-xs text-gray-500 mt-1">
+            Tổng cộng:{" "}
+            <span className="font-bold text-[#113e48]">{filtered.length}</span>{" "}
+            giao dịch
+          </p>
+        </div>
+
+        <div className="relative w-full sm:w-72">
+          <Search
+            className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"
+            size={18}
+          />
+          <input
+            type="text"
+            placeholder="Tìm mã vận đơn, khách hàng..."
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            className="w-full pl-10 pr-4 py-2.5 bg-gray-50 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 transition-all"
+          />
+        </div>
       </div>
 
-      {/* TABLE */}
-      <div className="overflow-x-auto bg-white rounded-lg shadow-lg">
-        <table className="w-full border-collapse text-sm">
-          <thead className="bg-gradient-to-r from-blue-600 to-blue-500 text-white">
-            <tr>
-              <th className="p-3 text-left">#</th>
-              <th className="p-3 text-left">Mã vận đơn</th>
-              <th className="p-3 text-left">Khách hàng</th>
-              <th className="p-3 text-left">Số tiền</th>
-              <th className="p-3 text-left">Phương thức</th>
-              <th className="p-3 text-left">Trạng thái</th>
-              <th className="p-3 text-left">Ngày tạo</th>
-              <th className="p-3 text-center">Thao tác</th>
-            </tr>
-          </thead>
-          <tbody>
-            {currentPayments.length > 0 ? (
-              currentPayments.map((p, i) => (
-                <tr
-                  key={p.id}
-                  className="border-b hover:bg-gray-50 transition duration-200"
-                >
-                  <td className="p-3">{startIndex + i + 1}</td>
-                  <td className="p-3 font-semibold text-blue-600">
-                    {p.tracking_code || "—"}
-                  </td>
-                  <td className="p-3">{p.customer_name || "Không rõ"}</td>
-                  <td className="p-3 font-semibold text-green-700">
-                    {p.amount?.toLocaleString("vi-VN")} ₫
-                  </td>
-                  <td className="p-3">
-                    {p.method?.toLowerCase() === "momo" ? (
-                      <span className="text-pink-600 font-semibold">
-                        Ví MoMo
-                      </span>
-                    ) : p.method === "BankTransfer" ? (
-                      <span className="text-blue-600 font-semibold">
-                        Chuyển khoản
-                      </span>
-                    ) : (
-                      <span className="text-gray-700">Tiền mặt</span>
-                    )}
-                  </td>
-                  <td className="p-3">
-                    <select
-                      value={p.status}
-                      onChange={(e) => handleUpdate(p.id, e.target.value)}
-                      className={`border rounded px-2 py-1 ${
-                        p.status === "completed"
-                          ? "text-green-600 border-green-400"
-                          : p.status === "pending"
-                          ? "text-yellow-600 border-yellow-400"
-                          : "text-red-600 border-red-400"
-                      }`}
-                    >
-                      <option value="pending">Đang xử lý</option>
-                      <option value="completed">Hoàn tất</option>
-                      <option value="failed">Thất bại</option>
-                    </select>
-                  </td>
-                  <td className="p-3 text-gray-500">
-                    {new Date(p.created_at).toLocaleString("vi-VN")}
-                  </td>
-                  <td className="p-3 text-center">
-                    <button
-                      onClick={() => handleDelete(p.id)}
-                      className="bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded text-sm"
-                    >
-                      Xóa
-                    </button>
+      {/* 2. Table */}
+      <div className="bg-white border border-gray-100 rounded-xl shadow-sm overflow-hidden">
+        <div className="overflow-x-auto">
+          <table className="w-full text-sm text-left">
+            <thead className="bg-gray-50 text-gray-500 font-medium border-b border-gray-100">
+              <tr>
+                <th className="px-6 py-4">Mã vận đơn</th>
+                <th className="px-6 py-4">Khách hàng</th>
+                <th className="px-6 py-4">Số tiền</th>
+                <th className="px-6 py-4">Phương thức</th>
+                <th className="px-6 py-4 text-center">Trạng thái</th>
+                <th className="px-6 py-4 text-center">Ngày tạo</th>
+                <th className="px-6 py-4 text-center">Thao tác</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-gray-50">
+              {loading ? (
+                [...Array(5)].map((_, i) => (
+                  <tr key={i}>
+                    <td colSpan="7" className="px-6 py-4">
+                      <div className="h-4 bg-gray-100 rounded animate-pulse"></div>
+                    </td>
+                  </tr>
+                ))
+              ) : currentPayments.length > 0 ? (
+                currentPayments.map((p) => (
+                  <tr
+                    key={p.id}
+                    className="hover:bg-gray-50/50 transition-colors"
+                  >
+                    <td className="px-6 py-4 font-bold text-[#113e48]">
+                      #{p.tracking_code || "---"}
+                    </td>
+                    <td className="px-6 py-4 font-medium text-gray-700">
+                      {p.customer_name || "Khách lẻ"}
+                    </td>
+                    <td className="px-6 py-4 text-green-600 font-bold text-base">
+                      {Number(p.amount).toLocaleString("vi-VN")} ₫
+                    </td>
+                    <td className="px-6 py-4">{getMethodBadge(p.method)}</td>
+                    <td className="px-6 py-4 text-center">
+                      <select
+                        value={p.status}
+                        onChange={(e) => handleUpdate(p.id, e.target.value)}
+                        className={`border-none bg-transparent outline-none font-bold text-xs cursor-pointer px-2 py-1 rounded-full ${
+                          p.status === "completed"
+                            ? "text-green-700 bg-green-100"
+                            : p.status === "pending"
+                            ? "text-yellow-700 bg-yellow-100"
+                            : "text-red-700 bg-red-100"
+                        }`}
+                      >
+                        <option value="pending">⏳ Đang xử lý</option>
+                        <option value="completed">✅ Hoàn tất</option>
+                        <option value="failed">❌ Thất bại</option>
+                      </select>
+                    </td>
+                    <td className="px-6 py-4 text-center text-gray-500 text-xs">
+                      {new Date(p.created_at).toLocaleString("vi-VN")}
+                    </td>
+                    <td className="px-6 py-4 text-center">
+                      <button
+                        onClick={() => handleDelete(p.id)}
+                        className="p-2 text-red-500 hover:bg-red-50 rounded-lg transition-colors"
+                        title="Xóa giao dịch"
+                      >
+                        <Trash2 size={16} />
+                      </button>
+                    </td>
+                  </tr>
+                ))
+              ) : (
+                <tr>
+                  <td
+                    colSpan="7"
+                    className="px-6 py-12 text-center text-gray-400 italic"
+                  >
+                    Không tìm thấy dữ liệu thanh toán.
                   </td>
                 </tr>
-              ))
-            ) : (
-              <tr>
-                <td
-                  colSpan="8"
-                  className="p-6 text-center text-gray-500 italic"
-                >
-                  Không có dữ liệu thanh toán
-                </td>
-              </tr>
-            )}
-          </tbody>
-        </table>
-      </div>
-
-      {/* 🔸 PHÂN TRANG */}
-      {totalPages > 1 && (
-        <div className="flex justify-center items-center gap-4 mt-4 text-sm">
-          <button
-            disabled={currentPage === 1}
-            onClick={() => setCurrentPage((p) => p - 1)}
-            className={`px-4 py-2 rounded border ${
-              currentPage === 1
-                ? "bg-gray-100 text-gray-400 cursor-not-allowed"
-                : "bg-white hover:bg-gray-100 text-gray-700"
-            }`}
-          >
-            ← Trước
-          </button>
-
-          <span className="text-gray-700 font-medium">
-            Trang {currentPage}/{totalPages}
-          </span>
-
-          <button
-            disabled={currentPage === totalPages}
-            onClick={() => setCurrentPage((p) => p + 1)}
-            className={`px-4 py-2 rounded border ${
-              currentPage === totalPages
-                ? "bg-gray-100 text-gray-400 cursor-not-allowed"
-                : "bg-white hover:bg-gray-100 text-gray-700"
-            }`}
-          >
-            Sau →
-          </button>
+              )}
+            </tbody>
+          </table>
         </div>
-      )}
+
+        {/* 3. Pagination Component */}
+        <Pagination
+          currentPage={page}
+          totalPages={totalPages}
+          onPageChange={setPage}
+        />
+      </div>
     </div>
   );
 }
