@@ -94,7 +94,7 @@ export default function CustomerLayout() {
               <NavLink to="/customer" end className={navLinkClasses}>
                 <Home size={18} /> <span>Tổng quan</span>
               </NavLink>
-              <NavLink to="/customer/create" className={navLinkClasses}>
+              <NavLink to="/customer/create-order" className={navLinkClasses}>
                 <PlusCircle size={18} /> <span>Tạo đơn hàng</span>
               </NavLink>
               <NavLink to="/customer/track" className={navLinkClasses}>

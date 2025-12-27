@@ -13,14 +13,19 @@ import {
   Truck,
   CheckCircle,
   Map,
-  Hash, // Icon số lượng
-  Scale, // Icon cân nặng
-  DollarSign, // Icon tiền
+  Hash,
+  Scale,
+  DollarSign,
+  Book,
+  X,
+  Phone,
+  Home,
 } from "lucide-react";
 
 export default function CustomerCreateShipment() {
   const navigate = useNavigate();
 
+  // --- STATE FORM ---
   const [form, setForm] = useState({
     sender_name: "",
     sender_phone: "",
@@ -33,7 +38,7 @@ export default function CustomerCreateShipment() {
     delivery_lat: null,
     delivery_lng: null,
     item_name: "",
-    quantity: 1, // Mặc định là 1 kiện
+    quantity: 1,
     weight_kg: "",
     cod_amount: "",
     shipping_fee: 0,
@@ -51,16 +56,41 @@ export default function CustomerCreateShipment() {
     fast: 40000,
   };
 
+  // State Map
   const [showPickupMap, setShowPickupMap] = useState(false);
   const [showDeliveryMap, setShowDeliveryMap] = useState(false);
 
-  // Lấy ID user an toàn
+  // --- STATE SỔ ĐỊA CHỈ ---
+  const [showAddressModal, setShowAddressModal] = useState(false);
+  const [addressTarget, setAddressTarget] = useState(null);
+  const [savedAddresses, setSavedAddresses] = useState([]);
+  const [loadingAddresses, setLoadingAddresses] = useState(false);
+
+  // Hàm reset địa chỉ
+  const handleResetAddress = (type) => {
+    if (type === "pickup") {
+      setForm((prev) => ({
+        ...prev,
+        pickup_address: "",
+        pickup_lat: null,
+        pickup_lng: null,
+      }));
+    } else {
+      setForm((prev) => ({
+        ...prev,
+        delivery_address: "",
+        delivery_lat: null,
+        delivery_lng: null,
+      }));
+    }
+  };
+
+  // Lấy ID user
   const getUserId = () => {
     const userStr = localStorage.getItem("user");
     if (userStr) {
       try {
-        const user = JSON.parse(userStr);
-        return user.id;
+        return JSON.parse(userStr).id;
       } catch (e) {
         return localStorage.getItem("userId");
       }
@@ -70,16 +100,15 @@ export default function CustomerCreateShipment() {
   const customerId = getUserId();
 
   useEffect(() => {
-    // Khởi tạo AOS
     AOS.init({
       duration: 500,
       easing: "ease-out-cubic",
       once: true,
-      offset: 50, // Giảm offset để element hiện sớm hơn
+      offset: 50,
     });
   }, []);
 
-  // Tính khoảng cách giả lập (Demo)
+  // Tính khoảng cách Demo
   useEffect(() => {
     if (!form.delivery_address) return;
     const km = Math.floor(Math.random() * 30) + 5;
@@ -96,22 +125,60 @@ export default function CustomerCreateShipment() {
 
     const total = baseFee + distanceFee + weightFee + serviceFee;
     setEstimatedFee(total);
-
-    setForm((prev) => ({
-      ...prev,
-      shipping_fee: total,
-    }));
+    setForm((prev) => ({ ...prev, shipping_fee: total }));
   }, [distanceKm, form.weight_kg, serviceType, form.delivery_address]);
 
   const handleChange = (e) =>
     setForm((prev) => ({ ...prev, [e.target.name]: e.target.value }));
 
+  // --- HÀM XỬ LÝ SỔ ĐỊA CHỈ ---
+  const openAddressBook = async (target) => {
+    setAddressTarget(target);
+    setShowAddressModal(true);
+
+    if (savedAddresses.length === 0) {
+      setLoadingAddresses(true);
+      try {
+        // Gọi API lấy danh sách địa chỉ
+        const res = await API.get(`/addresses/${customerId}`);
+        setSavedAddresses(res.data);
+      } catch (error) {
+        console.error("Lỗi lấy sổ địa chỉ:", error);
+        toast.error("Không tải được sổ địa chỉ");
+      } finally {
+        setLoadingAddresses(false);
+      }
+    }
+  };
+
+  const handleSelectAddress = (addr) => {
+    if (addressTarget === "pickup") {
+      setForm((prev) => ({
+        ...prev,
+        sender_name: addr.name,
+        sender_phone: addr.phone,
+        pickup_address: addr.address,
+        pickup_lat: addr.lat || null,
+        pickup_lng: addr.lng || null,
+      }));
+    } else {
+      setForm((prev) => ({
+        ...prev,
+        receiver_name: addr.name,
+        receiver_phone: addr.phone,
+        delivery_address: addr.address,
+        delivery_lat: addr.lat || null,
+        delivery_lng: addr.lng || null,
+      }));
+    }
+    setShowAddressModal(false);
+    toast.success("Đã điền thông tin từ sổ địa chỉ!");
+  };
+
+  // --- SUBMIT: TẠO ĐƠN -> CHUYỂN QUA THANH TOÁN ---
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!customerId) {
-      toast.error("⚠️ Bạn chưa đăng nhập!");
-      return;
-    }
+    if (!customerId) return toast.error("⚠️ Bạn chưa đăng nhập!");
 
     setCreating(true);
     try {
@@ -126,9 +193,31 @@ export default function CustomerCreateShipment() {
         quantity: Number(form.quantity),
       };
 
-      await API.post("/shipments", payload);
-      toast.success("🎉 Tạo đơn hàng thành công!");
-      navigate("/customer/history");
+      // 1. Gọi API tạo đơn
+      const res = await API.post("/shipments", payload);
+
+      // 2. Lấy ID đơn hàng vừa tạo
+      // Lưu ý: Backend cần trả về id hoặc insertId
+      const newShipmentId =
+        res.data.id || res.data.shipmentId || res.data.insertId;
+
+      if (!newShipmentId) {
+        // Fallback: Nếu backend chưa trả về ID, tạm thời thông báo thành công và về lịch sử
+        toast.success("Tạo đơn thành công (Chưa lấy được ID để thanh toán)");
+        navigate("/customer/history");
+        return;
+      }
+
+      toast.success("🎉 Tạo đơn thành công! Đang chuyển sang thanh toán...");
+
+      // 3. CHUYỂN HƯỚNG SANG TRANG THANH TOÁN KÈM DỮ LIỆU
+      navigate("/customer/payment", {
+        state: {
+          shipment_id: newShipmentId,
+          amount: estimatedFee,
+          cod: form.cod_amount,
+        },
+      });
     } catch (err) {
       console.error(err);
       toast.error("❌ Không thể tạo đơn hàng. Vui lòng thử lại!");
@@ -153,17 +242,26 @@ export default function CustomerCreateShipment() {
         onSubmit={handleSubmit}
         className="grid grid-cols-1 lg:grid-cols-3 gap-8"
       >
-        {/* --- CỘT TRÁI (CHIẾM 2 PHẦN) --- */}
+        {/* --- CỘT TRÁI --- */}
         <div className="lg:col-span-2 space-y-6">
           {/* 1. THÔNG TIN NGƯỜI GỬI */}
           <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 relative overflow-hidden">
             <div className="absolute top-0 left-0 w-1 h-full bg-blue-500"></div>
-            <h3 className="text-lg font-bold text-[#113e48] mb-4 flex items-center gap-2">
-              <div className="p-2 bg-blue-100 rounded-lg text-blue-600">
-                <User size={20} />
-              </div>
-              Thông tin người gửi
-            </h3>
+            <div className="flex justify-between items-center mb-4">
+              <h3 className="text-lg font-bold text-[#113e48] flex items-center gap-2">
+                <div className="p-2 bg-blue-100 rounded-lg text-blue-600">
+                  <User size={20} />
+                </div>
+                Thông tin người gửi
+              </h3>
+              <button
+                type="button"
+                onClick={() => openAddressBook("pickup")}
+                className="text-sm font-bold text-blue-600 bg-blue-50 hover:bg-blue-100 px-3 py-1.5 rounded-lg flex items-center gap-2 transition-colors"
+              >
+                <Book size={16} /> Chọn từ sổ địa chỉ
+              </button>
+            </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
               <div>
@@ -235,7 +333,29 @@ export default function CustomerCreateShipment() {
               </div>
             </div>
 
-            {pickupOption === "sender" && (
+            {form.pickup_address ? (
+              <div className="relative group">
+                <label className="text-xs font-bold text-gray-500 ml-1 mb-1 block">
+                  Địa chỉ lấy hàng chi tiết
+                </label>
+                <textarea
+                  value={form.pickup_address}
+                  onChange={(e) =>
+                    setForm({ ...form, pickup_address: e.target.value })
+                  }
+                  className="w-full p-3 border border-orange-300 bg-orange-50 rounded-xl outline-none focus:border-orange-500 transition-all font-medium resize-none"
+                  rows={3}
+                />
+                <button
+                  type="button"
+                  onClick={() => handleResetAddress("pickup")}
+                  className="absolute top-8 right-2 p-1 bg-gray-200 hover:bg-red-100 hover:text-red-600 rounded-full transition-all"
+                  title="Chọn lại địa chỉ khác"
+                >
+                  <X size={16} />
+                </button>
+              </div>
+            ) : (
               <div className="relative">
                 <DiaChiSelector
                   label="Địa chỉ lấy hàng"
@@ -263,12 +383,21 @@ export default function CustomerCreateShipment() {
           {/* 2. THÔNG TIN NGƯỜI NHẬN */}
           <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 relative overflow-hidden">
             <div className="absolute top-0 left-0 w-1 h-full bg-green-500"></div>
-            <h3 className="text-lg font-bold text-[#113e48] mb-4 flex items-center gap-2">
-              <div className="p-2 bg-green-100 rounded-lg text-green-600">
-                <MapPin size={20} />
-              </div>
-              Thông tin người nhận
-            </h3>
+            <div className="flex justify-between items-center mb-4">
+              <h3 className="text-lg font-bold text-[#113e48] mb-4 flex items-center gap-2">
+                <div className="p-2 bg-green-100 rounded-lg text-green-600">
+                  <MapPin size={20} />
+                </div>
+                Thông tin người nhận
+              </h3>
+              <button
+                type="button"
+                onClick={() => openAddressBook("delivery")}
+                className="text-sm font-bold text-green-600 bg-green-50 hover:bg-green-100 px-3 py-1.5 rounded-lg flex items-center gap-2 transition-colors"
+              >
+                <Book size={16} /> Chọn từ sổ địa chỉ
+              </button>
+            </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
               <div>
@@ -300,30 +429,54 @@ export default function CustomerCreateShipment() {
               </div>
             </div>
 
-            <div className="relative">
-              <DiaChiSelector
-                label="Địa chỉ giao hàng"
-                required
-                onChange={(data) => {
-                  setForm((prev) => ({
-                    ...prev,
-                    delivery_address: data.address,
-                    delivery_lat: data.lat,
-                    delivery_lng: data.lng,
-                  }));
-                }}
-              />
-              <button
-                type="button"
-                onClick={() => setShowDeliveryMap(true)}
-                className="absolute top-0 right-0 mt-1 text-xs font-bold text-green-600 hover:underline flex items-center gap-1"
-              >
-                <Map size={14} /> Chọn trên bản đồ
-              </button>
-            </div>
+            {form.delivery_address ? (
+              <div className="relative group">
+                <label className="text-xs font-bold text-gray-500 ml-1 mb-1 block">
+                  Địa chỉ giao hàng chi tiết
+                </label>
+                <textarea
+                  value={form.delivery_address}
+                  onChange={(e) =>
+                    setForm({ ...form, delivery_address: e.target.value })
+                  }
+                  className="w-full p-3 border border-green-300 bg-green-50 rounded-xl outline-none focus:border-green-500 transition-all font-medium resize-none"
+                  rows={3}
+                />
+                <button
+                  type="button"
+                  onClick={() => handleResetAddress("delivery")}
+                  className="absolute top-8 right-2 p-1 bg-gray-200 hover:bg-red-100 hover:text-red-600 rounded-full transition-all"
+                  title="Chọn lại địa chỉ khác"
+                >
+                  <X size={16} />
+                </button>
+              </div>
+            ) : (
+              <div className="relative">
+                <DiaChiSelector
+                  label="Địa chỉ giao hàng"
+                  required
+                  onChange={(data) => {
+                    setForm((prev) => ({
+                      ...prev,
+                      delivery_address: data.address,
+                      delivery_lat: data.lat,
+                      delivery_lng: data.lng,
+                    }));
+                  }}
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowDeliveryMap(true)}
+                  className="absolute top-0 right-0 mt-1 text-xs font-bold text-green-600 hover:underline flex items-center gap-1"
+                >
+                  <Map size={14} /> Chọn trên bản đồ
+                </button>
+              </div>
+            )}
           </div>
 
-          {/* 3. THÔNG TIN HÀNG HÓA (Đảm bảo hiển thị) */}
+          {/* 3. THÔNG TIN HÀNG HÓA */}
           <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 relative overflow-hidden">
             <div className="absolute top-0 left-0 w-1 h-full bg-orange-500"></div>
             <h3 className="text-lg font-bold text-[#113e48] mb-4 flex items-center gap-2">
@@ -334,7 +487,6 @@ export default function CustomerCreateShipment() {
             </h3>
 
             <div className="space-y-4">
-              {/* Tên hàng */}
               <div>
                 <label className="text-xs font-bold text-gray-500 ml-1 mb-1 block">
                   Tên hàng hóa chi tiết
@@ -349,9 +501,7 @@ export default function CustomerCreateShipment() {
                 />
               </div>
 
-              {/* 3 Trường: Số lượng - Cân nặng - Tiền thu hộ */}
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                {/* Số lượng */}
                 <div>
                   <label className="text-xs font-bold text-gray-500 ml-1 mb-1 flex items-center gap-1">
                     <Hash size={12} /> Số kiện
@@ -368,7 +518,6 @@ export default function CustomerCreateShipment() {
                   />
                 </div>
 
-                {/* Khối lượng */}
                 <div>
                   <label className="text-xs font-bold text-gray-500 ml-1 mb-1 flex items-center gap-1">
                     <Scale size={12} /> Khối lượng (kg)
@@ -386,7 +535,6 @@ export default function CustomerCreateShipment() {
                   />
                 </div>
 
-                {/* COD */}
                 <div>
                   <label className="text-xs font-bold text-gray-500 ml-1 mb-1 flex items-center gap-1">
                     <DollarSign size={12} /> Thu hộ (COD)
@@ -407,13 +555,12 @@ export default function CustomerCreateShipment() {
           </div>
         </div>
 
-        {/* --- CỘT PHẢI: DỊCH VỤ (STICKY) --- */}
+        {/* --- CỘT PHẢI: DỊCH VỤ --- */}
         <div className="lg:col-span-1">
           <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 sticky top-6">
             <h3 className="text-lg font-bold text-[#113e48] mb-4">
               Chọn dịch vụ
             </h3>
-
             <div className="space-y-3">
               {[
                 {
@@ -490,13 +637,13 @@ export default function CustomerCreateShipment() {
               disabled={creating}
               className="w-full mt-6 bg-[#113e48] hover:bg-[#0d2f36] text-white py-4 rounded-xl font-bold text-lg shadow-xl shadow-blue-900/20 transition-all flex items-center justify-center gap-2 disabled:opacity-70 hover:scale-[1.02]"
             >
-              {creating ? "Đang xử lý..." : "Tạo đơn ngay"}
+              {creating ? "Đang xử lý..." : "Tạo đơn & Thanh toán"}
             </button>
           </div>
         </div>
       </form>
 
-      {/* --- MAP MODALS (Giữ nguyên) --- */}
+      {/* --- MAP MODALS --- */}
       {showPickupMap && (
         <div className="fixed inset-0 bg-black/60 z-[9999] flex items-center justify-center backdrop-blur-sm p-4">
           <div className="bg-white rounded-2xl overflow-hidden w-full max-w-3xl h-[500px] shadow-2xl relative">
@@ -537,6 +684,69 @@ export default function CustomerCreateShipment() {
               }}
               onCancel={() => setShowDeliveryMap(false)}
             />
+          </div>
+        </div>
+      )}
+
+      {/* --- MODAL SỔ ĐỊA CHỈ (MỚI) --- */}
+      {showAddressModal && (
+        <div className="fixed inset-0 bg-black/60 z-[9999] flex items-center justify-center backdrop-blur-sm p-4 animate-in fade-in duration-200">
+          <div className="bg-white rounded-2xl w-full max-w-md shadow-2xl overflow-hidden flex flex-col max-h-[80vh]">
+            <div className="p-4 border-b border-gray-100 flex justify-between items-center bg-gray-50">
+              <h3 className="font-bold text-[#113e48] flex items-center gap-2">
+                <Book size={18} /> Chọn địa chỉ{" "}
+                {addressTarget === "pickup" ? "gửi" : "nhận"}
+              </h3>
+              <button
+                onClick={() => setShowAddressModal(false)}
+                className="p-1 hover:bg-gray-200 rounded-full transition"
+              >
+                <X size={20} />
+              </button>
+            </div>
+
+            <div className="flex-1 overflow-y-auto p-4 space-y-3">
+              {loadingAddresses ? (
+                <p className="text-center text-gray-500 py-8">
+                  Đang tải danh sách...
+                </p>
+              ) : savedAddresses.length > 0 ? (
+                savedAddresses.map((addr) => (
+                  <div
+                    key={addr.id}
+                    onClick={() => handleSelectAddress(addr)}
+                    className="p-4 border border-gray-200 rounded-xl hover:border-orange-500 hover:bg-orange-50 cursor-pointer transition-all group"
+                  >
+                    <div className="flex justify-between items-start mb-1">
+                      <span className="font-bold text-[#113e48] group-hover:text-orange-700">
+                        {addr.name}
+                      </span>
+                      <span className="text-xs bg-gray-200 text-gray-600 px-2 py-0.5 rounded uppercase font-bold">
+                        {addr.type}
+                      </span>
+                    </div>
+                    <div className="text-sm text-gray-600 flex items-center gap-2 mb-1">
+                      <Phone size={14} /> {addr.phone}
+                    </div>
+                    <div className="text-sm text-gray-500 flex items-start gap-2">
+                      <MapPin size={14} className="mt-0.5 flex-shrink-0" />
+                      <span className="line-clamp-2">{addr.address}</span>
+                    </div>
+                  </div>
+                ))
+              ) : (
+                <div className="text-center py-8">
+                  <Home size={40} className="mx-auto text-gray-300 mb-2" />
+                  <p className="text-gray-500">Bạn chưa lưu địa chỉ nào.</p>
+                  <button
+                    onClick={() => navigate("/customer/addresses")}
+                    className="text-blue-600 font-bold hover:underline mt-2"
+                  >
+                    Thêm địa chỉ mới
+                  </button>
+                </div>
+              )}
+            </div>
           </div>
         </div>
       )}

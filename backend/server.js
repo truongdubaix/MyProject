@@ -25,7 +25,8 @@ import feedbackRoutes from "./routes/feedbackRoutes.js";
 import notificationRoutes from "./routes/notificationRoutes.js";
 import contactRoutes from "./routes/contactRoutes.js";
 import aiRoutes from "./routes/aiRoutes.js";
-//import bankRoutes from "./routes/bankRoutes.js";
+import addressRoutes from "./routes/addressRoutes.js";
+import walletRoutes from "./routes/walletRoutes.js";
 
 dotenv.config();
 const app = express();
@@ -93,7 +94,8 @@ app.use("/api/feedbacks", feedbackRoutes);
 app.use("/api/notifications", notificationRoutes);
 app.use("/api/contact", contactRoutes);
 app.use("/api/ai", aiRoutes);
-//app.use("/api/payment/bank", bankRoutes);
+app.use("/api/addresses", addressRoutes);
+app.use("/api/wallet", walletRoutes);
 
 //  Kiểm tra API
 app.get("/", (_req, res) =>

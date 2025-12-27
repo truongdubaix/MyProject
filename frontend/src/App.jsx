@@ -75,6 +75,7 @@ import PriceList from "./pages/service/PriceList.jsx";
 import CustomerAddress from "./pages/customer/CustomerAddress.jsx";
 import CustomerWallet from "./pages/customer/CustomerWallet.jsx";
 import CustomerSupport from "./pages/customer/CustomerSupport.jsx";
+import PaymentResult from "./pages/customer/PaymentResult.jsx";
 
 export default function App() {
   // 🟢 Logic để ẩn chat ở các trang quản trị
@@ -194,13 +195,19 @@ export default function App() {
             }
           >
             <Route index element={<CustomerDashboard />} />
-            <Route path="create" element={<CustomerCreateShipment />} />
+            <Route
+              path="/customer/create-order"
+              element={<CustomerCreateShipment />}
+            />
             <Route path="track" element={<CustomerTrack />} />
             <Route path="history" element={<CustomerHistory />} />
             <Route path="profile" element={<CustomerProfile />} />
             <Route path="history/:id" element={<CustomerShipmentDetail />} />
-            <Route path="payment" element={<CustomerPayment />} />
-            <Route path="payment-success" element={<PaymentSuccess />} />
+            <Route path="/customer/payment" element={<CustomerPayment />} />
+            <Route
+              path="/customer/payment-success"
+              element={<PaymentResult />}
+            />
             <Route path="payment-fail" element={<PaymentFail />} />
             <Route path="feedback" element={<CustomerFeedback />} />
             <Route path="addresses" element={<CustomerAddress />} />

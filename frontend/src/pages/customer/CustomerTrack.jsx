@@ -68,12 +68,31 @@ export default function CustomerTrack() {
     AOS.init({ duration: 500 });
   }, []);
 
-  // API OSRM
+  // 👇 THUẬT TOÁN VẼ ĐƯỜNG "ÉP" VỀ VIỆT NAM
   const fetchRouteOSRM = async (start, end) => {
     if (!start || !end) return [];
+
+    // OSRM dùng [Lng, Lat]
     const startStr = `${start[1]},${start[0]}`;
     const endStr = `${end[1]},${end[0]}`;
-    const url = `https://router.project-osrm.org/route/v1/driving/${startStr};${endStr}?overview=full&geometries=geojson`;
+
+    // Tọa độ Đà Nẵng (Điểm neo để giữ đường đi ở VN)
+    const midPointStr = "108.2022,16.0544";
+
+    // Tính khoảng cách vĩ độ (Bắc - Nam)
+    const latDiff = Math.abs(start[0] - end[0]);
+
+    let url = "";
+
+    // 💡 LOGIC THÔNG MINH:
+    // Nếu khoảng cách Bắc-Nam lớn hơn 4 độ vĩ tuyến (khá xa)
+    // -> Chèn thêm Đà Nẵng vào giữa để ép đường đi bám biển
+    if (latDiff > 4) {
+      url = `https://router.project-osrm.org/route/v1/driving/${startStr};${midPointStr};${endStr}?overview=full&geometries=geojson`;
+    } else {
+      // Nếu gần thì đi thẳng
+      url = `https://router.project-osrm.org/route/v1/driving/${startStr};${endStr}?overview=full&geometries=geojson`;
+    }
 
     try {
       const res = await fetch(url);
@@ -87,6 +106,7 @@ export default function CustomerTrack() {
     } catch (error) {
       console.error("Lỗi OSRM:", error);
     }
+    // Fallback đường thẳng nếu lỗi
     return [start, end];
   };
 
@@ -118,9 +138,6 @@ export default function CustomerTrack() {
       }
       if (data.delivery_lat && data.delivery_lng) {
         delivery = [Number(data.delivery_lat), Number(data.delivery_lng)];
-      } else if (data.driver_lat && data.driver_lng && delivery) {
-        // Nếu chưa có pickup nhưng có driver thì vẽ từ driver -> delivery
-        pickup = [Number(data.driver_lat), Number(data.driver_lng)];
       }
 
       // Default nếu thiếu tọa độ
@@ -128,8 +145,14 @@ export default function CustomerTrack() {
       if (!delivery) delivery = [21.0285, 105.8542];
 
       setWaypoints([pickup, delivery]);
-      const realPath = await fetchRouteOSRM(pickup, delivery);
-      setRoutePoints(realPath);
+
+      // Logic vẽ đường: Chỉ vẽ khi đang di chuyển
+      if (data.status === "picking" || data.status === "delivering") {
+        const realPath = await fetchRouteOSRM(pickup, delivery);
+        setRoutePoints(realPath);
+      } else {
+        setRoutePoints([]);
+      }
 
       toast.success("✅ Đã tìm thấy đơn hàng!");
     } catch (err) {
@@ -352,20 +375,22 @@ export default function CustomerTrack() {
                   </Marker>
                 )}
 
-                {/* Driver Marker */}
-                {shipment.driver_lat && (
-                  <Marker
-                    position={[shipment.driver_lat, shipment.driver_lng]}
-                    icon={iconDriver}
-                    zIndexOffset={999}
-                  >
-                    <Popup>
-                      <b>Tài xế đang ở đây</b>
-                    </Popup>
-                  </Marker>
-                )}
+                {/* Driver Marker - Chỉ hiện khi đang di chuyển */}
+                {(shipment.status === "picking" ||
+                  shipment.status === "delivering") &&
+                  shipment.driver_lat && (
+                    <Marker
+                      position={[shipment.driver_lat, shipment.driver_lng]}
+                      icon={iconDriver}
+                      zIndexOffset={999}
+                    >
+                      <Popup>
+                        <b>Tài xế đang ở đây</b>
+                      </Popup>
+                    </Marker>
+                  )}
 
-                {/* Route Line */}
+                {/* Route Line - Chỉ hiện khi đang di chuyển */}
                 {routePoints.length > 0 && (
                   <Polyline
                     positions={routePoints}

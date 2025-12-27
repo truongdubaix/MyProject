@@ -23,71 +23,65 @@ import {
   CheckCircle,
   CreditCard,
   MapPin,
-  Navigation,
 } from "lucide-react";
-import { renderToStaticMarkup } from "react-dom/server"; // ✨ Import để render Icon React sang HTML string
+import { renderToStaticMarkup } from "react-dom/server";
 
-// --- 🎨 CẤU HÌNH ICON BẢN ĐỒ (DÙNG HTML/CSS) ---
-
-// 1. Hàm tạo Icon tùy chỉnh (Custom Marker)
+// --- 🎨 CẤU HÌNH ICON BẢN ĐỒ ---
 const createCustomIcon = (iconComponent, bgColor, ringColor) => {
   return L.divIcon({
-    className: "custom-marker", // Class rỗng để xóa style mặc định của Leaflet
+    className: "custom-marker",
     html: renderToStaticMarkup(
       <div
         className={`relative w-10 h-10 flex items-center justify-center rounded-full text-white shadow-xl border-2 border-white ${bgColor}`}
       >
-        {/* Vòng lan tỏa (Pulse effect) cho đẹp */}
         <div
           className={`absolute -inset-1 rounded-full opacity-30 animate-ping ${ringColor}`}
         ></div>
         {iconComponent}
-        {/* Mũi tên nhỏ ở dưới để chỉ vị trí */}
         <div
           className={`absolute -bottom-1 w-3 h-3 transform rotate-45 ${bgColor} border-r-2 border-b-2 border-white`}
         ></div>
       </div>
     ),
     iconSize: [40, 40],
-    iconAnchor: [20, 45], // Căn giữa đáy
+    iconAnchor: [20, 45],
     popupAnchor: [0, -45],
   });
 };
 
-// 2. Định nghĩa từng loại Icon
 const iconDriver = createCustomIcon(
   <Truck size={20} />,
   "bg-[#113e48]",
   "bg-[#113e48]"
-); // Màu Teal đậm
+);
 const iconPickup = createCustomIcon(
   <Package size={20} />,
   "bg-blue-600",
   "bg-blue-400"
-); // Màu Xanh dương
+);
 const iconDelivery = createCustomIcon(
   <MapPin size={20} fill="currentColor" />,
   "bg-orange-500",
   "bg-orange-400"
-); // Màu Cam
+);
 
-// --- COMPONENT CON (Giữ nguyên) ---
+// --- SUB COMPONENTS ---
 function FitBounds({ points }) {
   const map = useMap();
   useEffect(() => {
     if (points && points.length > 0) {
       const bounds = L.latLngBounds(points);
-      map.fitBounds(bounds, { padding: [80, 80] }); // Tăng padding để icon không bị che
+      map.fitBounds(bounds, { padding: [80, 80] });
     }
   }, [points, map]);
   return null;
 }
 
-// ⏳ TIMELINE COMPONENT (ĐÃ SỬA LỖI CĂN CHỈNH & LOGIC)
+// Timeline Component
 function TrackingTimeline({ status }) {
   const steps = [
     { key: "pending", label: "Đã đặt hàng", icon: <Package size={18} /> },
-    { key: "picking", label: "Đang lấy hàng", icon: <Package size={18} /> }, // Gom assigned vào đây
+    { key: "picking", label: "Đang lấy hàng", icon: <Package size={18} /> },
     { key: "delivering", label: "Đang giao hàng", icon: <Truck size={18} /> },
     {
       key: "completed",
@@ -96,13 +90,12 @@ function TrackingTimeline({ status }) {
     },
   ];
 
-  // 1️⃣ Logic chuẩn hóa trạng thái về Index (0, 1, 2, 3)
   const getStatusIndex = (s) => {
     switch (s) {
       case "pending":
         return 0;
       case "assigned":
-        return 1; // Đã phân công tài xế -> coi như đang lấy
+        return 1;
       case "picking":
         return 1;
       case "delivering":
@@ -125,12 +118,8 @@ function TrackingTimeline({ status }) {
 
   return (
     <div className="w-full py-4">
-      {/* Container chính */}
       <div className="flex items-start justify-between w-full relative">
-        {/* Đường kẻ nền (Màu xám) - Nằm chìm bên dưới */}
         <div className="absolute top-5 left-0 w-full h-1 bg-gray-100 -z-10 rounded-full"></div>
-
-        {/* Đường kẻ tiến độ (Màu xanh/đỏ) - Chạy theo % */}
         <div
           className={`absolute top-5 left-0 h-1 transition-all duration-700 ease-out -z-10 rounded-full ${
             isFailed ? "bg-red-500" : "bg-green-500"
@@ -140,14 +129,11 @@ function TrackingTimeline({ status }) {
           }}
         ></div>
 
-        {/* Render các bước */}
         {steps.map((step, index) => {
           const isCompleted = index <= currentIndex;
           const isCurrent = index === currentIndex;
-
           return (
             <div key={step.key} className="flex flex-col items-center flex-1">
-              {/* Icon Tròn */}
               <div
                 className={`w-10 h-10 rounded-full flex items-center justify-center border-2 transition-all duration-300 z-10 bg-white
                   ${
@@ -161,17 +147,10 @@ function TrackingTimeline({ status }) {
               >
                 {step.icon}
               </div>
-
-              {/* Label Text (Căn giữa tuyệt đối để không đẩy layout) */}
               <p
-                className={`mt-2 text-[11px] md:text-xs font-bold text-center px-1 transition-colors duration-300
-                  ${
-                    isCurrent || isCompleted
-                      ? "text-[#113e48]"
-                      : "text-gray-400"
-                  }
-                  ${isCurrent && isFailed ? "text-red-600" : ""}
-              `}
+                className={`mt-2 text-[11px] md:text-xs font-bold text-center px-1 transition-colors duration-300 ${
+                  isCurrent || isCompleted ? "text-[#113e48]" : "text-gray-400"
+                } ${isCurrent && isFailed ? "text-red-600" : ""}`}
               >
                 {step.label}
               </p>
@@ -179,8 +158,6 @@ function TrackingTimeline({ status }) {
           );
         })}
       </div>
-
-      {/* Thông báo lỗi nếu có */}
       {isFailed && (
         <div className="mt-6 p-3 bg-red-50 text-red-600 text-center rounded-xl text-sm font-bold border border-red-100 flex items-center justify-center gap-2 animate-pulse">
           <Clock size={16} /> Đơn hàng đã bị hủy hoặc giao thất bại.
@@ -199,12 +176,28 @@ export default function CustomerShipmentDetail() {
   const [waypoints, setWaypoints] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  // API OSRM
+  // 👇 API OSRM (Logic từ CustomerTrack: Ép đường đi qua Đà Nẵng)
   const fetchRouteOSRM = async (start, end) => {
     if (!start || !end) return [];
+
+    // OSRM dùng [Lng, Lat]
     const startStr = `${start[1]},${start[0]}`;
     const endStr = `${end[1]},${end[0]}`;
-    const url = `https://router.project-osrm.org/route/v1/driving/${startStr};${endStr}?overview=full&geometries=geojson`;
+
+    // Tọa độ Đà Nẵng (Điểm neo)
+    const midPointStr = "108.2022,16.0544";
+
+    // Tính khoảng cách vĩ độ (Bắc - Nam)
+    const latDiff = Math.abs(start[0] - end[0]);
+
+    let url = "";
+
+    // 💡 LOGIC: Nếu xa (> 4 độ vĩ tuyến) -> Chèn Đà Nẵng vào giữa
+    if (latDiff > 4) {
+      url = `https://router.project-osrm.org/route/v1/driving/${startStr};${midPointStr};${endStr}?overview=full&geometries=geojson`;
+    } else {
+      url = `https://router.project-osrm.org/route/v1/driving/${startStr};${endStr}?overview=full&geometries=geojson`;
+    }
 
     try {
       const res = await fetch(url);
@@ -243,14 +236,19 @@ export default function CustomerShipmentDetail() {
 
         if (pickup && delivery) {
           setWaypoints([pickup, delivery]);
-          const realPath = await fetchRouteOSRM(pickup, delivery);
-          setRoutePoints(realPath);
+
+          // 👇 LOGIC VẼ ĐƯỜNG: Chỉ vẽ khi 'picking' hoặc 'delivering'
+          if (data.status === "picking" || data.status === "delivering") {
+            const realPath = await fetchRouteOSRM(pickup, delivery);
+            setRoutePoints(realPath);
+          } else {
+            setRoutePoints([]); // Xóa đường nếu không phải đang đi
+          }
         } else {
-          // Demo coordinates if missing
+          // Fallback demo
           const demoPickup = [10.7769, 106.7009];
           const demoDelivery = [21.0285, 105.8542];
           setWaypoints([demoPickup, demoDelivery]);
-          setRoutePoints([demoPickup, demoDelivery]);
         }
       } catch (err) {
         console.error(err);
@@ -268,7 +266,7 @@ export default function CustomerShipmentDetail() {
         <div className="flex flex-col items-center gap-4">
           <div className="animate-spin rounded-full h-12 w-12 border-t-4 border-b-4 border-orange-500"></div>
           <p className="text-gray-500 font-medium">
-            Đang tải dữ liệu vận đơn...
+            Đang tải chi tiết đơn hàng...
           </p>
         </div>
       </div>
@@ -307,7 +305,7 @@ export default function CustomerShipmentDetail() {
       </div>
 
       <div className="max-w-7xl mx-auto p-6 grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* --- CỘT TRÁI (Giữ nguyên) --- */}
+        {/* --- CỘT TRÁI (Thông tin) --- */}
         <div className="lg:col-span-1 space-y-6">
           <div
             className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100"
@@ -460,7 +458,7 @@ export default function CustomerShipmentDetail() {
               attribution="&copy; OpenStreetMap"
             />
 
-            {/* Marker Pickup - XANH DƯƠNG */}
+            {/* Marker Pickup */}
             {waypoints[0] && (
               <Marker position={waypoints[0]} icon={iconPickup}>
                 <Popup className="custom-popup">
@@ -476,7 +474,7 @@ export default function CustomerShipmentDetail() {
               </Marker>
             )}
 
-            {/* Marker Delivery - CAM */}
+            {/* Marker Delivery */}
             {waypoints[1] && (
               <Marker position={waypoints[1]} icon={iconDelivery}>
                 <Popup className="custom-popup">
@@ -492,15 +490,22 @@ export default function CustomerShipmentDetail() {
               </Marker>
             )}
 
-            {/* Marker Driver - TEAL ĐẬM */}
-            {shipment.driver_lat && (
-              <Marker position={driverPos} icon={iconDriver} zIndexOffset={999}>
-                <Popup>
-                  <b className="text-[#113e48]">Tài xế đang ở đây</b>
-                </Popup>
-              </Marker>
-            )}
+            {/* Marker Driver (Chỉ hiện khi đang đi) */}
+            {(shipment.status === "picking" ||
+              shipment.status === "delivering") &&
+              shipment.driver_lat && (
+                <Marker
+                  position={driverPos}
+                  icon={iconDriver}
+                  zIndexOffset={999}
+                >
+                  <Popup>
+                    <b className="text-[#113e48]">Tài xế đang ở đây</b>
+                  </Popup>
+                </Marker>
+              )}
 
+            {/* Polyline (Chỉ hiện khi đang đi) */}
             {routePoints.length > 0 && (
               <Polyline
                 positions={routePoints}

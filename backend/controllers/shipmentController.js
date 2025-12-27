@@ -46,47 +46,81 @@ export const createShipment = async (req, res) => {
       receiver_name,
       receiver_phone,
       pickup_address,
+      pickup_lat, // Nhận tọa độ
+      pickup_lng,
       delivery_address,
+      delivery_lat, // Nhận tọa độ
+      delivery_lng,
+      item_name,
+      quantity,
       weight_kg,
       cod_amount,
+      shipping_fee,
+      payment_method,
+      pickup_option, // Nhận tùy chọn lấy hàng
+      service_type, // Nhận loại dịch vụ
+      status,
       customer_id,
     } = req.body;
 
+    // Tạo mã vận đơn ngẫu nhiên (VD: SP123456)
     const tracking_code = "SP" + Date.now().toString().slice(-6);
 
-    const [result] = await db.query(
-      `INSERT INTO shipments 
-       (tracking_code, sender_name, sender_phone, receiver_name, receiver_phone,
-        pickup_address, delivery_address, weight_kg, cod_amount,
-        customer_id, status, created_at)
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'pending', NOW())`,
-      [
-        tracking_code,
-        sender_name,
-        sender_phone,
-        receiver_name,
-        receiver_phone,
-        pickup_address,
-        delivery_address,
-        weight_kg,
-        cod_amount,
-        customer_id,
-      ]
-    );
+    // Câu lệnh SQL (Cần khớp với tên cột trong Database)
+    const q = `
+      INSERT INTO shipments 
+      (customer_id, tracking_code, sender_name, sender_phone, pickup_address, pickup_lat, pickup_lng, 
+       receiver_name, receiver_phone, delivery_address, delivery_lat, delivery_lng, 
+       item_name, quantity, weight_kg, cod_amount, shipping_fee, 
+       payment_method, pickup_option, service_type, status, created_at) 
+      VALUES (?)
+    `;
 
+    const values = [
+      customer_id,
+      tracking_code,
+      sender_name,
+      sender_phone,
+      pickup_address,
+      pickup_lat || null, // Nếu không có thì lưu NULL
+      pickup_lng || null,
+      receiver_name,
+      receiver_phone,
+      delivery_address,
+      delivery_lat || null,
+      delivery_lng || null,
+      item_name,
+      quantity,
+      weight_kg, // Lưu ý: Database có thể đặt tên cột là 'weight' hoặc 'weight_kg'. Kiểm tra kỹ trong DB.
+      cod_amount,
+      shipping_fee,
+      payment_method,
+      pickup_option,
+      service_type,
+      status || "pending",
+      new Date(),
+    ];
+
+    const [result] = await db.query(q, [values]);
+
+    // Gửi thông báo cho điều phối viên (nếu cần)
     await sendNotificationToDispatcher(
       1,
       result.insertId,
       `🆕 Đơn hàng #${result.insertId} vừa được tạo`
     );
 
+    // ✅ QUAN TRỌNG: Trả về ID của đơn hàng vừa tạo và tracking_code (đúng tên biến)
     res.status(201).json({
       message: "Tạo đơn hàng thành công",
-      tracking_code,
+      id: result.insertId,
+      tracking_code: tracking_code, // Sử dụng đúng tên biến đã khai báo
     });
   } catch (err) {
-    console.error("❌ Lỗi tạo đơn hàng:", err);
-    res.status(500).json({ error: "Không thể tạo đơn hàng" });
+    console.error("❌ Lỗi tạo đơn hàng:", err); // Xem lỗi chi tiết ở Terminal backend
+    res
+      .status(500)
+      .json({ error: "Lỗi server khi tạo đơn hàng", details: err.message });
   }
 };
 
