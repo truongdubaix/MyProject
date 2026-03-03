@@ -1,31 +1,72 @@
 import pool from "../config/db.js";
+import bcrypt from "bcryptjs";
 
-// Lấy thông tin hồ sơ khách hàng
+// --- 1. LẤY HỒ SƠ KHÁCH HÀNG (FULL THÔNG TIN) ---
 export const getCustomerProfile = async (req, res) => {
   try {
-    const [rows] = await pool.query(
-      "SELECT id, name, email, phone, status FROM users WHERE id = ? AND role = 'customer'",
-      [req.params.id]
-    );
-    if (rows.length === 0)
-      return res.status(404).json({ message: "Customer not found" });
-    res.json(rows[0]);
+    const userId = req.params.id;
+
+    // Câu lệnh SQL: Lấy thông tin user + Số dư ví + Thống kê đơn hàng + Tổng chi tiêu
+    const sql = `
+      SELECT 
+        u.id, u.name, u.email, u.phone, u.avatar, u.address,
+        COALESCE(w.balance, 0) AS wallet_balance,
+        (SELECT COUNT(*) FROM shipments WHERE customer_id = u.id) AS total_orders,
+        (SELECT COALESCE(SUM(amount), 0) FROM payments WHERE customer_id = u.id AND status = 'completed') AS total_spent
+      FROM users u
+      LEFT JOIN wallets w ON u.id = w.user_id
+      WHERE u.id = ? AND u.role = 'customer'
+    `;
+
+    const [rows] = await pool.query(sql, [userId]);
+
+    if (rows.length === 0) {
+      return res.status(404).json({ message: "Không tìm thấy khách hàng" });
+    }
+
+    const user = rows[0];
+
+    // --- Logic tính Hạng thành viên (Rank) ---
+    let rank = "Thành viên mới";
+    const spent = Number(user.total_spent);
+
+    if (spent >= 20000000) rank = "💎 Kim Cương";
+    else if (spent >= 10000000) rank = "🏆 Vàng";
+    else if (spent >= 2000000) rank = "🥈 Bạc";
+    else if (spent > 0) rank = "🥉 Đồng";
+
+    // Trả về dữ liệu đã gộp
+    res.json({
+      ...user,
+      rank: rank,
+      wallet_balance: Number(user.wallet_balance), // Đảm bảo là số
+      total_spent: spent,
+    });
   } catch (err) {
-    res.status(500).json({ message: err.message });
+    console.error("Lỗi lấy hồ sơ:", err);
+    res.status(500).json({ message: "Lỗi hệ thống" });
   }
 };
 
-// Cập nhật hồ sơ khách hàng
+// --- 2. CẬP NHẬT HỒ SƠ (Bao gồm Avatar & Address) ---
 export const updateCustomerProfile = async (req, res) => {
-  const { name, email, phone } = req.body;
+  const { name, email, phone, address, avatar } = req.body;
+  const userId = req.params.id;
+
   try {
+    // Chỉ cập nhật các trường được gửi lên
+    // Lưu ý: Avatar gửi lên là chuỗi Base64 rất dài, nên dùng LONGTEXT trong DB
     await pool.query(
-      "UPDATE users SET name = ?, email = ?, phone = ? WHERE id = ? AND role = 'customer'",
-      [name, email, phone, req.params.id]
+      `UPDATE users 
+       SET name = ?, phone = ?, address = ?, avatar = ? 
+       WHERE id = ? AND role = 'customer'`,
+      [name, phone, address, avatar, userId]
     );
+
     res.json({ message: "Cập nhật hồ sơ thành công!" });
   } catch (err) {
-    res.status(500).json({ message: err.message });
+    console.error("Lỗi cập nhật hồ sơ:", err);
+    res.status(500).json({ message: "Không thể cập nhật hồ sơ" });
   }
 };
 
@@ -112,7 +153,7 @@ export const createShipment = async (req, res) => {
   }
 };
 
-// Lấy danh sách đơn hàng theo khách hàng
+// Lấy danh sách đơn hàng
 export const getShipmentsByCustomer = async (req, res) => {
   try {
     const [rows] = await pool.query(
@@ -151,15 +192,18 @@ export const trackShipment = async (req, res) => {
     }
 
     let query = `
-      SELECT 
-        s.*, 
-        d.name AS driver_name, d.phone AS driver_phone,
-        d.latitude AS driver_lat, d.longitude AS driver_lng
-      FROM shipments s
-      LEFT JOIN assignments a ON a.shipment_id = s.id
-      LEFT JOIN drivers d ON a.driver_id = d.id
-      WHERE s.tracking_code = ?
-    `;
+  SELECT 
+    s.*, 
+    d.name AS driver_name, 
+    d.phone AS driver_phone,
+    d.license_no AS plate_number, 
+    d.latitude AS driver_lat, 
+    d.longitude AS driver_lng
+  FROM shipments s
+  LEFT JOIN assignments a ON a.shipment_id = s.id
+  LEFT JOIN drivers d ON a.driver_id = d.id
+  WHERE s.tracking_code = ?
+`;
     const params = [code];
 
     //  Nếu là khách hàng đã đăng nhập → chỉ xem đơn của mình
@@ -194,7 +238,6 @@ export const trackShipment = async (req, res) => {
     res.status(500).json({ message: "Lỗi máy chủ!" });
   }
 };
-
 //  Xem chi tiết đơn hàng (hiển thị vị trí tài xế)
 export const getShipmentDetail = async (req, res) => {
   try {
@@ -204,10 +247,10 @@ export const getShipmentDetail = async (req, res) => {
           d.name AS driver_name,
           d.latitude AS driver_lat,
           d.longitude AS driver_lng
-       FROM shipments s
-       LEFT JOIN assignments a ON a.shipment_id = s.id
-       LEFT JOIN drivers d ON a.driver_id = d.id
-       WHERE s.id = ?`,
+        FROM shipments s
+        LEFT JOIN assignments a ON a.shipment_id = s.id
+        LEFT JOIN drivers d ON a.driver_id = d.id
+        WHERE s.id = ?`,
       [req.params.id]
     );
 
@@ -218,5 +261,57 @@ export const getShipmentDetail = async (req, res) => {
   } catch (err) {
     console.error("❌ Lỗi SQL:", err);
     res.status(500).json({ message: err.message });
+  }
+};
+
+// --- ĐỔI MẬT KHẨU ---
+export const changePassword = async (req, res) => {
+  const { id } = req.params;
+  const { currentPassword, newPassword } = req.body;
+
+  try {
+    // 1. Kiểm tra dữ liệu đầu vào
+    if (!currentPassword || !newPassword) {
+      return res.status(400).json({ error: "Vui lòng nhập đầy đủ thông tin" });
+    }
+
+    if (newPassword.length < 6) {
+      return res
+        .status(400)
+        .json({ error: "Mật khẩu mới phải có ít nhất 6 ký tự" });
+    }
+
+    // 2. Lấy thông tin user từ DB để lấy mật khẩu đã mã hóa hiện tại
+    const [users] = await pool.query("SELECT * FROM users WHERE id = ?", [id]);
+
+    if (users.length === 0) {
+      return res.status(404).json({ error: "Người dùng không tồn tại" });
+    }
+
+    const user = users[0];
+
+    // 3. So sánh mật khẩu cũ (currentPassword) với mật khẩu trong DB (user.password)
+    const isMatch = await bcrypt.compare(currentPassword, user.password);
+
+    if (!isMatch) {
+      return res
+        .status(400)
+        .json({ error: "Mật khẩu hiện tại không chính xác!" });
+    }
+
+    // 4. Mã hóa mật khẩu mới
+    const salt = await bcrypt.genSalt(10);
+    const hashedPassword = await bcrypt.hash(newPassword, salt);
+
+    // 5. Cập nhật mật khẩu mới vào DB
+    await pool.query("UPDATE users SET password = ? WHERE id = ?", [
+      hashedPassword,
+      id,
+    ]);
+
+    res.status(200).json({ message: "Đổi mật khẩu thành công!" });
+  } catch (err) {
+    console.error("Lỗi đổi mật khẩu:", err);
+    res.status(500).json({ error: "Lỗi hệ thống, vui lòng thử lại sau." });
   }
 };

@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import API from "../../services/api";
 import toast from "react-hot-toast";
 import {
@@ -11,86 +11,83 @@ import {
   Clock,
   CheckCircle,
   AlertCircle,
+  X,
 } from "lucide-react";
-import {
-  MapContainer,
-  TileLayer,
+import Map, {
   Marker,
   Popup,
-  Polyline,
-  useMap,
-} from "react-leaflet";
-import "leaflet/dist/leaflet.css";
-import L from "leaflet";
+  Source,
+  Layer,
+  NavigationControl,
+} from "react-map-gl";
+import mapboxgl from "mapbox-gl";
+import "mapbox-gl/dist/mapbox-gl.css";
+import bbox from "@turf/bbox"; // npm install @turf/bbox
 import AOS from "aos";
 import "aos/dist/aos.css";
 
-// --- ICONS MAP ---
-const iconDriver = new L.Icon({
-  iconUrl: "https://cdn-icons-png.flaticon.com/512/1995/1995574.png",
-  iconSize: [40, 40],
-  iconAnchor: [20, 40],
-  popupAnchor: [0, -40],
-});
-const iconPickup = new L.Icon({
-  iconUrl: "https://cdn-icons-png.flaticon.com/512/3082/3082383.png",
-  iconSize: [35, 35],
-  iconAnchor: [17, 35],
-  popupAnchor: [0, -32],
-});
-const iconDelivery = new L.Icon({
-  iconUrl: "https://cdn-icons-png.flaticon.com/512/8700/8700621.png",
-  iconSize: [35, 35],
-  iconAnchor: [17, 35],
-  popupAnchor: [0, -32],
-});
+// Token Mapbox
+const MAPBOX_TOKEN = import.meta.env.VITE_MAPBOX_TOKEN;
 
-// --- SUB COMPONENTS ---
-function FitBounds({ points }) {
-  const map = useMap();
-  useEffect(() => {
-    if (points && points.length > 0) {
-      const bounds = L.latLngBounds(points);
-      map.fitBounds(bounds, { padding: [50, 50] });
-    }
-  }, [points, map]);
-  return null;
-}
+// --- CUSTOM MARKER COMPONENT ---
+const CustomMarker = ({ icon, bgColor, ringColor, onClick }) => {
+  return (
+    <div
+      onClick={onClick}
+      className="relative w-10 h-10 flex items-center justify-center cursor-pointer hover:scale-110 transition-transform duration-200"
+    >
+      <div
+        className={`absolute inset-0 rounded-full opacity-30 animate-ping ${ringColor}`}
+      ></div>
+      <div
+        className={`relative z-10 w-10 h-10 flex items-center justify-center rounded-full text-white shadow-xl border-2 border-white ${bgColor}`}
+      >
+        {icon}
+      </div>
+      <div
+        className={`absolute -bottom-1 w-3 h-3 transform rotate-45 ${bgColor} border-r-2 border-b-2 border-white z-0`}
+      ></div>
+    </div>
+  );
+};
 
 export default function CustomerTrack() {
   const [trackingCode, setTrackingCode] = useState("");
   const [shipment, setShipment] = useState(null);
-  const [routePoints, setRoutePoints] = useState([]);
-  const [waypoints, setWaypoints] = useState([]);
+  const [routeGeoJSON, setRouteGeoJSON] = useState(null); // Lưu GeoJSON đường đi
+  const [waypoints, setWaypoints] = useState([]); // [Pickup, Delivery]
+  const [driverPos, setDriverPos] = useState(null); // Vị trí tài xế (mô phỏng)
   const [loading, setLoading] = useState(false);
+  const [popupInfo, setPopupInfo] = useState(null); // Popup state
+
+  const mapRef = useRef(null);
+  const animationRef = useRef(null);
 
   useEffect(() => {
     AOS.init({ duration: 500 });
   }, []);
 
-  // 👇 THUẬT TOÁN VẼ ĐƯỜNG "ÉP" VỀ VIỆT NAM
+  // API OSRM: Lấy đường đi (Logic ép đường Việt Nam)
   const fetchRouteOSRM = async (start, end) => {
-    if (!start || !end) return [];
+    if (!start || !end) return null;
 
-    // OSRM dùng [Lng, Lat]
+    // OSRM: [Lng, Lat]
     const startStr = `${start[1]},${start[0]}`;
     const endStr = `${end[1]},${end[0]}`;
 
-    // Tọa độ Đà Nẵng (Điểm neo để giữ đường đi ở VN)
-    const midPointStr = "108.2022,16.0544";
+    // Các điểm neo dọc bờ biển để ép đường đi ở VN
+    const daNang = "108.2022,16.0544";
+    const nhaTrang = "109.1967,12.2388";
 
-    // Tính khoảng cách vĩ độ (Bắc - Nam)
+    // Tính khoảng cách vĩ độ
     const latDiff = Math.abs(start[0] - end[0]);
-
     let url = "";
 
-    // 💡 LOGIC THÔNG MINH:
-    // Nếu khoảng cách Bắc-Nam lớn hơn 4 độ vĩ tuyến (khá xa)
-    // -> Chèn thêm Đà Nẵng vào giữa để ép đường đi bám biển
-    if (latDiff > 4) {
-      url = `https://router.project-osrm.org/route/v1/driving/${startStr};${midPointStr};${endStr}?overview=full&geometries=geojson`;
+    // Nếu đi đường dài Bắc - Nam (chênh lệch > 2 độ vĩ tuyến)
+    // Thì ép đi qua Đà Nẵng và Nha Trang
+    if (latDiff > 2) {
+      url = `https://router.project-osrm.org/route/v1/driving/${startStr};${daNang};${nhaTrang};${endStr}?overview=full&geometries=geojson`;
     } else {
-      // Nếu gần thì đi thẳng
       url = `https://router.project-osrm.org/route/v1/driving/${startStr};${endStr}?overview=full&geometries=geojson`;
     }
 
@@ -98,16 +95,15 @@ export default function CustomerTrack() {
       const res = await fetch(url);
       const data = await res.json();
       if (data.code === "Ok" && data.routes.length > 0) {
-        return data.routes[0].geometry.coordinates.map((coord) => [
-          coord[1],
-          coord[0],
-        ]);
+        return {
+          type: "Feature",
+          geometry: data.routes[0].geometry,
+        };
       }
     } catch (error) {
       console.error("Lỗi OSRM:", error);
     }
-    // Fallback đường thẳng nếu lỗi
-    return [start, end];
+    return null;
   };
 
   const handleTrack = async (e) => {
@@ -117,8 +113,11 @@ export default function CustomerTrack() {
 
     setLoading(true);
     setShipment(null);
-    setRoutePoints([]);
+    setRouteGeoJSON(null);
     setWaypoints([]);
+    setDriverPos(null);
+    setPopupInfo(null);
+    if (animationRef.current) clearInterval(animationRef.current);
 
     try {
       const customerId =
@@ -129,10 +128,10 @@ export default function CustomerTrack() {
       const data = res.data;
       setShipment(data);
 
-      // Xử lý tọa độ
       let pickup = null;
       let delivery = null;
 
+      // Xử lý tọa độ [Lat, Lng]
       if (data.pickup_lat && data.pickup_lng) {
         pickup = [Number(data.pickup_lat), Number(data.pickup_lng)];
       }
@@ -140,18 +139,29 @@ export default function CustomerTrack() {
         delivery = [Number(data.delivery_lat), Number(data.delivery_lng)];
       }
 
-      // Default nếu thiếu tọa độ
+      // Default nếu thiếu (Demo)
       if (!pickup) pickup = [10.7769, 106.7009];
       if (!delivery) delivery = [21.0285, 105.8542];
 
       setWaypoints([pickup, delivery]);
 
-      // Logic vẽ đường: Chỉ vẽ khi đang di chuyển
+      // --- LOGIC HIỂN THỊ XE ---
       if (data.status === "picking" || data.status === "delivering") {
-        const realPath = await fetchRouteOSRM(pickup, delivery);
-        setRoutePoints(realPath);
+        // Đang đi -> Vẽ đường & Chạy xe
+        const geoJson = await fetchRouteOSRM(pickup, delivery);
+        setRouteGeoJSON(geoJson);
+      } else if (
+        data.status === "completed" ||
+        data.status === "delivered" ||
+        data.status === "success"
+      ) {
+        // Đã giao -> Xe nằm ngay tại điểm giao, KHÔNG vẽ đường
+        setDriverPos(delivery); // Xe đậu tại điểm giao
+        setRouteGeoJSON(null);
       } else {
-        setRoutePoints([]);
+        // Mới tạo hoặc hủy -> Không hiện xe
+        setDriverPos(null);
+        setRouteGeoJSON(null);
       }
 
       toast.success("✅ Đã tìm thấy đơn hàng!");
@@ -161,6 +171,76 @@ export default function CustomerTrack() {
       setLoading(false);
     }
   };
+
+  // --- MÔ PHỎNG TÀI XẾ (CHẠY CHẬM) ---
+  useEffect(() => {
+    if (
+      !routeGeoJSON ||
+      !routeGeoJSON.geometry ||
+      !routeGeoJSON.geometry.coordinates
+    )
+      return;
+
+    const pathCoordinates = routeGeoJSON.geometry.coordinates;
+    let index = 0;
+    const totalPoints = pathCoordinates.length;
+
+    // Tốc độ xe: 200ms mỗi bước
+    animationRef.current = setInterval(() => {
+      if (index >= totalPoints) index = 0;
+      const point = pathCoordinates[index];
+      // Mapbox: [lng, lat], DriverPos: [lat, lng]
+      setDriverPos([point[1], point[0]]);
+      index += 1;
+    }, 800);
+
+    return () => clearInterval(animationRef.current);
+  }, [routeGeoJSON]);
+
+  // --- AUTO ZOOM ---
+  useEffect(() => {
+    if (!mapRef.current || waypoints.length === 0) return;
+
+    let features = [];
+
+    // Gom tất cả các điểm cần hiển thị
+    waypoints.forEach((pt) => {
+      features.push({
+        type: "Feature",
+        geometry: { type: "Point", coordinates: [pt[1], pt[0]] }, // [Lng, Lat]
+      });
+    });
+
+    if (routeGeoJSON) features.push(routeGeoJSON);
+
+    if (features.length > 0) {
+      const featureCollection = {
+        type: "FeatureCollection",
+        features: features,
+      };
+
+      try {
+        const [minLng, minLat, maxLng, maxLat] = bbox(featureCollection);
+
+        // Nếu chỉ có 1 điểm hoặc trùng nhau
+        const isSamePoint = minLng === maxLng && minLat === maxLat;
+
+        if (isSamePoint) {
+          mapRef.current.flyTo({ center: [minLng, minLat], zoom: 14 });
+        } else {
+          mapRef.current.fitBounds(
+            [
+              [minLng, minLat],
+              [maxLng, maxLat],
+            ],
+            { padding: 80, duration: 1500, maxZoom: 14 }
+          );
+        }
+      } catch (error) {
+        console.error("Zoom error:", error);
+      }
+    }
+  }, [routeGeoJSON, waypoints, shipment]);
 
   // Helper render status
   const getStatusColor = (status) => {
@@ -172,7 +252,6 @@ export default function CustomerTrack() {
       case "delivering":
         return "text-orange-600 bg-orange-50 border-orange-200";
       case "completed":
-        return "text-green-600 bg-green-50 border-green-200";
       case "delivered":
         return "text-green-600 bg-green-50 border-green-200";
       case "failed":
@@ -202,7 +281,6 @@ export default function CustomerTrack() {
     <div className="min-h-screen bg-[#F8FAFC] pb-20 font-sans animate-in fade-in duration-500">
       {/* Header Search Section */}
       <div className="bg-[#113e48] pt-10 pb-24 px-4 relative overflow-hidden">
-        {/* Background Decor */}
         <div className="absolute top-0 right-0 w-64 h-64 bg-white/5 rounded-full blur-3xl translate-x-1/2 -translate-y-1/2"></div>
         <div className="absolute bottom-0 left-0 w-48 h-48 bg-orange-500/10 rounded-full blur-2xl -translate-x-1/2 translate-y-1/2"></div>
 
@@ -352,63 +430,134 @@ export default function CustomerTrack() {
 
             {/* Right Column: Map */}
             <div className="lg:col-span-2 h-[500px] lg:h-auto bg-white rounded-2xl shadow-lg border border-gray-100 overflow-hidden relative z-0">
-              <MapContainer
-                center={waypoints[0] || [10.8231, 106.6297]}
-                zoom={13}
-                style={{ height: "100%", width: "100%" }}
-                zoomControl={false}
+              <Map
+                ref={mapRef}
+                initialViewState={{
+                  longitude: waypoints[0]?.[1] || 106.6297,
+                  latitude: waypoints[0]?.[0] || 10.8231,
+                  zoom: 13,
+                }}
+                style={{ width: "100%", height: "100%" }}
+                mapStyle="mapbox://styles/mapbox/streets-v12"
+                mapboxAccessToken={MAPBOX_TOKEN}
               >
-                <TileLayer
-                  url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-                  attribution="&copy; OpenStreetMap"
-                />
+                <NavigationControl position="bottom-right" />
 
-                {/* Markers */}
+                {/* ROUTE LINE (Chỉ hiện khi đang đi) */}
+                {routeGeoJSON && (
+                  <Source id="route" type="geojson" data={routeGeoJSON}>
+                    <Layer
+                      id="route-line"
+                      type="line"
+                      paint={{
+                        "line-color": "#3B82F6",
+                        "line-width": 6,
+                        "line-opacity": 0.8,
+                      }}
+                      layout={{ "line-join": "round", "line-cap": "round" }}
+                    />
+                  </Source>
+                )}
+
+                {/* PICKUP MARKER */}
                 {waypoints[0] && (
-                  <Marker position={waypoints[0]} icon={iconPickup}>
-                    <Popup>Điểm lấy hàng</Popup>
+                  <Marker
+                    longitude={waypoints[0][1]}
+                    latitude={waypoints[0][0]}
+                    anchor="bottom"
+                  >
+                    <CustomMarker
+                      icon={<Package size={20} />}
+                      bgColor="bg-blue-600"
+                      ringColor="bg-blue-400"
+                      onClick={(e) => {
+                        e.originalEvent.stopPropagation();
+                        setPopupInfo({
+                          longitude: waypoints[0][1],
+                          latitude: waypoints[0][0],
+                          title: "Điểm lấy hàng",
+                          desc: shipment.pickup_address,
+                          color: "text-blue-600",
+                        });
+                      }}
+                    />
                   </Marker>
                 )}
+
+                {/* DELIVERY MARKER */}
                 {waypoints[1] && (
-                  <Marker position={waypoints[1]} icon={iconDelivery}>
-                    <Popup>Điểm giao hàng</Popup>
+                  <Marker
+                    longitude={waypoints[1][1]}
+                    latitude={waypoints[1][0]}
+                    anchor="bottom"
+                  >
+                    <CustomMarker
+                      icon={<MapPin size={20} fill="currentColor" />}
+                      bgColor="bg-orange-500"
+                      ringColor="bg-orange-400"
+                      onClick={(e) => {
+                        e.originalEvent.stopPropagation();
+                        setPopupInfo({
+                          longitude: waypoints[1][1],
+                          latitude: waypoints[1][0],
+                          title: "Điểm giao hàng",
+                          desc: shipment.delivery_address,
+                          color: "text-orange-600",
+                        });
+                      }}
+                    />
                   </Marker>
                 )}
 
-                {/* Driver Marker - Chỉ hiện khi đang di chuyển */}
-                {(shipment.status === "picking" ||
-                  shipment.status === "delivering") &&
-                  shipment.driver_lat && (
-                    <Marker
-                      position={[shipment.driver_lat, shipment.driver_lng]}
-                      icon={iconDriver}
-                      zIndexOffset={999}
-                    >
-                      <Popup>
-                        <b>Tài xế đang ở đây</b>
-                      </Popup>
-                    </Marker>
-                  )}
-
-                {/* Route Line - Chỉ hiện khi đang di chuyển */}
-                {routePoints.length > 0 && (
-                  <Polyline
-                    positions={routePoints}
-                    color="#3B82F6"
-                    weight={5}
-                    opacity={0.8}
-                    lineCap="round"
-                    lineJoin="round"
-                  />
+                {/* DRIVER MARKER */}
+                {driverPos && (
+                  <Marker
+                    longitude={driverPos[1]}
+                    latitude={driverPos[0]}
+                    anchor="bottom"
+                  >
+                    <CustomMarker
+                      icon={<Truck size={20} />}
+                      bgColor="bg-[#113e48]"
+                      ringColor="bg-[#113e48]"
+                      onClick={(e) => {
+                        e.originalEvent.stopPropagation();
+                        setPopupInfo({
+                          longitude: driverPos[1],
+                          latitude: driverPos[0],
+                          title: "Vị trí tài xế",
+                          desc: "Tài xế đang di chuyển...",
+                          color: "text-[#113e48]",
+                        });
+                      }}
+                    />
+                  </Marker>
                 )}
 
-                <FitBounds
-                  points={routePoints.length > 0 ? routePoints : waypoints}
-                />
-              </MapContainer>
+                {/* POPUP */}
+                {popupInfo && (
+                  <Popup
+                    anchor="top"
+                    longitude={popupInfo.longitude}
+                    latitude={popupInfo.latitude}
+                    onClose={() => setPopupInfo(null)}
+                    closeOnClick={false}
+                    offset={10}
+                  >
+                    <div className="text-center p-1 max-w-[200px]">
+                      <p className={`font-bold text-sm ${popupInfo.color}`}>
+                        {popupInfo.title}
+                      </p>
+                      <p className="text-xs text-gray-600 mt-1">
+                        {popupInfo.desc}
+                      </p>
+                    </div>
+                  </Popup>
+                )}
+              </Map>
 
-              {/* Mobile Overlay Status */}
-              <div className="lg:hidden absolute top-4 left-4 right-4 bg-white/90 backdrop-blur p-3 rounded-xl shadow-lg border border-gray-100 z-[400]">
+              {/* Mobile Overlay */}
+              <div className="lg:hidden absolute top-4 left-4 right-4 bg-white/90 backdrop-blur p-3 rounded-xl shadow-lg border border-gray-100 z-[40]">
                 <p className="text-xs font-bold text-gray-500 uppercase">
                   Trạng thái hiện tại
                 </p>

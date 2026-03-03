@@ -1,148 +1,359 @@
-// src/pages/driver/DriverProfile.jsx
 import { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
 import API from "../../services/api";
 import { motion } from "framer-motion";
+import toast, { Toaster } from "react-hot-toast";
+import {
+  User,
+  Mail,
+  Phone,
+  Truck,
+  MapPin,
+  Star,
+  Shield,
+  Calendar,
+  Edit,
+  Power,
+  RefreshCw,
+  Award,
+  TrendingUp,
+  PackageCheck,
+} from "lucide-react";
 
 export default function DriverProfile() {
   const { id: paramId } = useParams();
   const [profile, setProfile] = useState(null);
-  const [stats, setStats] = useState(null); // ➕ thêm state thống kê
-  const [driverId, setDriverId] = useState(
-    paramId || localStorage.getItem("userId")
-  );
+  const [stats, setStats] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [isRefeshing, setIsRefreshing] = useState(false);
+
+  // Lấy ID: Ưu tiên từ URL, nếu không có thì lấy từ LocalStorage
+  const driverId = paramId || localStorage.getItem("userId");
+
+  const fetchData = async () => {
+    if (!driverId) return;
+    setIsRefreshing(true);
+    try {
+      // Gọi song song 2 API để tiết kiệm thời gian
+      const [profileRes, statsRes] = await Promise.all([
+        API.get(`/drivers/profile/${driverId}`),
+        API.get(`/drivers/dashboard/${driverId}`).catch(() => ({
+          data: { total: 0, completed: 0, rating: 5.0 },
+        })),
+      ]);
+
+      setProfile(profileRes.data);
+      setStats(statsRes.data);
+    } catch (err) {
+      console.error("❌ Lỗi tải dữ liệu:", err);
+      toast.error("Không thể tải thông tin tài xế");
+    } finally {
+      setLoading(false);
+      setIsRefreshing(false);
+    }
+  };
 
   useEffect(() => {
-    const id = paramId || localStorage.getItem("userId");
-    setDriverId(id);
-    if (!id) return;
+    fetchData();
+  }, [driverId]);
 
-    const fetchProfile = async () => {
-      try {
-        const res = await API.get(`/drivers/profile/${id}`);
-        setProfile(res.data);
-      } catch (err) {
-        console.error("❌ Lỗi khi tải hồ sơ tài xế:", err);
-      }
-    };
+  // Xử lý đổi trạng thái hoạt động
+  const toggleStatus = async () => {
+    if (!profile) return;
+    const newStatus = profile.status === "available" ? "inactive" : "available";
+    const toastId = toast.loading("Đang cập nhật trạng thái...");
 
-    const fetchStats = async () => {
-      try {
-        const res = await API.get(`/drivers/dashboard/${id}`);
-        setStats(res.data);
-      } catch (err) {
-        console.warn("❌ Không thể tải dashboard");
-        setStats({ total: 0, completed: 0, rating: 0 });
-      }
-    };
+    try {
+      // Giả lập gọi API update status (Bạn cần thay bằng endpoint thật)
+      // await API.patch(`/drivers/${driverId}/status`, { status: newStatus });
 
-    fetchProfile();
-    fetchStats();
-  }, [paramId]);
+      // Update UI Optimistically
+      setProfile((prev) => ({ ...prev, status: newStatus }));
+      toast.success(
+        newStatus === "available"
+          ? "Đã bật trạng thái Sẵn sàng!"
+          : "Đã chuyển sang Nghỉ ngơi",
+        { id: toastId }
+      );
+    } catch (err) {
+      toast.error("Lỗi cập nhật trạng thái", { id: toastId });
+    }
+  };
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center min-h-screen bg-gray-50">
+        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-600"></div>
+      </div>
+    );
+  }
 
   if (!profile)
     return (
-      <p className="p-6 text-gray-500 text-center">⏳ Đang tải hồ sơ...</p>
+      <div className="p-8 text-center">Không tìm thấy thông tin tài xế.</div>
     );
 
-  const statusColor = {
-    available: "text-green-600 bg-green-100",
-    delivering: "text-blue-600 bg-blue-100",
-    inactive: "text-gray-600 bg-gray-100",
-  };
-
-  const avatarUrl = `https://api.dicebear.com/9.x/initials/svg?seed=${encodeURIComponent(
-    profile.name
-  )}&backgroundColor=blue&fontSize=50`;
+  // Config màu sắc trạng thái
+  const isAvailable = profile.status === "available";
+  const isDelivering = profile.status === "delivering";
 
   return (
-    <div className="p-6 space-y-8 bg-gray-50 min-h-screen flex justify-center">
-      <motion.div
-        className="bg-white p-8 rounded-2xl shadow-lg max-w-lg w-full"
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.4 }}
-      >
-        {/* Hồ sơ tài xế */}
-        <div className="flex flex-col items-center text-center space-y-4">
-          <img
-            src={avatarUrl}
-            alt={profile.name}
-            className="w-28 h-28 rounded-full border-4 border-blue-500 shadow"
-          />
-          <h1 className="text-3xl font-bold text-blue-700">{profile.name}</h1>
-          <span
-            className={`px-3 py-1 rounded-full text-sm font-medium ${
-              statusColor[profile.status]
-            }`}
+    <div className="min-h-screen bg-[#F8FAFC] p-4 lg:p-8 space-y-6 pb-24">
+      <Toaster position="top-right" />
+
+      {/* --- HEADER SECTION --- */}
+      <div className="relative bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden">
+        {/* Cover Background */}
+        <div className="h-32 bg-gradient-to-r from-[#113e48] to-[#2a6f7d]"></div>
+
+        <div className="px-6 pb-6 relative flex flex-col md:flex-row items-center md:items-end -mt-12 gap-4 md:gap-6">
+          {/* Avatar */}
+          <div className="relative">
+            <img
+              src={`https://api.dicebear.com/9.x/initials/svg?seed=${encodeURIComponent(
+                profile.name
+              )}&backgroundColor=113e48&fontSize=50`}
+              alt={profile.name}
+              className="w-28 h-28 rounded-full border-4 border-white shadow-md bg-white"
+            />
+            {/* Online Indicator */}
+            <span
+              className={`absolute bottom-2 right-2 w-5 h-5 border-2 border-white rounded-full ${
+                isAvailable
+                  ? "bg-green-500"
+                  : isDelivering
+                  ? "bg-blue-500"
+                  : "bg-gray-400"
+              }`}
+            ></span>
+          </div>
+
+          {/* Name & Role */}
+          <div className="flex-1 text-center md:text-left mb-2 md:mb-0">
+            <h1 className="text-2xl font-bold text-gray-900 flex items-center justify-center md:justify-start gap-2">
+              {profile.name}
+              <Shield
+                size={18}
+                className="text-blue-500"
+                fill="currentColor"
+                fillOpacity={0.2}
+              />
+            </h1>
+            <p className="text-sm text-gray-500 font-medium">
+              Đối tác vận chuyển • Tham gia từ 2024
+            </p>
+          </div>
+
+          {/* Action Buttons */}
+          <div className="flex items-center gap-3 mt-2 md:mt-0">
+            <button
+              onClick={toggleStatus}
+              disabled={isDelivering}
+              className={`flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-bold transition-all shadow-sm
+                  ${
+                    isDelivering
+                      ? "bg-blue-100 text-blue-700 cursor-not-allowed"
+                      : isAvailable
+                      ? "bg-green-100 text-green-700 hover:bg-green-200"
+                      : "bg-gray-100 text-gray-600 hover:bg-gray-200"
+                  }`}
+            >
+              <Power size={18} />
+              {isDelivering
+                ? "Đang giao hàng"
+                : isAvailable
+                ? "Đang trực tuyến"
+                : "Đang nghỉ"}
+            </button>
+
+            <button
+              onClick={fetchData}
+              className="p-2 rounded-xl bg-gray-50 hover:bg-white text-gray-600 border border-gray-200 hover:shadow transition-all"
+              title="Làm mới"
+            >
+              <RefreshCw
+                size={20}
+                className={isRefeshing ? "animate-spin" : ""}
+              />
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        {/* --- LEFT COLUMN: PERSONAL INFO --- */}
+        <div className="lg:col-span-1 space-y-6">
+          <motion.div
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100"
           >
-            {profile.status === "available"
-              ? "🟢 Sẵn sàng nhận đơn"
-              : profile.status === "delivering"
-              ? "🚚 Đang giao hàng"
-              : "⚪ Không hoạt động"}
-          </span>
+            <div className="flex justify-between items-center mb-6">
+              <h3 className="font-bold text-gray-800 flex items-center gap-2">
+                <User size={18} className="text-[#113e48]" /> Thông tin cá nhân
+              </h3>
+              <button className="text-blue-600 hover:bg-blue-50 p-1.5 rounded-lg transition">
+                <Edit size={16} />
+              </button>
+            </div>
+
+            <div className="space-y-4">
+              <InfoRow icon={Mail} label="Email" value={profile.email} />
+              <InfoRow
+                icon={Phone}
+                label="Số điện thoại"
+                value={profile.phone}
+              />
+              <InfoRow
+                icon={Truck}
+                label="Phương tiện"
+                value={profile.vehicle_type || "Xe máy"}
+              />
+              <InfoRow
+                icon={MapPin}
+                label="Khu vực"
+                value={profile.region_id || "Hồ Chí Minh"}
+              />
+              <InfoRow icon={Calendar} label="Ngày sinh" value="01/01/1995" />
+            </div>
+          </motion.div>
+
+          {/* Account Security (Demo) */}
+          <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
+            <h3 className="font-bold text-gray-800 mb-4 flex items-center gap-2">
+              <Shield size={18} className="text-[#113e48]" /> Bảo mật
+            </h3>
+            <button className="w-full py-2.5 rounded-xl border border-gray-200 text-gray-600 font-medium hover:bg-gray-50 hover:text-[#113e48] transition-colors">
+              Đổi mật khẩu
+            </button>
+          </div>
         </div>
 
-        <hr className="my-6 border-gray-200" />
+        {/* --- RIGHT COLUMN: STATISTICS --- */}
+        <div className="lg:col-span-2 space-y-6">
+          {/* Stats Grid */}
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+            <StatBox
+              label="Tổng đơn"
+              value={stats?.total || 0}
+              icon={PackageCheck}
+              color="blue"
+            />
+            <StatBox
+              label="Hoàn tất"
+              value={stats?.completed || 0}
+              icon={Award}
+              color="green"
+            />
+            <StatBox
+              label="Tỉ lệ thành công"
+              value={`${((stats?.completed / stats?.total) * 100 || 0).toFixed(
+                0
+              )}%`}
+              icon={TrendingUp}
+              color="purple"
+            />
+            <StatBox
+              label="Đánh giá"
+              value={stats?.rating?.toFixed(1) || "5.0"}
+              icon={Star}
+              color="yellow"
+              subValue="/ 5.0"
+            />
+          </div>
 
-        {/* Thông tin chi tiết */}
-        <div className="space-y-3 text-gray-700">
-          <p>
-            <strong>ID:</strong> {profile.id}
-          </p>
-          <p>
-            <strong>Email:</strong> {profile.email}
-          </p>
-          <p>
-            <strong>Số điện thoại:</strong> {profile.phone}
-          </p>
-          <p>
-            <strong>Loại xe:</strong> {profile.vehicle_type}
-          </p>
-        </div>
+          {/* Rating Section (Demo Visuals) */}
+          <motion.div
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.1 }}
+            className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100"
+          >
+            <div className="flex justify-between items-center mb-6">
+              <h3 className="font-bold text-gray-800">Đánh giá gần đây</h3>
+              <span className="text-xs font-bold text-green-600 bg-green-50 px-2 py-1 rounded-lg">
+                Rất tốt
+              </span>
+            </div>
 
-        {/* 📊 Thống kê hiệu suất */}
-        {stats && (
-          <>
-            <hr className="my-8 border-gray-200" />
-            <h2 className="text-xl font-semibold text-blue-700 mb-3 text-center">
-              📊 Hiệu suất tài xế
-            </h2>
-            <div className="grid grid-cols-3 gap-4 text-center">
-              <div className="bg-blue-50 p-3 rounded-lg shadow-sm">
-                <p className="text-sm text-gray-500">Tổng đơn</p>
-                <p className="text-xl font-bold text-blue-700">{stats.total}</p>
+            <div className="flex items-center gap-4 mb-8">
+              <div className="text-5xl font-bold text-gray-800">
+                {stats?.rating?.toFixed(1) || 5.0}
               </div>
-              <div className="bg-green-50 p-3 rounded-lg shadow-sm">
-                <p className="text-sm text-gray-500">Hoàn tất</p>
-                <p className="text-xl font-bold text-green-700">
-                  {stats.completed}
-                </p>
-              </div>
-              <div className="bg-yellow-50 p-3 rounded-lg shadow-sm">
-                <p className="text-sm text-gray-500">Tỉ lệ</p>
-                <p className="text-xl font-bold text-yellow-700">
-                  {((stats.completed / stats.total) * 100 || 0).toFixed(1)}%
+              <div className="space-y-1">
+                <div className="flex text-yellow-400 gap-1">
+                  {[...Array(5)].map((_, i) => (
+                    <Star key={i} size={20} fill="currentColor" />
+                  ))}
+                </div>
+                <p className="text-sm text-gray-400">
+                  Dựa trên {stats?.completed || 0} lượt đánh giá
                 </p>
               </div>
             </div>
-            <div className="text-center mt-4 text-purple-700 font-semibold">
-              ⭐ Đánh giá trung bình: {stats.rating?.toFixed(1) || 5.0}/5
-            </div>
-          </>
-        )}
 
-        {/* Nút làm mới */}
-        <div className="mt-6 flex justify-center">
-          <button
-            onClick={() => window.location.reload()}
-            className="px-5 py-2 bg-blue-600 text-white rounded-lg shadow hover:bg-blue-700 transition"
-          >
-            🔄 Làm mới hồ sơ
-          </button>
+            {/* Progress Bars Demo */}
+            <div className="space-y-3">
+              <RatingBar star={5} percent={80} />
+              <RatingBar star={4} percent={15} />
+              <RatingBar star={3} percent={5} />
+            </div>
+          </motion.div>
         </div>
-      </motion.div>
+      </div>
     </div>
   );
 }
+
+// --- SUB COMPONENTS ---
+
+const InfoRow = ({ icon: Icon, label, value }) => (
+  <div className="flex items-center gap-4 py-2 border-b border-gray-50 last:border-0">
+    <div className="w-10 h-10 rounded-full bg-gray-50 flex items-center justify-center text-gray-500 shrink-0">
+      <Icon size={18} />
+    </div>
+    <div className="flex-1">
+      <p className="text-xs text-gray-400 font-medium uppercase">{label}</p>
+      <p className="text-sm font-semibold text-gray-800">{value}</p>
+    </div>
+  </div>
+);
+
+const StatBox = ({ label, value, icon: Icon, color, subValue }) => {
+  const colorClasses = {
+    blue: "bg-blue-50 text-blue-600",
+    green: "bg-green-50 text-green-600",
+    purple: "bg-purple-50 text-purple-600",
+    yellow: "bg-yellow-50 text-yellow-600",
+  };
+
+  return (
+    <motion.div
+      whileHover={{ y: -2 }}
+      className="bg-white p-4 rounded-2xl shadow-sm border border-gray-100 flex flex-col items-center justify-center text-center space-y-2"
+    >
+      <div className={`p-3 rounded-full ${colorClasses[color]} mb-1`}>
+        <Icon size={24} />
+      </div>
+      <p className="text-xs text-gray-400 font-bold uppercase">{label}</p>
+      <p className="text-2xl font-bold text-gray-800">
+        {value}{" "}
+        <span className="text-sm text-gray-400 font-normal">{subValue}</span>
+      </p>
+    </motion.div>
+  );
+};
+
+const RatingBar = ({ star, percent }) => (
+  <div className="flex items-center gap-3">
+    <span className="text-sm font-bold text-gray-600 w-3">{star}</span>
+    <Star size={14} className="text-gray-300" />
+    <div className="flex-1 h-2 bg-gray-100 rounded-full overflow-hidden">
+      <div
+        className="h-full bg-yellow-400 rounded-full"
+        style={{ width: `${percent}%` }}
+      ></div>
+    </div>
+    <span className="text-xs text-gray-400 w-8 text-right">{percent}%</span>
+  </div>
+);

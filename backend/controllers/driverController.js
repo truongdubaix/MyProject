@@ -18,7 +18,7 @@ export const getDriverDashboard = async (req, res) => {
       JOIN assignments a ON s.id = a.shipment_id
       WHERE a.driver_id = ?
       `,
-      [id]
+      [id],
     );
 
     const stats = rows[0] || {
@@ -43,7 +43,7 @@ export const getDriverDashboard = async (req, res) => {
       ORDER BY s.updated_at DESC
       LIMIT 5
       `,
-      [id]
+      [id],
     );
 
     //  Trả về dữ liệu tổng hợp
@@ -78,7 +78,7 @@ export const getDriverAssignments = async (req, res) => {
         AND a.status IN ('assigned', 'picking', 'delivering')
       ORDER BY a.assigned_at DESC
       `,
-      [id]
+      [id],
     );
     res.json(rows);
   } catch (err) {
@@ -103,7 +103,7 @@ export const getDriverHistory = async (req, res) => {
       WHERE a.driver_id = ? AND a.status = 'completed'
       ORDER BY a.assigned_at DESC
       `,
-      [id]
+      [id],
     );
     res.json(rows);
   } catch (err) {
@@ -154,7 +154,7 @@ export const getDriverProfile = async (req, res) => {
       LEFT JOIN vehicles v ON d.vehicle_id = v.id
       WHERE d.id = ?
       `,
-      [id]
+      [id],
     );
 
     if (rows.length === 0)
@@ -175,7 +175,7 @@ export const changeDriverPassword = async (req, res) => {
 
     const [[driver]] = await db.query(
       "SELECT password FROM drivers WHERE id = ?",
-      [id]
+      [id],
     );
     if (!driver)
       return res.status(404).json({ message: "Không tìm thấy tài xế" });
@@ -240,7 +240,7 @@ export const getDriverProfileByUser = async (req, res) => {
       LEFT JOIN vehicles v ON d.vehicle_id = v.id
       WHERE d.user_id = ?
       `,
-      [userId]
+      [userId],
     );
 
     if (!rows.length)

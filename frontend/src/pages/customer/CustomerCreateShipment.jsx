@@ -43,6 +43,12 @@ export default function CustomerCreateShipment() {
     cod_amount: "",
     shipping_fee: 0,
   });
+  async function reverseGeocode(lat, lng) {
+    const url = `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}`;
+    const res = await fetch(url);
+    const data = await res.json();
+    return data?.display_name || "";
+  }
 
   const [pickupOption, setPickupOption] = useState("sender");
   const [creating, setCreating] = useState(false);
@@ -179,7 +185,10 @@ export default function CustomerCreateShipment() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!customerId) return toast.error("⚠️ Bạn chưa đăng nhập!");
-
+    if (!form.pickup_lat || !form.delivery_lat) {
+      toast.error("Vui lòng chọn vị trí lấy và giao hàng");
+      return;
+    }
     setCreating(true);
     try {
       const payload = {
@@ -652,12 +661,16 @@ export default function CustomerCreateShipment() {
                 form.pickup_lat || 16.047,
                 form.pickup_lng || 108.206,
               ]}
-              onConfirm={(pos) => {
+              onConfirm={async (pos) => {
+                const addr = await reverseGeocode(pos.lat, pos.lng);
+
                 setForm((prev) => ({
                   ...prev,
                   pickup_lat: pos.lat,
                   pickup_lng: pos.lng,
+                  pickup_address: addr, // ✅ ĐỊA CHỈ TỰ ĐIỀN
                 }));
+
                 setShowPickupMap(false);
               }}
               onCancel={() => setShowPickupMap(false)}
@@ -674,13 +687,17 @@ export default function CustomerCreateShipment() {
                 form.delivery_lat || 16.047,
                 form.delivery_lng || 108.206,
               ]}
-              onConfirm={(pos) => {
+              onConfirm={async (pos) => {
+                const addr = await reverseGeocode(pos.lat, pos.lng);
+
                 setForm((prev) => ({
                   ...prev,
                   delivery_lat: pos.lat,
                   delivery_lng: pos.lng,
+                  delivery_address: addr, // ✅ ĐÚNG FIELD
                 }));
-                setShowDeliveryMap(false);
+
+                setShowDeliveryMap(false); // ✅ ĐÚNG MODAL
               }}
               onCancel={() => setShowDeliveryMap(false)}
             />

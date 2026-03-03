@@ -7,6 +7,7 @@ import {
   createFeedback,
   trackShipment,
   getShipmentDetail,
+  changePassword,
 } from "../controllers/customerController.js";
 
 const router = express.Router();
@@ -23,5 +24,7 @@ router.get("/track/:code", trackShipment);
 router.get("/:customer_id/shipments", getShipmentsByCustomer);
 // Feedback
 router.post("/feedback", createFeedback);
+// đổi mật khẩu
+router.put("/change-password/:id", changePassword);
 
 export default router;

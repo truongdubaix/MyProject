@@ -1,9 +1,6 @@
 import { useEffect, useState } from "react";
 import AOS from "aos";
 import "aos/dist/aos.css";
-import { MapContainer, TileLayer, Marker, Popup, useMap } from "react-leaflet";
-import L from "leaflet";
-import "leaflet/dist/leaflet.css";
 import API from "../services/api";
 import toast, { Toaster } from "react-hot-toast";
 import {
@@ -14,21 +11,42 @@ import {
   FaPaperPlane,
 } from "react-icons/fa";
 
-// 🗺️ Icon marker văn phòng (Custom Marker đẹp hơn)
-const officeIcon = new L.Icon({
-  iconUrl: "https://cdn-icons-png.flaticon.com/512/684/684908.png", // Bạn có thể thay bằng icon logo cty nếu có
-  iconSize: [40, 40],
-  iconAnchor: [20, 40],
-  popupAnchor: [0, -40],
-});
+// --- MAPBOX IMPORTS ---
+import Map, { Marker, Popup, NavigationControl } from "react-map-gl";
+import mapboxgl from "mapbox-gl";
+import "mapbox-gl/dist/mapbox-gl.css";
 
-function ZoomToOffice() {
-  const map = useMap();
-  useEffect(() => {
-    map.setView([16.0544, 108.2022], 14, { animate: true });
-  }, [map]);
-  return null;
-}
+// Token Mapbox (Lấy từ .env)
+const MAPBOX_TOKEN = import.meta.env.VITE_MAPBOX_TOKEN;
+
+// 🏢 Tọa độ văn phòng (Đà Nẵng)
+const OFFICE_COORDS = {
+  lat: 16.0544,
+  lng: 108.2022,
+};
+
+// --- CUSTOM MARKER COMPONENT ---
+const OfficeMarker = ({ onClick }) => {
+  return (
+    <div
+      onClick={onClick}
+      className="relative w-12 h-12 flex items-center justify-center cursor-pointer hover:scale-110 transition-transform duration-200"
+    >
+      {/* Hiệu ứng Ping */}
+      <div className="absolute inset-0 bg-orange-500 rounded-full opacity-20 animate-ping"></div>
+
+      {/* Icon ảnh */}
+      <img
+        src="https://cdn-icons-png.flaticon.com/512/684/684908.png"
+        alt="Office"
+        className="relative z-10 w-10 h-10 drop-shadow-lg"
+      />
+
+      {/* Mũi nhọn */}
+      <div className="absolute -bottom-2 w-3 h-3 bg-white transform rotate-45 border-r border-b border-gray-300 z-0"></div>
+    </div>
+  );
+};
 
 export default function Contact() {
   const [form, setForm] = useState({
@@ -39,6 +57,7 @@ export default function Contact() {
   });
 
   const [loading, setLoading] = useState(false);
+  const [showPopup, setShowPopup] = useState(true); // Mặc định hiện Popup
 
   useEffect(() => {
     AOS.init({ duration: 800, once: true });
@@ -65,7 +84,7 @@ export default function Contact() {
     <div className="font-sans bg-gray-50">
       <Toaster position="top-center" />
 
-      {/* 1. HERO HEADER: Xanh đậm + Cam */}
+      {/* 1. HERO HEADER */}
       <section className="pt-32 pb-20 bg-[#113e48] text-white text-center relative overflow-hidden">
         {/* Background Pattern */}
         <div className="absolute inset-0 opacity-10 pointer-events-none">
@@ -167,31 +186,52 @@ export default function Contact() {
             </div>
           </div>
 
-          {/* Bản đồ Leaflet */}
-          <div className="rounded-xl shadow-inner overflow-hidden h-[300px] border border-gray-200 mt-auto">
-            <MapContainer
-              center={[16.0544, 108.2022]}
-              zoom={13}
-              scrollWheelZoom={false}
-              style={{ height: "100%", width: "100%" }}
+          {/* --- BẢN ĐỒ MAPBOX --- */}
+          <div className="rounded-xl shadow-inner overflow-hidden h-[300px] border border-gray-200 mt-auto relative">
+            <Map
+              initialViewState={{
+                latitude: OFFICE_COORDS.lat,
+                longitude: OFFICE_COORDS.lng,
+                zoom: 14,
+              }}
+              style={{ width: "100%", height: "100%" }}
+              mapStyle="mapbox://styles/mapbox/streets-v12"
+              mapboxAccessToken={MAPBOX_TOKEN}
+              scrollZoom={false} // Tắt scroll zoom để tránh lướt web bị vướng
             >
-              <TileLayer
-                attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
-                url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-              />
-              <Marker position={[16.0544, 108.2022]} icon={officeIcon}>
-                <Popup>
-                  <div className="text-center">
-                    <strong className="text-orange-600">
+              <NavigationControl position="bottom-right" />
+
+              {/* Marker Văn Phòng */}
+              <Marker
+                longitude={OFFICE_COORDS.lng}
+                latitude={OFFICE_COORDS.lat}
+                anchor="bottom"
+              >
+                <OfficeMarker onClick={() => setShowPopup(true)} />
+              </Marker>
+
+              {/* Popup */}
+              {showPopup && (
+                <Popup
+                  longitude={OFFICE_COORDS.lng}
+                  latitude={OFFICE_COORDS.lat}
+                  anchor="top"
+                  onClose={() => setShowPopup(false)}
+                  offset={20}
+                  closeButton={false}
+                  closeOnClick={false}
+                >
+                  <div className="text-center p-2">
+                    <strong className="text-orange-600 text-lg block mb-1">
                       SpeedyShip Đà Nẵng
                     </strong>
-                    <br />
-                    55 Nguyễn Văn Linh
+                    <span className="text-gray-600 text-xs font-semibold">
+                      55 Nguyễn Văn Linh
+                    </span>
                   </div>
                 </Popup>
-              </Marker>
-              <ZoomToOffice />
-            </MapContainer>
+              )}
+            </Map>
           </div>
         </div>
 
@@ -287,7 +327,7 @@ export default function Contact() {
         </div>
       </section>
 
-      {/* 3. FOOTER CTA: Nhẹ nhàng hơn */}
+      {/* 3. FOOTER CTA */}
       <section className="bg-white py-16 border-t border-gray-100 text-center">
         <div className="max-w-4xl mx-auto px-6" data-aos="fade-up">
           <h4 className="text-2xl font-bold mb-4 text-[#113e48]">

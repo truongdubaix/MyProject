@@ -1,22 +1,24 @@
 import { useState, useEffect } from "react";
 
-/** GEOCODE 💡 */
+const MAPBOX_TOKEN = import.meta.env.VITE_MAPBOX_TOKEN;
+
+/** GEOCODE bằng Mapbox */
 async function geocodeAddress(addr) {
+  if (!addr) return null;
+
   const url =
-    `https://nominatim.openstreetmap.org/search?` +
-    `format=json&addressdetails=1&limit=1&countrycodes=vn&q=${encodeURIComponent(
-      addr
-    )}`;
+    `https://api.mapbox.com/geocoding/v5/mapbox.places/` +
+    `${encodeURIComponent(addr)}.json` +
+    `?access_token=${MAPBOX_TOKEN}` +
+    `&country=vn&language=vi&limit=1`;
 
   const res = await fetch(url);
   const data = await res.json();
-  if (!data.length) return null;
 
-  return {
-    lat: parseFloat(data[0].lat),
-    lng: parseFloat(data[0].lon),
-    raw: data[0],
-  };
+  if (!data.features || !data.features.length) return null;
+
+  const [lng, lat] = data.features[0].center;
+  return { lat, lng, raw: data.features[0] };
 }
 
 export default function DiaChiSelector({ label, onChange, required }) {
@@ -45,7 +47,7 @@ export default function DiaChiSelector({ label, onChange, required }) {
     if (!code) return;
 
     const r = await fetch(
-      `https://provinces.open-api.vn/api/p/${code}?depth=2`
+      `https://provinces.open-api.vn/api/p/${code}?depth=2`,
     );
     const data = await r.json();
 
@@ -62,7 +64,7 @@ export default function DiaChiSelector({ label, onChange, required }) {
     if (!code) return;
 
     const r = await fetch(
-      `https://provinces.open-api.vn/api/d/${code}?depth=2`
+      `https://provinces.open-api.vn/api/d/${code}?depth=2`,
     );
     const data = await r.json();
 
@@ -72,7 +74,8 @@ export default function DiaChiSelector({ label, onChange, required }) {
     emitAddress(selected.province, data, null);
   };
 
-  // ===== WARD (KHÔNG FETCH) =====
+  // ===== WARD =====
+
   const handleWard = async (e) => {
     const code = e.target.value;
     const ward = wards.find((w) => Number(w.code) === Number(code));
@@ -83,15 +86,12 @@ export default function DiaChiSelector({ label, onChange, required }) {
     emitAddress(selected.province, selected.district, ward);
   };
 
-  // ===== EMIT VỀ PARENT =====
   const emitAddress = async (prov, dist, ward) => {
-    const addr = [ward?.name, dist?.name, prov?.name]
-      .filter(Boolean)
-      .join(", ");
+    if (!prov || !dist || !ward) return;
 
+    const addr = [ward.name, dist.name, prov.name].join(", ");
     setFullAddress(addr);
 
-    // ---- GEOCODE ----
     const geo = await geocodeAddress(addr);
 
     onChange({
@@ -106,7 +106,6 @@ export default function DiaChiSelector({ label, onChange, required }) {
       <label className="font-medium text-gray-700">{label}</label>
 
       <div className="grid md:grid-cols-3 gap-3">
-        {/* ===== Province ===== */}
         <select
           defaultValue=""
           onChange={handleProvince}
@@ -121,7 +120,6 @@ export default function DiaChiSelector({ label, onChange, required }) {
           ))}
         </select>
 
-        {/* ===== District ===== */}
         <select
           defaultValue=""
           disabled={!districts.length}
@@ -137,7 +135,6 @@ export default function DiaChiSelector({ label, onChange, required }) {
           ))}
         </select>
 
-        {/* ===== Ward ===== */}
         <select
           defaultValue=""
           disabled={!wards.length}
@@ -154,7 +151,6 @@ export default function DiaChiSelector({ label, onChange, required }) {
         </select>
       </div>
 
-      {/* Input ẩn để Validate HTML */}
       <input
         type="text"
         readOnly

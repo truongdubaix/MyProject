@@ -1,7 +1,7 @@
 import jwt from "jsonwebtoken";
 
-// Middleware xác thực JWT
-export const authMiddleware = (req, res, next) => {
+// 👇 ĐỔI TÊN Ở ĐÂY: từ 'authMiddleware' thành 'verifyToken'
+export const verifyToken = (req, res, next) => {
   const authHeader = req.headers.authorization;
 
   if (!authHeader || !authHeader.startsWith("Bearer ")) {
@@ -13,7 +13,8 @@ export const authMiddleware = (req, res, next) => {
   const token = authHeader.split(" ")[1];
 
   try {
-    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    // Lưu ý: Đảm bảo secret key khớp với file authController (nên dùng biến môi trường hoặc chuỗi cứng giống nhau)
+    const decoded = jwt.verify(token, process.env.JWT_SECRET || "secret-key");
 
     req.user = decoded; // gắn user vào request
     return next();

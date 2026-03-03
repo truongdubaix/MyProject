@@ -1,8 +1,7 @@
-import { Routes, Route, useLocation } from "react-router-dom";
+import { Routes, Route, useLocation, Outlet } from "react-router-dom";
 import Navbar from "./components/Navbar.jsx";
 import Footer from "./components/Footer.jsx";
 import ProtectedRoute from "./components/ProtectedRoute.jsx";
-import "leaflet/dist/leaflet.css";
 
 // 🌍 Public pages
 import Home from "./pages/Home.jsx";
@@ -39,6 +38,7 @@ import DispatcherAssignments from "./pages/dispatcher/DispatcherAssignments.jsx"
 import DispatcherTracking from "./pages/dispatcher/DispatcherTracking.jsx";
 import DispatcherTrackingDetail from "./pages/dispatcher/DispatcherTrackingDetail.jsx";
 import DispatcherContacts from "./pages/dispatcher/DispatcherContacts.jsx";
+import DispatcherChat from "./pages/dispatcher/DispatcherChat.jsx";
 
 // 🚚 Driver pages
 import DriverDashboard from "./pages/driver/DriverDashboard.jsx";
@@ -46,7 +46,6 @@ import DriverAssignments from "./pages/driver/DriverAssignments.jsx";
 import DriverHistory from "./pages/driver/DriverHistory.jsx";
 import DriverProfile from "./pages/driver/DriverProfile.jsx";
 import DriverShipmentDetail from "./pages/driver/DriverShipmentDetail.jsx";
-import DispatcherChat from "./pages/dispatcher/DispatcherChat.jsx";
 
 // 👤 Customer pages
 import CustomerDashboard from "./pages/customer/CustomerDashboard.jsx";
@@ -56,13 +55,15 @@ import CustomerHistory from "./pages/customer/CustomerHistory.jsx";
 import CustomerProfile from "./pages/customer/CustomerProfile.jsx";
 import CustomerShipmentDetail from "./pages/customer/CustomerShipmentDetail.jsx";
 import CustomerPayment from "./pages/customer/CustomerPayment.jsx";
-import PaymentSuccess from "./pages/customer/PaymentSuccess.jsx";
+// import PaymentSuccess from "./pages/customer/PaymentSuccess.jsx"; // ❌ Bỏ nếu không dùng
 import PaymentFail from "./pages/customer/PaymentFail.jsx";
 import CustomerFeedback from "./pages/customer/CustomerFeedback.jsx";
-//import CustomerTrackDetail from "./pages/customer/CustomerTrackDetail.jsx";
+import PaymentResult from "./pages/customer/PaymentResult.jsx";
+import CustomerAddress from "./pages/customer/CustomerAddress.jsx";
+import CustomerWallet from "./pages/customer/CustomerWallet.jsx";
+import CustomerSupport from "./pages/customer/CustomerSupport.jsx";
 
-import { ChatProvider } from "./context/ChatContext";
-import ChatLayout from "./components/ChatLayout.jsx";
+// 📜 Policy & Services
 import PrivacyPolicy from "./pages/policy/PrivacyPolicy.jsx";
 import Claims from "./pages/policy/Claims.jsx";
 import Terms from "./pages/policy/Terms.jsx";
@@ -72,65 +73,61 @@ import RoadFreight from "./pages/service/RoadFreight.jsx";
 import Warehouse from "./pages/service/Warehourse.jsx";
 import ExpressDelivery from "./pages/service/ExpressDelivery.jsx";
 import PriceList from "./pages/service/PriceList.jsx";
-import CustomerAddress from "./pages/customer/CustomerAddress.jsx";
-import CustomerWallet from "./pages/customer/CustomerWallet.jsx";
-import CustomerSupport from "./pages/customer/CustomerSupport.jsx";
-import PaymentResult from "./pages/customer/PaymentResult.jsx";
+
+import { ChatProvider } from "./context/ChatContext";
+import ChatLayout from "./components/ChatLayout.jsx";
+
+// ✨ Layout riêng cho trang Public để tránh re-render Navbar/Footer
+const PublicLayout = () => (
+  <>
+    <Navbar />
+    <main className="flex-1">
+      <Outlet />
+    </main>
+    <Footer />
+  </>
+);
 
 export default function App() {
-  // 🟢 Logic để ẩn chat ở các trang quản trị
   const location = useLocation();
   const hiddenPaths = ["/admin", "/dispatcher", "/driver"];
-  // Nếu đường dẫn hiện tại bắt đầu bằng các từ khóa trên -> Ẩn chat
   const shouldShowChat = !hiddenPaths.some((path) =>
     location.pathname.startsWith(path)
   );
 
   return (
     <ChatProvider>
-      <div className="bg-gray-50 text-gray-800 min-h-screen flex flex-col relative">
+      <div className="bg-gray-50 text-gray-800 min-h-screen flex flex-col relative font-sans">
         <Routes>
-          {/* 🌍 Public routes */}
-          {[
-            { path: "/", element: <Home /> },
-            { path: "/tracking", element: <Tracking /> },
-            { path: "/about", element: <About /> },
-            { path: "/services", element: <Services /> },
-            { path: "/services/air", element: <ComingSoon /> },
-            { path: "/services/road", element: <RoadFreight /> },
-            { path: "/services/warehouse", element: <Warehouse /> },
-            { path: "/services/express", element: <ExpressDelivery /> },
-            { path: "/services/price-list", element: <PriceList /> },
-            { path: "/contact", element: <Contact /> },
-            { path: "/login", element: <Login /> },
-            { path: "/register", element: <Register /> },
+          {/* 🌍 PUBLIC ROUTES (Được bọc bởi Navbar & Footer) */}
+          <Route element={<PublicLayout />}>
+            <Route path="/" element={<Home />} />
+            <Route path="/tracking" element={<Tracking />} />
+            <Route path="/about" element={<About />} />
+            <Route path="/services" element={<Services />} />
+            <Route path="/services/air" element={<ComingSoon />} />
+            <Route path="/services/road" element={<RoadFreight />} />
+            <Route path="/services/warehouse" element={<Warehouse />} />
+            <Route path="/services/express" element={<ExpressDelivery />} />
+            <Route path="/services/price-list" element={<PriceList />} />
+            <Route path="/contact" element={<Contact />} />
+            <Route path="/login" element={<Login />} />
+            <Route path="/register" element={<Register />} />
+            <Route path="/apply-driver" element={<ApplyDriver />} />
 
-            // ✅ Trang tuyển dụng tài xế mới
-            { path: "/apply-driver", element: <ApplyDriver /> },
-            { path: "/policy/privacy", element: <PrivacyPolicy /> },
-            { path: "/policy/claims", element: <Claims /> },
-            { path: "/policy/terms", element: <Terms /> },
-            { path: "/policy/shipping-rules", element: <ShippingRules /> },
-          ].map(({ path, element }) => (
-            <Route
-              key={path}
-              path={path}
-              element={
-                <>
-                  <Navbar />
-                  <main className="flex-1">{element}</main>
+            {/* Policy Routes */}
+            <Route path="/policy/privacy" element={<PrivacyPolicy />} />
+            <Route path="/policy/claims" element={<Claims />} />
+            <Route path="/policy/terms" element={<Terms />} />
+            <Route path="/policy/shipping-rules" element={<ShippingRules />} />
+          </Route>
 
-                  <Footer />
-                </>
-              }
-            />
-          ))}
-
-          {/* 🚪 Logout + Unauthorized */}
+          {/* 🚪 Auth/Error Routes (Không cần Navbar/Footer hoặc Layout riêng) */}
           <Route path="/logout" element={<Logout />} />
           <Route path="/unauthorized" element={<Unauthorized />} />
           <Route path="/forgot-password" element={<ForgotPassword />} />
-          {/* 🧭 Admin */}
+
+          {/* 🧭 ADMIN */}
           <Route
             path="/admin"
             element={
@@ -149,7 +146,7 @@ export default function App() {
             <Route path="contact" element={<AdminContacts />} />
           </Route>
 
-          {/* 🧩 Dispatcher */}
+          {/* 🧩 DISPATCHER */}
           <Route
             path="/dispatcher"
             element={
@@ -166,7 +163,7 @@ export default function App() {
             <Route path="contacts" element={<DispatcherContacts />} />
           </Route>
 
-          {/* 🚚 Driver */}
+          {/* 🚚 DRIVER */}
           <Route
             path="/driver/:id"
             element={
@@ -185,7 +182,7 @@ export default function App() {
             />
           </Route>
 
-          {/* 👤 Customer */}
+          {/* 👤 CUSTOMER */}
           <Route
             path="/customer"
             element={
@@ -195,37 +192,49 @@ export default function App() {
             }
           >
             <Route index element={<CustomerDashboard />} />
-            <Route
-              path="/customer/create-order"
-              element={<CustomerCreateShipment />}
-            />
+
+            {/* 👇 ĐÃ SỬA: Dùng đường dẫn tương đối (bỏ /customer/ ở đầu) */}
+            <Route path="create-order" element={<CustomerCreateShipment />} />
             <Route path="track" element={<CustomerTrack />} />
             <Route path="history" element={<CustomerHistory />} />
             <Route path="profile" element={<CustomerProfile />} />
             <Route path="history/:id" element={<CustomerShipmentDetail />} />
-            <Route path="/customer/payment" element={<CustomerPayment />} />
-            <Route
-              path="/customer/payment-success"
-              element={<PaymentResult />}
-            />
+
+            {/* Payment Routes */}
+            <Route path="payment" element={<CustomerPayment />} />
+            <Route path="payment-success" element={<PaymentResult />} />
             <Route path="payment-fail" element={<PaymentFail />} />
+
             <Route path="feedback" element={<CustomerFeedback />} />
             <Route path="addresses" element={<CustomerAddress />} />
             <Route path="wallet" element={<CustomerWallet />} />
             <Route path="support" element={<CustomerSupport />} />
           </Route>
 
-          {/* ❌ 404 fallback */}
+          {/* ❌ 404 Not Found */}
           <Route
             path="*"
             element={
-              <p className="p-10 text-center text-red-600">
-                404 - Không tìm thấy trang
-              </p>
+              <div className="flex items-center justify-center min-h-screen bg-gray-100">
+                <div className="text-center">
+                  <h1 className="text-9xl font-bold text-gray-800">404</h1>
+                  <p className="text-2xl font-light text-gray-600 mt-4">
+                    Oops! Trang bạn tìm kiếm không tồn tại.
+                  </p>
+                  <a
+                    href="/"
+                    className="mt-6 inline-block bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition"
+                  >
+                    Về trang chủ
+                  </a>
+                </div>
+              </div>
             }
           />
         </Routes>
       </div>
+
+      {/* Chat Widget cho khách vãng lai và customer */}
       {shouldShowChat && <ChatLayout />}
     </ChatProvider>
   );

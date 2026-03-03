@@ -3,7 +3,6 @@ import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
 
 // --- ICONS ---
-// Đã tối ưu hóa class để dùng Tailwind chuẩn
 const Icons = {
   Box: () => (
     <svg

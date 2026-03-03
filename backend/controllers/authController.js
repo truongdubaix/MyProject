@@ -3,7 +3,9 @@ import jwt from "jsonwebtoken";
 import pool from "../config/db.js";
 import { sendMail } from "../utils/sendMail.js";
 
-// Đăng ký
+// ==========================
+// ĐĂNG KÝ
+// ==========================
 export const register = async (req, res) => {
   const { name, email, password, phone } = req.body;
   if (!name || !email || !password)
@@ -17,12 +19,14 @@ export const register = async (req, res) => {
       return res.status(400).json({ message: "Email đã tồn tại" });
 
     const hash = await bcrypt.hash(password, 10);
+
+    // Insert user (mặc định region_id sẽ là NULL)
     const [result] = await pool.query(
       "INSERT INTO users (name,email,password,phone) VALUES (?,?,?,?)",
       [name, email, hash, phone]
     );
 
-    // mặc định role customer
+    // Mặc định role customer
     const [role] = await pool.query(
       "SELECT id FROM roles WHERE code='customer'"
     );
@@ -38,13 +42,17 @@ export const register = async (req, res) => {
   }
 };
 
-// Đăng nhập
+// ==========================
+// ĐĂNG NHẬP (Cập nhật Logic Vùng Miền)
+// ==========================
 export const login = async (req, res) => {
   const { email, password } = req.body;
   if (!email || !password)
     return res.status(400).json({ message: "Vui lòng nhập đầy đủ thông tin!" });
 
   try {
+    // 1. Tìm user
+    // (Câu lệnh SELECT * đã lấy luôn cột region_id nếu bạn đã chạy lệnh ALTER TABLE)
     const [users] = await pool.query("SELECT * FROM users WHERE email = ?", [
       email,
     ]);
@@ -52,25 +60,22 @@ export const login = async (req, res) => {
       return res.status(401).json({ message: "Sai tài khoản hoặc mật khẩu" });
 
     const user = users[0];
-    //console.log("🟡 Trạng thái user:", user.status);
 
-    // Kiểm tra trạng thái
+    // 2. Kiểm tra trạng thái
     if (user.status && user.status.toLowerCase() === "inactive") {
-      console.log("🚫 User bị vô hiệu hóa:", user.email);
       return res.status(403).json({
         message:
           "Tài khoản của bạn đã bị vô hiệu hóa, vui lòng liên hệ quản trị viên.",
       });
     }
 
-    // Kiểm tra mật khẩu
+    // 3. Kiểm tra mật khẩu
     const match = await bcrypt.compare(password, user.password);
     if (!match) {
-      console.log("❌ Sai mật khẩu:", user.email);
       return res.status(401).json({ message: "Sai tài khoản hoặc mật khẩu" });
     }
 
-    // 🔹 Lấy role
+    // 4. Lấy role
     const [roles] = await pool.query(
       `SELECT r.code FROM roles r JOIN user_roles ur ON ur.role_id = r.id WHERE ur.user_id = ?`,
       [user.id]
@@ -78,10 +83,18 @@ export const login = async (req, res) => {
 
     const role = roles[0]?.code || "customer";
 
-    const token = jwt.sign({ id: user.id, role }, "secret-key", {
-      expiresIn: "2h",
-    });
+    // 5. TẠO TOKEN (QUAN TRỌNG: Thêm region_id vào đây)
+    const token = jwt.sign(
+      {
+        id: user.id,
+        role: role,
+        region_id: user.region_id, // <--- THÊM DÒNG NÀY (VD: 'DN', 'HCM' hoặc NULL)
+      },
+      process.env.JWT_SECRET || "secret-key", // Nên dùng biến môi trường
+      { expiresIn: "1d" } // Tăng lên 1 ngày cho tiện test
+    );
 
+    // 6. Trả về kết quả
     res.json({
       message: "Đăng nhập thành công",
       token,
@@ -89,7 +102,8 @@ export const login = async (req, res) => {
         id: user.id,
         name: user.name,
         email: user.email,
-        role,
+        role: role,
+        region_id: user.region_id, // Trả về để Frontend hiển thị "Khu vực: Đà Nẵng"
       },
     });
   } catch (err) {
@@ -98,7 +112,9 @@ export const login = async (req, res) => {
   }
 };
 
-// Gửi OTP
+// ==========================
+// GỬI OTP
+// ==========================
 export const sendOtp = async (req, res) => {
   const { email } = req.body;
   if (!email) return res.status(400).json({ message: "Thiếu email" });
@@ -154,7 +170,9 @@ export const sendOtp = async (req, res) => {
   }
 };
 
-// Xác thực OTP
+// ==========================
+// XÁC THỰC OTP
+// ==========================
 export const verifyOtp = async (req, res) => {
   const { email, otp } = req.body;
 

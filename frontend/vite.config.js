@@ -9,6 +9,9 @@ const __dirname = path.dirname(__filename);
 // ✅ Cấu hình chuẩn cho React Router
 export default defineConfig({
   plugins: [react()],
+  optimizeDeps: {
+    include: ["mapbox-gl", "react-map-gl"],
+  },
   server: {
     port: 5173,
     open: true, // tự mở trình duyệt khi chạy
