@@ -237,7 +237,7 @@ export default function Login() {
           </div>
 
           <div className="absolute bottom-6 left-12 text-[10px] text-gray-400 opacity-60">
-            © 2024 SpeedyShip JSC. All rights reserved.
+            © 2026 SpeedyShip JSC. All rights reserved.
           </div>
         </div>
       </motion.div>

@@ -2,12 +2,42 @@ import { Link, useNavigate, useLocation } from "react-router-dom";
 import { useEffect, useState, useRef } from "react";
 import {
   ChevronDownIcon,
-  MenuIcon,
-  CloseIcon,
   UserIcon,
   LogoutIcon,
   DashboardIcon,
 } from "../assets/icons/ui";
+
+const CustomMenuIcon = () => (
+  <svg
+    className="w-7 h-7"
+    fill="none"
+    stroke="currentColor"
+    viewBox="0 0 24 24"
+  >
+    <path
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      strokeWidth={2}
+      d="M4 6h16M4 12h16m-7 6h7"
+    />
+  </svg>
+);
+
+const CustomCloseIcon = () => (
+  <svg
+    className="w-7 h-7"
+    fill="none"
+    stroke="currentColor"
+    viewBox="0 0 24 24"
+  >
+    <path
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      strokeWidth={2}
+      d="M6 18L18 6M6 6l12 12"
+    />
+  </svg>
+);
 
 export default function Navbar() {
   const navigate = useNavigate();
@@ -20,7 +50,6 @@ export default function Navbar() {
   const [userDropdownOpen, setUserDropdownOpen] = useState(false);
   const dropdownRef = useRef(null);
 
-  // --- CÁC USE EFFECT GIỮ NGUYÊN ---
   useEffect(() => {
     const handleScroll = () => setScrolled(window.scrollY > 20);
     window.addEventListener("scroll", handleScroll);
@@ -69,6 +98,20 @@ export default function Navbar() {
     navigate(paths[role] || "/");
   };
 
+  // THÊM HÀM XỬ LÝ NÚT GỬI HÀNG NGAY TẠI ĐÂY
+  const handleCreateOrder = () => {
+    if (!role) {
+      // Yêu cầu đăng nhập nếu chưa có role
+      navigate("/login");
+    } else if (role !== "customer") {
+      // Ngăn các role khác (admin, driver, dispatcher) tạo đơn hàng
+      alert("Chức năng tạo đơn hàng chỉ dành cho tài khoản Khách hàng.");
+    } else {
+      // Nếu đúng là khách hàng thì cho phép chuyển hướng
+      navigate("/customer/create-order");
+    }
+  };
+
   const getRoleLabel = (r) => {
     const roles = {
       admin: "Quản trị viên",
@@ -102,7 +145,6 @@ export default function Navbar() {
           scrolled ? "h-0 opacity-0" : "h-10 opacity-100"
         }`}
       >
-        {/* 🔥 UPDATE: Dùng max-w-screen-2xl để giới hạn lại (1536px) thay vì w-full */}
         <div className="max-w-screen-2xl mx-auto px-4 sm:px-8 h-full flex justify-between items-center font-medium">
           <span className="flex items-center gap-2 whitespace-nowrap">
             <span className="bg-green-500 rounded-full w-2 h-2 inline-block animate-pulse"></span>
@@ -121,11 +163,6 @@ export default function Navbar() {
           scrolled ? "bg-white/95 backdrop-blur-md py-2" : "bg-white py-3"
         }`}
       >
-        {/* 🔥 UPDATE QUAN TRỌNG: 
-            - max-w-screen-2xl: Rộng hơn 7xl cũ nhưng nhỏ hơn full màn hình.
-            - mx-auto: Để căn giữa container.
-            - px-4 sm:px-8: Padding vừa phải.
-        */}
         <div className="max-w-screen-2xl mx-auto px-4 sm:px-8 flex items-center justify-between gap-4">
           {/* LOGO */}
           <div
@@ -154,16 +191,13 @@ export default function Navbar() {
                 <ChevronDownIcon className="w-5 h-5 ml-1 opacity-70 group-hover:rotate-180 transition" />
               </span>
 
-              {/* Dropdown Content - Tăng chiều rộng lên w-72 để chứa đủ nội dung */}
               <div className="absolute top-full left-1/2 -translate-x-1/2 w-80 bg-white rounded-xl shadow-xl border border-gray-100 opacity-0 invisible translate-y-2 group-hover:opacity-100 group-hover:visible group-hover:translate-y-0 transition-all duration-300 z-50 mt-2 overflow-hidden">
                 <div className="h-1 bg-orange-500"></div>
                 <div className="p-1">
-                  {/* 1. Tra cứu vận đơn  */}
                   <Link
                     to="/tracking"
                     className="flex items-center justify-between px-4 py-3 hover:bg-orange-50 rounded-lg text-sm font-medium text-slate-700 hover:text-orange-600 transition-colors group/item"
                   >
-                    {" "}
                     <span className="flex items-center gap-2">
                       🔍 Tra cứu vận đơn
                     </span>
@@ -171,12 +205,10 @@ export default function Navbar() {
                       Hot
                     </span>
                   </Link>
-                  {/* 2. Đường bộ */}
                   <Link
                     to="/services/road"
                     className="flex items-center justify-between px-4 py-3 hover:bg-orange-50 rounded-lg text-sm font-medium text-slate-700 hover:text-orange-600 transition-colors group/item"
                   >
-                    {" "}
                     <span className="flex items-center gap-2">
                       🚛 Vận chuyển Đường bộ
                     </span>
@@ -184,7 +216,6 @@ export default function Navbar() {
                       Hot
                     </span>
                   </Link>
-                  {/* 3. Hàng không (Coming Soon Link) */}
                   <Link
                     to="/services/air"
                     className="flex items-center justify-between px-4 py-3 hover:bg-orange-50 rounded-lg text-sm font-medium text-slate-700 hover:text-orange-600 transition-colors group/item"
@@ -196,23 +227,18 @@ export default function Navbar() {
                       Sắp ra mắt
                     </span>
                   </Link>
-                  {/* 3. Kho bãi */}
                   <Link
                     to="/services/warehouse"
                     className="block px-4 py-3 hover:bg-orange-50 rounded-lg text-sm font-medium text-slate-700 hover:text-orange-600 transition-colors"
                   >
                     🏭 Kho bãi & Lưu trữ
                   </Link>
-
-                  {/* 4. Hỏa tốc */}
                   <Link
                     to="/services/express"
                     className="block px-4 py-3 hover:bg-orange-50 rounded-lg text-sm font-medium text-slate-700 hover:text-orange-600 transition-colors"
                   >
                     ⚡ Giao hàng hỏa tốc
                   </Link>
-
-                  {/* 5. Bảng giá */}
                   <Link
                     to="/services/price-list"
                     className="block px-4 py-3 hover:bg-orange-50 rounded-lg text-sm font-semibold text-slate-700 hover:text-orange-600 transition-colors"
@@ -267,14 +293,16 @@ export default function Navbar() {
 
           {/* RIGHT ACTIONS */}
           <div className="flex items-center gap-3 shrink-0">
-            <Link to="/contact">
-              <button className="hidden md:flex relative overflow-hidden group bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 text-white font-bold px-6 py-2 rounded-full shadow-md hover:shadow-orange-500/30 transition-all items-center gap-2 transform active:scale-95 whitespace-nowrap">
-                <span className="relative z-10 text-sm flex items-center gap-2">
-                  <i className="fas fa-paper-plane"></i> GỬI HÀNG NGAY
-                </span>
-                <div className="absolute top-0 -left-[100%] w-full h-full bg-white/20 skew-x-[45deg] group-hover:left-[100%] transition-all duration-700 ease-in-out"></div>
-              </button>
-            </Link>
+            {/* UPDATE: GẮN SỰ KIỆN onClick VÀO NÚT BỎ THẺ Link */}
+            <button
+              onClick={handleCreateOrder}
+              className="hidden md:flex relative overflow-hidden group bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 text-white font-bold px-6 py-2 rounded-full shadow-md hover:shadow-orange-500/30 transition-all items-center gap-2 transform active:scale-95 whitespace-nowrap"
+            >
+              <span className="relative z-10 text-sm flex items-center gap-2">
+                <i className="fas fa-paper-plane"></i> GỬI HÀNG NGAY
+              </span>
+              <div className="absolute top-0 -left-[100%] w-full h-full bg-white/20 skew-x-[45deg] group-hover:left-[100%] transition-all duration-700 ease-in-out"></div>
+            </button>
 
             {role ? (
               <div className="relative ml-2" ref={dropdownRef}>
@@ -329,7 +357,7 @@ export default function Navbar() {
                     </button>
 
                     <Link
-                      to="/profile"
+                      to="/customer/profile"
                       onClick={() => setUserDropdownOpen(false)}
                       className="flex items-center gap-3 w-full px-3 py-2.5 text-sm font-medium text-slate-700 rounded-lg hover:bg-gray-100 transition-all text-left group"
                     >
@@ -377,15 +405,15 @@ export default function Navbar() {
 
             <button
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              className="lg:hidden p-2 hover:bg-gray-100 rounded-md transition-colors"
+              className="lg:hidden p-2 text-slate-700 hover:bg-gray-100 rounded-md transition-colors focus:outline-none ml-2"
             >
-              {mobileMenuOpen ? <CloseIcon /> : <MenuIcon />}
+              {mobileMenuOpen ? <CustomCloseIcon /> : <CustomMenuIcon />}
             </button>
           </div>
         </div>
       </nav>
 
-      {/* ===== MOBILE MENU (Giữ nguyên) ===== */}
+      {/* ===== MOBILE MENU ===== */}
       <div
         className={`lg:hidden overflow-hidden transition-all duration-300 ${
           mobileMenuOpen
@@ -413,39 +441,30 @@ export default function Navbar() {
               Dịch vụ
             </p>
             <div className="space-y-1 border-l-2 border-gray-100 pl-3">
-              {/* 1. Hàng không (Coming Soon) - Dùng div thay vì Link để không click được */}
               <div className="flex items-center justify-between py-1.5 pr-2 text-sm text-gray-400 cursor-not-allowed select-none">
                 <span className="flex items-center gap-1">✈️ Hàng không</span>
                 <span className="text-[10px] font-bold bg-gray-100 text-gray-500 px-2 py-0.5 rounded-full border border-gray-200">
                   Sắp ra mắt
                 </span>
               </div>
-
-              {/* 2. Đường bộ */}
               <Link
                 to="/services/road"
                 className="block py-1.5 text-sm text-slate-600 hover:text-orange-600 transition-colors"
               >
                 🚛 Vận chuyển Đường bộ
               </Link>
-
-              {/* 3. Kho bãi (Mới thêm) */}
               <Link
                 to="/services/warehouse"
                 className="block py-1.5 text-sm text-slate-600 hover:text-orange-600 transition-colors"
               >
                 🏭 Kho bãi & Lưu trữ
               </Link>
-
-              {/* 4. Hỏa tốc (Mới thêm) */}
               <Link
                 to="/services/express"
                 className="block py-1.5 text-sm text-slate-600 hover:text-orange-600 transition-colors"
               >
                 ⚡ Giao hàng hỏa tốc
               </Link>
-
-              {/* 5. Bảng giá (Sửa từ Ship COD) */}
               <Link
                 to="/services/price-list"
                 className="block py-1.5 text-sm font-semibold text-slate-700 hover:text-orange-600 transition-colors"

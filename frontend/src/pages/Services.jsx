@@ -201,7 +201,7 @@ export default function Service() {
           </p>
           <div className="flex justify-center gap-4">
             <Link
-              to="/customer/create"
+              to="/register"
               className="px-10 py-3 bg-[#113e48] text-white font-bold rounded-full hover:bg-orange-500 transition-all shadow-lg"
             >
               Đăng ký ngay

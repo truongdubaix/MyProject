@@ -118,19 +118,19 @@ export default function About() {
             <div className="absolute -bottom-6 -right-6 w-32 h-32 bg-blue-100 rounded-full z-0 mix-blend-multiply filter blur-xl opacity-70"></div>
 
             <img
-              src="https://images.unsplash.com/photo-1616401784845-180886ba9ca8?auto=format&fit=crop&w=800&q=80"
+              src="/assets/img/about1.png"
               alt="Mission"
               className="relative z-10 rounded-2xl shadow-xl w-full object-cover h-[450px]"
             />
             {/* Quote Box nhỏ */}
-            <div className="absolute bottom-8 -right-8 bg-white p-6 rounded-xl shadow-2xl z-20 max-w-xs hidden md:block border border-gray-50">
+            {/* <div className="absolute bottom-8 -right-8 bg-white p-6 rounded-xl shadow-2xl z-20 max-w-xs hidden md:block border border-gray-50">
               <p className="text-sm font-bold text-[#113e48] italic">
                 "Khách hàng là trọng tâm của mọi chuyến đi."
               </p>
               <div className="flex gap-1 text-orange-400 mt-3 text-xs">
                 ⭐⭐⭐⭐⭐
               </div>
-            </div>
+            </div> */}
           </div>
 
           <div data-aos="fade-left">
@@ -190,7 +190,7 @@ export default function About() {
           <div className="order-1 md:order-2 relative" data-aos="fade-left">
             <div className="absolute inset-0 bg-[#113e48] rounded-2xl transform rotate-3 scale-[0.98] opacity-10 z-0"></div>
             <img
-              src="https://images.unsplash.com/photo-1551288049-bebda4e38f71?auto=format&fit=crop&w=800&q=80"
+              src="/assets/img/about2.png"
               alt="Vision"
               className="relative z-10 rounded-2xl shadow-xl w-full object-cover h-[450px]"
             />
