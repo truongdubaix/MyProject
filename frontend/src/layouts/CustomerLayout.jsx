@@ -1,4 +1,5 @@
 import { NavLink, Outlet, useNavigate, useLocation } from "react-router-dom";
+import { useState, useEffect } from "react";
 import {
   LogOut,
   Home,
@@ -8,17 +9,26 @@ import {
   User,
   Bell,
   ChevronRight,
-  // 👇 Import thêm các icon mới
-  MapPin, // Sổ địa chỉ
-  Wallet, // Ví tiền
-  Headphones, // Hỗ trợ
-  Gift, // Khuyến mãi (Optional)
+  MapPin,
+  Wallet,
+  Headphones,
+  Gift,
+  Menu,
+  X,
 } from "lucide-react";
 
 export default function CustomerLayout() {
   const navigate = useNavigate();
   const location = useLocation();
   const username = localStorage.getItem("username") || "Khách hàng";
+
+  // State quản lý việc mở/đóng sidebar trên mobile
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+
+  // Tự động đóng sidebar khi chuyển trang trên mobile
+  useEffect(() => {
+    setIsSidebarOpen(false);
+  }, [location.pathname]);
 
   const handleLogout = () => {
     if (window.confirm("Bạn có chắc chắn muốn đăng xuất?")) {
@@ -42,17 +52,18 @@ export default function CustomerLayout() {
       case "/customer":
         return "Dashboard";
       case "/customer/create":
+      case "/customer/create-order":
         return "Tạo đơn hàng mới";
       case "/customer/track":
         return "Tra cứu vận đơn";
       case "/customer/history":
         return "Lịch sử đơn hàng";
       case "/customer/addresses":
-        return "Sổ địa chỉ"; // ✨ Mới
+        return "Sổ địa chỉ";
       case "/customer/wallet":
-        return "Ví & Thanh toán"; // ✨ Mới
+        return "Ví & Thanh toán";
       case "/customer/support":
-        return "Hỗ trợ khách hàng"; // ✨ Mới
+        return "Hỗ trợ khách hàng";
       case "/customer/profile":
         return "Hồ sơ cá nhân";
       default:
@@ -62,10 +73,25 @@ export default function CustomerLayout() {
 
   return (
     <div className="flex h-screen bg-[#F8FAFC] overflow-hidden font-sans">
+      {/* --- OVERLAY MOBILE --- */}
+      {isSidebarOpen && (
+        <div
+          className="fixed inset-0 bg-black/50 z-40 md:hidden transition-opacity"
+          onClick={() => setIsSidebarOpen(false)}
+        />
+      )}
+
       {/* --- SIDEBAR --- */}
-      <aside className="w-72 bg-[#113e48] text-white flex flex-col shadow-2xl relative z-20">
-        {/* Brand Logo */}
-        <div className="h-20 flex items-center px-8 border-b border-white/10">
+      <aside
+        className={`
+          fixed inset-y-0 left-0 z-50 w-72 bg-[#113e48] text-white flex flex-col shadow-2xl 
+          transition-transform duration-300 ease-in-out transform
+          md:relative md:translate-x-0
+          ${isSidebarOpen ? "translate-x-0" : "-translate-x-full"}
+        `}
+      >
+        {/* Brand Logo & Nút Đóng (Mobile) */}
+        <div className="h-16 md:h-20 flex items-center justify-between px-6 md:px-8 border-b border-white/10 shrink-0">
           <div
             className="flex items-center gap-2 cursor-pointer"
             onClick={() => navigate("/")}
@@ -74,13 +100,21 @@ export default function CustomerLayout() {
               <img
                 src="/assets/logo/logoSpeedyShip.png"
                 alt="Logo"
-                className="w-6 h-6 object-contain brightness-0 invert"
+                className="w-5 h-5 md:w-6 md:h-6 object-contain brightness-0 invert"
               />
             </div>
-            <span className="text-xl font-extrabold tracking-tight">
+            <span className="text-lg md:text-xl font-extrabold tracking-tight">
               Speedy<span className="text-orange-500">Ship</span>
             </span>
           </div>
+
+          {/* Nút đóng sidebar chỉ hiện trên mobile */}
+          <button
+            onClick={() => setIsSidebarOpen(false)}
+            className="md:hidden p-2 bg-white/10 rounded-lg hover:bg-white/20 transition-colors text-white"
+          >
+            <X size={20} />
+          </button>
         </div>
 
         {/* Navigation Menu */}
@@ -106,25 +140,25 @@ export default function CustomerLayout() {
             </nav>
           </div>
 
-          {/* GROUP 2: TIỆN ÍCH (✨ MỚI THÊM) */}
+          {/* GROUP 2: TIỆN ÍCH */}
           <div>
             <p className="px-4 mb-2 text-[10px] font-bold text-blue-200/50 uppercase tracking-widest">
               Tiện ích
             </p>
-            <NavLink to="/customer/addresses" className={navLinkClasses}>
-              <MapPin size={18} /> <span>Sổ địa chỉ</span>
-            </NavLink>
-
-            <NavLink to="/customer/wallet" className={navLinkClasses}>
-              <Wallet size={20} /> <span>Ví & Thanh toán</span>
-            </NavLink>
-
-            <NavLink to="/customer/support" className={navLinkClasses}>
-              <Headphones size={20} /> <span>Hỗ trợ</span>
-            </NavLink>
+            <nav className="flex flex-col space-y-1">
+              <NavLink to="/customer/addresses" className={navLinkClasses}>
+                <MapPin size={18} /> <span>Sổ địa chỉ</span>
+              </NavLink>
+              <NavLink to="/customer/wallet" className={navLinkClasses}>
+                <Wallet size={18} /> <span>Ví & Thanh toán</span>
+              </NavLink>
+              <NavLink to="/customer/support" className={navLinkClasses}>
+                <Headphones size={18} /> <span>Hỗ trợ</span>
+              </NavLink>
+            </nav>
           </div>
 
-          {/* GROUP 3: TÀI KHOẢN */}
+          {/* GROUP 3: CÀI ĐẶT */}
           <div>
             <p className="px-4 mb-2 text-[10px] font-bold text-blue-200/50 uppercase tracking-widest">
               Cài đặt
@@ -133,15 +167,12 @@ export default function CustomerLayout() {
               <NavLink to="/customer/profile" className={navLinkClasses}>
                 <User size={18} /> <span>Hồ sơ cá nhân</span>
               </NavLink>
-              <NavLink to="/customer/support" className={navLinkClasses}>
-                <Headphones size={18} /> <span>Hỗ trợ & Khiếu nại</span>
-              </NavLink>
             </nav>
           </div>
         </div>
 
         {/* User Profile Footer */}
-        <div className="p-4 bg-[#0d2f36] border-t border-white/5">
+        <div className="p-4 bg-[#0d2f36] border-t border-white/5 shrink-0">
           <div className="flex items-center justify-between p-3 rounded-xl bg-white/5 border border-white/5 hover:bg-white/10 transition-colors cursor-pointer group">
             <div className="flex items-center gap-3 overflow-hidden">
               <div className="w-9 h-9 rounded-full bg-gradient-to-br from-orange-400 to-red-500 flex items-center justify-center text-sm font-bold text-white shadow-inner shrink-0">
@@ -156,7 +187,8 @@ export default function CustomerLayout() {
             </div>
             <button
               onClick={handleLogout}
-              className="text-blue-200 hover:text-red-400 transition-colors"
+              className="text-blue-200 hover:text-red-400 transition-colors shrink-0"
+              title="Đăng xuất"
             >
               <LogOut size={18} />
             </button>
@@ -165,29 +197,37 @@ export default function CustomerLayout() {
       </aside>
 
       {/* --- MAIN CONTENT --- */}
-      <div className="flex-1 flex flex-col min-w-0">
-        <header className="h-16 bg-white shadow-sm border-b border-gray-100 flex items-center justify-between px-8 z-10 sticky top-0">
-          <div>
-            <h2 className="text-xl font-extrabold text-[#113e48]">
+      <div className="flex-1 flex flex-col min-w-0 h-screen overflow-hidden relative">
+        <header className="h-16 bg-white shadow-sm border-b border-gray-100 flex items-center justify-between px-4 md:px-8 z-10 shrink-0">
+          <div className="flex items-center gap-3">
+            {/* Nút Hamburger (Chỉ hiện trên mobile) */}
+            <button
+              onClick={() => setIsSidebarOpen(true)}
+              className="md:hidden p-2 -ml-2 text-slate-600 hover:bg-slate-100 rounded-lg transition-colors focus:outline-none"
+            >
+              <Menu size={24} />
+            </button>
+            <h2 className="text-lg md:text-xl font-extrabold text-[#113e48] truncate max-w-[150px] sm:max-w-[300px]">
               {getPageTitle()}
             </h2>
           </div>
-          <div className="flex items-center gap-4">
+
+          <div className="flex items-center gap-2 md:gap-4 shrink-0">
             <button className="p-2 text-gray-400 hover:text-orange-500 hover:bg-orange-50 rounded-full transition-all relative">
               <Bell size={20} />
               <span className="absolute top-2 right-2 w-2 h-2 bg-red-500 rounded-full border border-white animate-pulse"></span>
             </button>
-            <div className="h-6 w-[1px] bg-gray-200"></div>
+            <div className="hidden md:block h-6 w-[1px] bg-gray-200"></div>
             <button
               onClick={() => navigate("/")}
-              className="flex items-center gap-1 text-xs font-bold text-[#113e48] hover:text-orange-600 transition-colors px-3 py-1.5 rounded-lg hover:bg-gray-50"
+              className="hidden md:flex items-center gap-1 text-xs font-bold text-[#113e48] hover:text-orange-600 transition-colors px-3 py-1.5 rounded-lg hover:bg-gray-50"
             >
               Trang chủ <ChevronRight size={14} />
             </button>
           </div>
         </header>
 
-        <main className="flex-1 overflow-x-hidden overflow-y-auto bg-[#F8FAFC] p-6 md:p-8 scroll-smooth">
+        <main className="flex-1 overflow-x-hidden overflow-y-auto bg-[#F8FAFC] p-4 md:p-8 scroll-smooth w-full">
           <div className="max-w-7xl mx-auto min-h-full">
             <Outlet />
           </div>

@@ -1,6 +1,5 @@
 import { Navigate, Outlet } from "react-router-dom";
 
-// 👇 Thêm props 'children' vào đây
 const ProtectedRoute = ({ allowedRoles, children }) => {
   const token = localStorage.getItem("token");
   const rawRole = localStorage.getItem("role");
@@ -16,7 +15,7 @@ const ProtectedRoute = ({ allowedRoles, children }) => {
     return <Navigate to="/unauthorized" replace />;
   }
 
-  // 3. 👇 SỬA ĐOẠN NÀY: Ưu tiên render children (Layout) nếu có
+  // 3. Ưu tiên render children (Layout) nếu có
   return children ? children : <Outlet />;
 };
 

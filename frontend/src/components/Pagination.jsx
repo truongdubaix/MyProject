@@ -2,12 +2,11 @@ import { ChevronLeft, ChevronRight } from "lucide-react";
 
 /**
  * Component Phân trang tái sử dụng
- * @param {number} currentPage - Trang hiện tại
- * @param {number} totalPages - Tổng số trang
- * @param {function} onPageChange - Hàm xử lý khi chuyển trang (nhận vào số trang mới)
+ * @param {number} currentPage
+ * @param {number} totalPages
+ * @param {function} onPageChange
  */
 export default function Pagination({ currentPage, totalPages, onPageChange }) {
-  // Nếu chỉ có 1 trang hoặc không có trang nào thì ẩn luôn
   if (totalPages <= 1) return null;
 
   return (
