@@ -1,163 +1,213 @@
 import { useState, useEffect } from "react";
+import {
+  Search,
+  MapPin,
+  ChevronDown,
+  ChevronUp,
+  Map,
+  Navigation,
+  Loader2,
+} from "lucide-react";
 
 const MAPBOX_TOKEN = import.meta.env.VITE_MAPBOX_TOKEN;
 
-/** GEOCODE bằng Mapbox */
-async function geocodeAddress(addr) {
-  if (!addr) return null;
+export default function DiaChiSelector({
+  label,
+  onChange,
+  onOpenMap,
+  required,
+}) {
+  const [searchQuery, setSearchQuery] = useState("");
+  const [suggestions, setSuggestions] = useState([]);
+  const [showManual, setShowManual] = useState(false);
+  const [loading, setLoading] = useState(false);
 
-  const url =
-    `https://api.mapbox.com/geocoding/v5/mapbox.places/` +
-    `${encodeURIComponent(addr)}.json` +
-    `?access_token=${MAPBOX_TOKEN}` +
-    `&country=vn&language=vi&limit=1`;
-
-  const res = await fetch(url);
-  const data = await res.json();
-
-  if (!data.features || !data.features.length) return null;
-
-  const [lng, lat] = data.features[0].center;
-  return { lat, lng, raw: data.features[0] };
-}
-
-export default function DiaChiSelector({ label, onChange, required }) {
   const [provinces, setProvinces] = useState([]);
   const [districts, setDistricts] = useState([]);
   const [wards, setWards] = useState([]);
+  const [manualData, setManualData] = useState({ p: "", d: "", w: "" });
 
-  const [selected, setSelected] = useState({
-    province: null,
-    district: null,
-    ward: null,
-  });
-
-  const [fullAddress, setFullAddress] = useState("");
-
-  // ===== LOAD PROVINCE =====
   useEffect(() => {
     fetch("https://provinces.open-api.vn/api/?depth=1")
-      .then((r) => r.json())
-      .then(setProvinces);
+      .then((res) => res.json())
+      .then(setProvinces)
+      .catch((err) => console.error("Lỗi tải tỉnh thành:", err));
   }, []);
 
-  // ===== PROVINCE =====
-  const handleProvince = async (e) => {
-    const code = e.target.value;
-    if (!code) return;
+  const handleSearch = async (query) => {
+    setSearchQuery(query);
+    if (query.length < 3) {
+      setSuggestions([]);
+      return;
+    }
 
-    const r = await fetch(
+    setLoading(true);
+    try {
+      const url = `https://api.mapbox.com/geocoding/v5/mapbox.places/${encodeURIComponent(query)}.json?access_token=${MAPBOX_TOKEN}&country=vn&language=vi&types=address,poi,place,locality&limit=10`;
+      const res = await fetch(url);
+      const data = await res.json();
+      setSuggestions(data.features || []);
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleProvinceChange = async (code) => {
+    const res = await fetch(
       `https://provinces.open-api.vn/api/p/${code}?depth=2`,
     );
-    const data = await r.json();
-
-    setSelected({ province: data, district: null, ward: null });
+    const data = await res.json();
     setDistricts(data.districts || []);
     setWards([]);
-
-    emitAddress(data, null, null);
+    setManualData({ p: code, d: "", w: "" });
   };
 
-  // ===== DISTRICT =====
-  const handleDistrict = async (e) => {
-    const code = e.target.value;
-    if (!code) return;
-
-    const r = await fetch(
+  const handleDistrictChange = async (code) => {
+    const res = await fetch(
       `https://provinces.open-api.vn/api/d/${code}?depth=2`,
     );
-    const data = await r.json();
-
-    setSelected((prev) => ({ ...prev, district: data, ward: null }));
+    const data = await res.json();
     setWards(data.wards || []);
-
-    emitAddress(selected.province, data, null);
+    setManualData((prev) => ({ ...prev, d: code, w: "" }));
   };
 
-  // ===== WARD =====
+  const handleWardChange = (code) => {
+    const pName = provinces.find((x) => x.code == manualData.p)?.name;
+    const dName = districts.find((x) => x.code == manualData.d)?.name;
+    const wName = wards.find((x) => x.code == code)?.name;
 
-  const handleWard = async (e) => {
-    const code = e.target.value;
-    const ward = wards.find((w) => Number(w.code) === Number(code));
-    if (!ward) return;
-
-    setSelected((prev) => ({ ...prev, ward }));
-
-    emitAddress(selected.province, selected.district, ward);
-  };
-
-  const emitAddress = async (prov, dist, ward) => {
-    if (!prov || !dist || !ward) return;
-
-    const addr = [ward.name, dist.name, prov.name].join(", ");
-    setFullAddress(addr);
-
-    const geo = await geocodeAddress(addr);
-
-    onChange({
-      address: addr,
-      lat: geo?.lat || null,
-      lng: geo?.lng || null,
-    });
+    const fullAddr = `${wName}, ${dName}, ${pName}`;
+    setSearchQuery(fullAddr);
+    setManualData((prev) => ({ ...prev, w: code }));
+    setSuggestions([]);
+    onChange({ address: fullAddr, lat: null, lng: null });
   };
 
   return (
-    <div className="space-y-2">
-      <label className="font-medium text-gray-700">{label}</label>
+    <div className="space-y-3">
+      {label && (
+        <label className="text-xs font-bold text-gray-400 uppercase ml-1">
+          {label}
+        </label>
+      )}
 
-      <div className="grid md:grid-cols-3 gap-3">
-        <select
-          defaultValue=""
-          onChange={handleProvince}
-          className="border p-3 rounded-lg"
-          required={required}
-        >
-          <option value="">-- Tỉnh / Thành phố --</option>
-          {provinces.map((p) => (
-            <option key={p.code} value={p.code}>
-              {p.name}
-            </option>
-          ))}
-        </select>
+      <div className="relative group">
+        <div className="absolute inset-y-0 left-4 flex items-center pointer-events-none">
+          {loading ? (
+            <Loader2 size={18} className="animate-spin text-orange-500" />
+          ) : (
+            <Search size={18} className="text-gray-400" />
+          )}
+        </div>
 
-        <select
-          defaultValue=""
-          disabled={!districts.length}
-          onChange={handleDistrict}
-          className="border p-3 rounded-lg"
+        <input
+          type="text"
+          placeholder="Số nhà, tên đường, phường xã..."
+          className="w-full pl-11 pr-40 py-4 bg-gray-50 border-2 border-transparent focus:border-orange-500 focus:bg-white rounded-2xl outline-none shadow-sm transition-all text-[15px]"
+          value={searchQuery}
+          onChange={(e) => handleSearch(e.target.value)}
           required={required}
-        >
-          <option value="">-- Quận / Huyện --</option>
-          {districts.map((d) => (
-            <option key={d.code} value={d.code}>
-              {d.name}
-            </option>
-          ))}
-        </select>
+        />
 
-        <select
-          defaultValue=""
-          disabled={!wards.length}
-          onChange={handleWard}
-          className="border p-3 rounded-lg"
-          required={required}
+        {/* <button
+          type="button"
+          onClick={onOpenMap}
+          className="absolute right-2 top-2 bottom-2 px-4 bg-orange-500 hover:bg-orange-600 text-white rounded-xl flex items-center gap-2 shadow-md transition-all active:scale-95"
         >
-          <option value="">-- Phường / Xã --</option>
-          {wards.map((w) => (
-            <option key={w.code} value={w.code}>
-              {w.name}
-            </option>
-          ))}
-        </select>
+          <MapPin size={16} fill="white" />
+          <span className="text-xs font-bold uppercase">Bản đồ</span>
+        </button> */}
+
+        {/* --- GỢI Ý SEARCH --- */}
+        {suggestions.length > 0 && (
+          <div className="absolute z-[100] w-full mt-2 bg-white border border-gray-100 rounded-2xl shadow-2xl max-h-80 overflow-y-auto animate-in fade-in zoom-in-95">
+            {suggestions.map((s) => (
+              <div
+                key={s.id}
+                onClick={() => {
+                  setSearchQuery(s.place_name);
+                  setSuggestions([]);
+                  onChange({
+                    address: s.place_name,
+                    lat: s.center[1],
+                    lng: s.center[0],
+                  });
+                }}
+                className="p-4 hover:bg-orange-50 cursor-pointer flex items-start gap-4 border-b border-gray-50 last:border-0 transition-all group"
+              >
+                <div className="mt-1 p-2 bg-gray-100 text-gray-400 rounded-full group-hover:bg-orange-100 group-hover:text-orange-600">
+                  <MapPin size={16} />
+                </div>
+                <div>
+                  <div className="text-[14px] font-bold text-gray-800">
+                    {s.place_name.split(",")[0]}
+                  </div>
+                  <div className="text-[11px] text-gray-500 line-clamp-1">
+                    {s.place_name.split(",").slice(1).join(",")}
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
       </div>
 
-      <input
-        type="text"
-        readOnly
-        required={required}
-        value={fullAddress}
-        style={{ opacity: 0, height: 0, padding: 0, border: "none" }}
-      />
+      {/* --- PHẦN NHẬP THỦ CÔNG  */}
+      <button
+        type="button"
+        onClick={() => setShowManual(!showManual)}
+        className="ml-2 text-[10px] font-black text-gray-400 hover:text-orange-500 flex items-center gap-1 uppercase tracking-tighter transition-all"
+      >
+        {showManual ? <ChevronUp size={14} /> : <ChevronDown size={14} />}
+        Không tìm thấy địa chỉ? Nhập thủ công
+      </button>
+
+      {showManual && (
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-3 p-4 bg-gray-50 rounded-2xl border border-gray-100 animate-in slide-in-from-top-2 duration-300">
+          <select
+            className="p-3 bg-white border border-gray-200 rounded-xl text-sm outline-none focus:border-orange-500"
+            onChange={(e) => handleProvinceChange(e.target.value)}
+            value={manualData.p}
+          >
+            <option value="">-- Tỉnh/TP --</option>
+            {provinces.map((p) => (
+              <option key={p.code} value={p.code}>
+                {p.name}
+              </option>
+            ))}
+          </select>
+
+          <select
+            className="p-3 bg-white border border-gray-200 rounded-xl text-sm outline-none focus:border-orange-500 disabled:opacity-50"
+            disabled={!districts.length}
+            onChange={(e) => handleDistrictChange(e.target.value)}
+            value={manualData.d}
+          >
+            <option value="">-- Quận/Huyện --</option>
+            {districts.map((d) => (
+              <option key={d.code} value={d.code}>
+                {d.name}
+              </option>
+            ))}
+          </select>
+
+          <select
+            className="p-3 bg-white border border-gray-200 rounded-xl text-sm outline-none focus:border-orange-500 disabled:opacity-50"
+            disabled={!wards.length}
+            onChange={(e) => handleWardChange(e.target.value)}
+            value={manualData.w}
+          >
+            <option value="">-- Phường/Xã --</option>
+            {wards.map((w) => (
+              <option key={w.code} value={w.code}>
+                {w.name}
+              </option>
+            ))}
+          </select>
+        </div>
+      )}
     </div>
   );
 }

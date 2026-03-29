@@ -11,9 +11,11 @@ import {
   X,
   Save,
   Check,
+  Map as MapIcon, // Đổi tên để tránh trùng
 } from "lucide-react";
-// 👇 Import Component chọn địa chỉ
+
 import DiaChiSelector from "../../components/DiaChiSelector.jsx";
+import LocationMapModal from "../../components/LocationMapModal.jsx"; // Import Modal bản đồ
 
 export default function CustomerAddress() {
   const [addresses, setAddresses] = useState([]);
@@ -21,6 +23,7 @@ export default function CustomerAddress() {
 
   // Modal State
   const [showModal, setShowModal] = useState(false);
+  const [showMap, setShowMap] = useState(false); // State mở bản đồ
   const [editingId, setEditingId] = useState(null);
   const [submitting, setSubmitting] = useState(false);
 
@@ -32,10 +35,9 @@ export default function CustomerAddress() {
     is_default: false,
   });
 
-  // State riêng để ghép địa chỉ
-  const [street, setStreet] = useState(""); // Số nhà, tên đường
-  const [region, setRegion] = useState(""); // Xã, Huyện, Tỉnh (từ Selector)
-  const [geo, setGeo] = useState({ lat: null, lng: null }); // Tọa độ
+  const [street, setStreet] = useState("");
+  const [region, setRegion] = useState("");
+  const [geo, setGeo] = useState({ lat: null, lng: null });
 
   const customerId =
     localStorage.getItem("customer_id") || localStorage.getItem("userId");
@@ -67,10 +69,9 @@ export default function CustomerAddress() {
         type: address.type,
         is_default: address.is_default === 1 || address.is_default === true,
       });
-      // Khi sửa: Tạm thời cho phép sửa số nhà, còn phần Tỉnh/Huyện
-      // nếu muốn đổi thì phải chọn lại từ đầu (vì logic reverse từ string sang dropdown rất phức tạp)
       setStreet(address.address);
       setRegion("");
+      setGeo({ lat: address.lat, lng: address.lng });
     } else {
       setEditingId(null);
       setFormData({ name: "", phone: "", type: "home", is_default: false });
@@ -82,7 +83,7 @@ export default function CustomerAddress() {
   };
 
   const handleDelete = async (id) => {
-    if (!confirm("Bạn có chắc chắn muốn xóa địa chỉ này?")) return;
+    if (!window.confirm("Bạn có chắc chắn muốn xóa địa chỉ này?")) return;
     try {
       await API.delete(`/addresses/${id}`);
       toast.success("Đã xóa địa chỉ");
@@ -97,16 +98,13 @@ export default function CustomerAddress() {
     setSubmitting(true);
 
     try {
-      // 💡 Logic ghép địa chỉ
-      // Nếu có chọn từ Selector thì ghép: Số nhà + Vùng
-      // Nếu đang sửa mà không chọn lại Selector thì giữ nguyên text cũ trong ô Street
       let finalAddress = street;
       if (region) {
         finalAddress = street ? `${street}, ${region}` : region;
       }
 
       if (!finalAddress) {
-        toast.error("Vui lòng nhập địa chỉ!");
+        toast.error("Vui lòng chọn hoặc nhập địa chỉ đầy đủ!");
         setSubmitting(false);
         return;
       }
@@ -115,9 +113,8 @@ export default function CustomerAddress() {
         ...formData,
         address: finalAddress,
         customer_id: customerId,
-        // Nếu backend hỗ trợ lưu lat/lng thì bỏ comment dòng dưới
-        // lat: geo.lat,
-        // lng: geo.lng
+        lat: geo.lat, // Gửi tọa độ lên để lưu
+        lng: geo.lng,
       };
 
       if (editingId) {
@@ -131,7 +128,7 @@ export default function CustomerAddress() {
       fetchAddresses();
     } catch (err) {
       console.error(err);
-      toast.error("Có lỗi xảy ra, vui lòng thử lại!");
+      toast.error("Có lỗi xảy ra, vui lòng kiểm tra lại thông tin!");
     } finally {
       setSubmitting(false);
     }
@@ -159,22 +156,18 @@ export default function CustomerAddress() {
         </div>
         <button
           onClick={() => openModal()}
-          className="flex items-center gap-2 bg-orange-500 hover:bg-orange-600 text-white px-5 py-2.5 rounded-xl font-bold shadow-lg shadow-orange-500/20 transition-all transform hover:-translate-y-1"
+          className="flex items-center gap-2 bg-orange-500 hover:bg-orange-600 text-white px-5 py-2.5 rounded-xl font-bold shadow-lg transition-all transform hover:-translate-y-1"
         >
           <Plus size={18} /> Thêm địa chỉ mới
         </button>
       </div>
 
-      {/* LIST */}
+      {/* LIST ADDRESSES (Giữ nguyên phần render list của bạn) */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {addresses.map((addr) => (
           <div
             key={addr.id}
-            className={`group bg-white p-6 rounded-2xl shadow-sm border transition-all relative ${
-              addr.is_default
-                ? "border-orange-300 ring-1 ring-orange-100"
-                : "border-gray-100 hover:shadow-md hover:border-orange-200"
-            }`}
+            className={`group bg-white p-6 rounded-2xl shadow-sm border transition-all relative ${addr.is_default ? "border-orange-300 ring-1 ring-orange-100" : "border-gray-100 hover:shadow-md hover:border-orange-200"}`}
           >
             {addr.is_default && (
               <span className="absolute top-4 right-4 bg-orange-100 text-orange-700 text-[10px] font-bold px-2 py-1 rounded-full border border-orange-200 flex items-center gap-1">
@@ -214,7 +207,6 @@ export default function CustomerAddress() {
             </div>
           </div>
         ))}
-        {/* Empty State / Add New */}
         <div
           onClick={() => openModal()}
           className="border-2 border-dashed border-gray-300 rounded-2xl flex flex-col items-center justify-center p-6 text-gray-400 hover:border-orange-400 hover:bg-orange-50/10 hover:text-orange-500 cursor-pointer transition-all min-h-[300px]"
@@ -229,7 +221,7 @@ export default function CustomerAddress() {
       {/* --- MODAL FORM --- */}
       {showModal && (
         <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/50 backdrop-blur-sm p-4 animate-in fade-in duration-200">
-          <div className="bg-white w-full max-w-xl rounded-2xl shadow-2xl overflow-hidden animate-in zoom-in-95 duration-200 max-h-[90vh] overflow-y-auto">
+          <div className="bg-white w-full max-w-xl rounded-2xl shadow-2xl overflow-hidden flex flex-col max-h-[90vh]">
             <div className="px-6 py-4 border-b border-gray-100 flex justify-between items-center bg-gray-50 sticky top-0 z-10">
               <h3 className="font-bold text-lg text-[#113e48]">
                 {editingId ? "Cập nhật địa chỉ" : "Thêm địa chỉ mới"}
@@ -242,15 +234,18 @@ export default function CustomerAddress() {
               </button>
             </div>
 
-            <form onSubmit={handleSubmit} className="p-6 space-y-5">
+            <form
+              onSubmit={handleSubmit}
+              className="p-6 space-y-5 overflow-y-auto"
+            >
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <label className="block text-xs font-bold text-gray-500 uppercase mb-1">
-                    Tên gợi nhớ
+                    Tên người nhận
                   </label>
                   <input
                     type="text"
-                    placeholder="VD: Nhà riêng..."
+                    placeholder="Nguyễn Văn A"
                     className="w-full p-3 border border-gray-200 rounded-xl outline-none focus:border-orange-500"
                     value={formData.name}
                     onChange={(e) =>
@@ -266,6 +261,7 @@ export default function CustomerAddress() {
                   <input
                     type="tel"
                     placeholder="0901234567"
+                    maxLength={10}
                     className="w-full p-3 border border-gray-200 rounded-xl outline-none focus:border-orange-500"
                     value={formData.phone}
                     onChange={(e) =>
@@ -276,15 +272,25 @@ export default function CustomerAddress() {
                 </div>
               </div>
 
-              {/* 👇 TÍCH HỢP DIACHISELECTOR VÀO ĐÂY */}
-              <div className="bg-blue-50/50 p-4 rounded-xl border border-blue-100 space-y-3">
-                <label className="block text-sm font-bold text-[#113e48] flex items-center gap-2">
-                  <MapPin size={16} className="text-blue-500" /> Địa chỉ hành
-                  chính
-                </label>
+              {/* KHU VỰC VỊ TRÍ + NÚT BẢN ĐỒ */}
+              <div className="bg-blue-50/50 p-5 rounded-2xl border border-blue-100 space-y-4">
+                <div className="flex justify-between items-center">
+                  <label className="text-sm font-bold text-[#113e48] flex items-center gap-2">
+                    <MapPin size={18} className="text-blue-500" /> Vị trí địa
+                    chỉ
+                  </label>
+                  {/* NÚT CHỌN TRÊN BẢN ĐỒ MỚI THÊM */}
+                  <button
+                    type="button"
+                    onClick={() => setShowMap(true)}
+                    className="text-xs font-bold text-blue-600 bg-white border border-blue-200 px-3 py-1.5 rounded-lg flex items-center gap-1 hover:bg-blue-600 hover:text-white transition-all shadow-sm"
+                  >
+                    <MapIcon size={14} /> Chọn trên bản đồ
+                  </button>
+                </div>
 
                 <DiaChiSelector
-                  required={!editingId} // Khi thêm mới thì bắt buộc chọn, khi sửa thì không bắt buộc (nếu giữ nguyên)
+                  required={false}
                   onChange={(data) => {
                     setRegion(data.address);
                     setGeo({ lat: data.lat, lng: data.lng });
@@ -292,27 +298,26 @@ export default function CustomerAddress() {
                 />
 
                 <div>
-                  <label className="block text-xs font-bold text-gray-500 uppercase mb-1">
-                    Số nhà, Tên đường
+                  <label className="block text-[10px] font-black text-gray-400 uppercase mb-1 ml-1">
+                    Số nhà, Tên đường, Kiệt...
                   </label>
                   <input
                     type="text"
-                    placeholder="VD: 123 Nguyễn Văn Linh..."
-                    className="w-full p-3 border border-gray-200 rounded-xl outline-none focus:border-orange-500 bg-white"
+                    placeholder="Ví dụ: K62/23 Nguyễn Huy Tưởng..."
+                    className="w-full p-3 border border-gray-200 rounded-xl outline-none focus:border-blue-500 bg-white shadow-inner"
                     value={street}
                     onChange={(e) => setStreet(e.target.value)}
-                    required
+                    required={!region && !editingId}
                   />
                 </div>
 
-                {/* Preview địa chỉ sẽ lưu */}
-                <div className="text-xs text-gray-500 italic mt-2">
-                  📍 Địa chỉ đầy đủ:{" "}
-                  <span className="font-semibold text-[#113e48]">
-                    {street}
-                    {region ? `, ${region}` : ""}
-                  </span>
-                </div>
+                {/* Status Tọa độ */}
+                {geo.lat && (
+                  <div className="flex items-center gap-1 text-[11px] text-green-600 font-bold px-1">
+                    <Check size={14} /> Đã xác định tọa độ ({geo.lat.toFixed(4)}
+                    , {geo.lng.toFixed(4)})
+                  </div>
+                )}
               </div>
 
               <div className="grid grid-cols-2 gap-4">
@@ -332,8 +337,8 @@ export default function CustomerAddress() {
                     <option value="other">📍 Khác</option>
                   </select>
                 </div>
-                <div className="flex items-center">
-                  <label className="flex items-center gap-3 cursor-pointer p-3 border border-gray-200 rounded-xl w-full hover:bg-gray-50 transition-colors">
+                <div className="flex items-end">
+                  <label className="flex items-center gap-3 cursor-pointer p-3 border border-gray-200 rounded-xl w-full hover:bg-gray-50 transition-colors h-[46px]">
                     <input
                       type="checkbox"
                       className="w-5 h-5 text-orange-500 rounded focus:ring-orange-500"
@@ -352,18 +357,18 @@ export default function CustomerAddress() {
                 </div>
               </div>
 
-              <div className="pt-2 flex gap-3">
+              <div className="pt-4 flex gap-3">
                 <button
                   type="button"
                   onClick={() => setShowModal(false)}
-                  className="flex-1 py-3 rounded-xl border border-gray-200 font-bold text-gray-600 hover:bg-gray-50"
+                  className="flex-1 py-3 rounded-xl border border-gray-200 font-bold text-gray-600 hover:bg-gray-50 transition-all"
                 >
                   Hủy bỏ
                 </button>
                 <button
                   type="submit"
                   disabled={submitting}
-                  className="flex-1 py-3 rounded-xl bg-[#113e48] hover:bg-[#0d2f36] text-white font-bold shadow-lg flex items-center justify-center gap-2"
+                  className="flex-1 py-3 rounded-xl bg-[#113e48] hover:bg-[#0d2f36] text-white font-bold shadow-lg flex items-center justify-center gap-2 disabled:opacity-70 transition-all"
                 >
                   {submitting ? (
                     "Đang lưu..."
@@ -378,6 +383,19 @@ export default function CustomerAddress() {
           </div>
         </div>
       )}
+
+      {/* MODAL BẢN ĐỒ CHỌN VỊ TRÍ */}
+      <LocationMapModal
+        isOpen={showMap}
+        onClose={() => setShowMap(false)}
+        onConfirm={(data) => {
+          setStreet(data.address); // Điền địa chỉ từ bản đồ vào ô "Số nhà"
+          setRegion(""); // Xóa region cũ để tránh ghép trùng
+          setGeo({ lat: data.lat, lng: data.lng });
+          setShowMap(false);
+          toast.success("Đã lấy vị trí từ bản đồ!");
+        }}
+      />
     </div>
   );
 }

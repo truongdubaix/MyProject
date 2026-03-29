@@ -4,28 +4,30 @@ import toast from "react-hot-toast";
 import { useNavigate } from "react-router-dom";
 import AOS from "aos";
 import "aos/dist/aos.css";
+
+// Components
 import DiaChiSelector from "../../components/DiaChiSelector.jsx";
-import MapPicker from "../../components/MapPicker.jsx";
+import AddressBookModal from "../../components/AddressBookModal.jsx";
+import OrderSummarySidebar from "../../components/OrderSummarySidebar.jsx";
+import LocationMapModal from "../../components/LocationMapModal.jsx";
+
+// Icons
 import {
   Package,
   MapPin,
   User,
   Truck,
-  CheckCircle,
   Map,
   Hash,
   Scale,
   DollarSign,
   Book,
   X,
-  Phone,
-  Home,
 } from "lucide-react";
 
 export default function CustomerCreateShipment() {
   const navigate = useNavigate();
 
-  // --- STATE FORM ---
   const [form, setForm] = useState({
     sender_name: "",
     sender_phone: "",
@@ -43,67 +45,23 @@ export default function CustomerCreateShipment() {
     cod_amount: "",
     shipping_fee: 0,
   });
-  async function reverseGeocode(lat, lng) {
-    const url = `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}`;
-    const res = await fetch(url);
-    const data = await res.json();
-    return data?.display_name || "";
-  }
 
   const [pickupOption, setPickupOption] = useState("sender");
   const [creating, setCreating] = useState(false);
   const [estimatedFee, setEstimatedFee] = useState(0);
   const [distanceKm, setDistanceKm] = useState(0);
-
   const [serviceType, setServiceType] = useState("standard");
-  const SERVICE_PRICE = {
-    standard: 0,
-    express: 20000,
-    fast: 40000,
-  };
 
-  // State Map
-  const [showPickupMap, setShowPickupMap] = useState(false);
-  const [showDeliveryMap, setShowDeliveryMap] = useState(false);
-
-  // --- STATE SỔ ĐỊA CHỈ ---
+  const [activeMap, setActiveMap] = useState(null);
   const [showAddressModal, setShowAddressModal] = useState(false);
   const [addressTarget, setAddressTarget] = useState(null);
   const [savedAddresses, setSavedAddresses] = useState([]);
   const [loadingAddresses, setLoadingAddresses] = useState(false);
 
-  // Hàm reset địa chỉ
-  const handleResetAddress = (type) => {
-    if (type === "pickup") {
-      setForm((prev) => ({
-        ...prev,
-        pickup_address: "",
-        pickup_lat: null,
-        pickup_lng: null,
-      }));
-    } else {
-      setForm((prev) => ({
-        ...prev,
-        delivery_address: "",
-        delivery_lat: null,
-        delivery_lng: null,
-      }));
-    }
-  };
-
-  // Lấy ID user
-  const getUserId = () => {
-    const userStr = localStorage.getItem("user");
-    if (userStr) {
-      try {
-        return JSON.parse(userStr).id;
-      } catch (e) {
-        return localStorage.getItem("userId");
-      }
-    }
-    return localStorage.getItem("userId");
-  };
-  const customerId = getUserId();
+  const SERVICE_PRICE = { standard: 0, express: 20000, fast: 40000 };
+  const customerId =
+    JSON.parse(localStorage.getItem("user"))?.id ||
+    localStorage.getItem("userId");
 
   useEffect(() => {
     AOS.init({
@@ -114,22 +72,18 @@ export default function CustomerCreateShipment() {
     });
   }, []);
 
-  // Tính khoảng cách Demo
   useEffect(() => {
     if (!form.delivery_address) return;
-    const km = Math.floor(Math.random() * 30) + 5;
-    setDistanceKm(km);
+    setDistanceKm(Math.floor(Math.random() * 30) + 5);
   }, [form.delivery_address]);
 
-  // Tính phí vận chuyển
   useEffect(() => {
     if (!form.delivery_address) return;
     const baseFee = 15000;
     const distanceFee = distanceKm * 1000;
     const weightFee = (parseFloat(form.weight_kg) || 0) * 5000;
-    const serviceFee = SERVICE_PRICE[serviceType];
-
-    const total = baseFee + distanceFee + weightFee + serviceFee;
+    const total =
+      baseFee + distanceFee + weightFee + SERVICE_PRICE[serviceType];
     setEstimatedFee(total);
     setForm((prev) => ({ ...prev, shipping_fee: total }));
   }, [distanceKm, form.weight_kg, serviceType, form.delivery_address]);
@@ -137,58 +91,147 @@ export default function CustomerCreateShipment() {
   const handleChange = (e) =>
     setForm((prev) => ({ ...prev, [e.target.name]: e.target.value }));
 
-  // --- HÀM XỬ LÝ SỔ ĐỊA CHỈ ---
+  const handleResetAddress = (type) => {
+    if (type === "pickup")
+      setForm((p) => ({
+        ...p,
+        pickup_address: "",
+        pickup_lat: null,
+        pickup_lng: null,
+      }));
+    else
+      setForm((p) => ({
+        ...p,
+        delivery_address: "",
+        delivery_lat: null,
+        delivery_lng: null,
+      }));
+  };
+
   const openAddressBook = async (target) => {
     setAddressTarget(target);
     setShowAddressModal(true);
-
     if (savedAddresses.length === 0) {
       setLoadingAddresses(true);
       try {
-        // Gọi API lấy danh sách địa chỉ
         const res = await API.get(`/addresses/${customerId}`);
         setSavedAddresses(res.data);
       } catch (error) {
-        console.error("Lỗi lấy sổ địa chỉ:", error);
         toast.error("Không tải được sổ địa chỉ");
       } finally {
         setLoadingAddresses(false);
       }
     }
   };
+  const handleSelectAddress = async (addr) => {
+    const isPickup = addressTarget === "pickup";
 
-  const handleSelectAddress = (addr) => {
-    if (addressTarget === "pickup") {
-      setForm((prev) => ({
-        ...prev,
-        sender_name: addr.name,
-        sender_phone: addr.phone,
-        pickup_address: addr.address,
-        pickup_lat: addr.lat || null,
-        pickup_lng: addr.lng || null,
-      }));
-    } else {
-      setForm((prev) => ({
-        ...prev,
-        receiver_name: addr.name,
-        receiver_phone: addr.phone,
-        delivery_address: addr.address,
-        delivery_lat: addr.lat || null,
-        delivery_lng: addr.lng || null,
-      }));
+    // 1. Cập nhật thông tin text vào form trước
+    setForm((prev) => ({
+      ...prev,
+      [isPickup ? "sender_name" : "receiver_name"]: addr.name,
+      [isPickup ? "sender_phone" : "receiver_phone"]: addr.phone,
+      [isPickup ? "pickup_address" : "delivery_address"]: addr.address,
+      [isPickup ? "pickup_lat" : "delivery_lat"]: addr.lat || null,
+      [isPickup ? "pickup_lng" : "delivery_lng"]: addr.lng || null,
+    }));
+
+    // 2. Nếu địa chỉ chưa có tọa độ, tiến hành truy vấn
+    if (!addr.lat || !addr.lng) {
+      const loadToast = toast.loading("Đang xác thực địa chỉ...");
+      try {
+        const fetchCoords = async (query) => {
+          const res = await fetch(
+            `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(query)}&format=json&limit=1`,
+          );
+          return await res.json();
+        };
+
+        // Lần 1: Tìm nguyên văn địa chỉ người dùng lưu
+        let data = await fetchCoords(addr.address);
+
+        // Lần 2: Nếu không thấy, tự động bỏ số nhà/kiệt để tìm tên đường
+        if (data.length === 0) {
+          // Logic: Tách chuỗi bằng dấu phẩy hoặc khoảng trắng, bỏ phần đầu tiên
+          // Ví dụ: "K62/23 Nguyễn Huy Tưởng, Đà Nẵng" -> "Nguyễn Huy Tưởng, Đà Nẵng"
+          const parts = addr.address.split(/[, ]+/);
+          if (parts.length > 2) {
+            const fallbackQuery = parts.slice(1).join(" ");
+            data = await fetchCoords(fallbackQuery);
+          }
+        }
+
+        if (data && data.length > 0) {
+          const { lat, lon } = data[0];
+          setForm((prev) => ({
+            ...prev,
+            [isPickup ? "pickup_lat" : "delivery_lat"]: parseFloat(lat),
+            [isPickup ? "pickup_lng" : "delivery_lng"]: parseFloat(lon),
+          }));
+          toast.success("Đã xác định vị trí trên trục đường chính!");
+        } else {
+          toast.error(
+            "Không tìm thấy đường này, vui lòng ghim thủ công trên bản đồ.",
+          );
+        }
+      } catch (error) {
+        console.error("Lỗi xác thực:", error);
+        toast.error("Lỗi kết nối bản đồ.");
+      } finally {
+        toast.dismiss(loadToast);
+      }
     }
+
     setShowAddressModal(false);
-    toast.success("Đã điền thông tin từ sổ địa chỉ!");
   };
 
-  // --- SUBMIT: TẠO ĐƠN -> CHUYỂN QUA THANH TOÁN ---
+  // --- MAP & GEOCODING ---
+  const getCurrentLocation = () =>
+    new Promise((resolve, reject) => {
+      if (!navigator.geolocation) return reject("Không hỗ trợ");
+      navigator.geolocation.getCurrentPosition(
+        (pos) =>
+          resolve({ lat: pos.coords.latitude, lng: pos.coords.longitude }),
+        (err) => reject(err),
+        { enableHighAccuracy: true },
+      );
+    });
+
+  const handleOpenMap = async (type) => {
+    const isPickup = type === "pickup";
+    if (
+      isPickup
+        ? form.pickup_lat && form.pickup_lng
+        : form.delivery_lat && form.delivery_lng
+    ) {
+      setActiveMap(type);
+      return;
+    }
+
+    // Nếu chưa có, tiến hành định vị GPS
+    const loadToast = toast.loading("Đang định vị...");
+    try {
+      const pos = await getCurrentLocation();
+      setForm((p) => ({
+        ...p,
+        [isPickup ? "pickup_lat" : "delivery_lat"]: pos.lat,
+        [isPickup ? "pickup_lng" : "delivery_lng"]: pos.lng,
+      }));
+    } catch (e) {
+      console.error(e);
+    } finally {
+      toast.dismiss(loadToast);
+      setActiveMap(type);
+    }
+  };
+
+  // --- SUBMIT ---
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!customerId) return toast.error("⚠️ Bạn chưa đăng nhập!");
-    if (!form.pickup_lat || !form.delivery_lat) {
-      toast.error("Vui lòng chọn vị trí lấy và giao hàng");
-      return;
-    }
+    if (!form.pickup_lat || !form.delivery_lat)
+      return toast.error("Vui lòng chọn vị trí lấy và giao hàng");
+
     setCreating(true);
     try {
       const payload = {
@@ -201,25 +244,15 @@ export default function CustomerCreateShipment() {
         status: "pending",
         quantity: Number(form.quantity),
       };
-
-      // 1. Gọi API tạo đơn
       const res = await API.post("/shipments", payload);
-
-      // 2. Lấy ID đơn hàng vừa tạo
-      // Lưu ý: Backend cần trả về id hoặc insertId
       const newShipmentId =
         res.data.id || res.data.shipmentId || res.data.insertId;
 
       if (!newShipmentId) {
-        // Fallback: Nếu backend chưa trả về ID, tạm thời thông báo thành công và về lịch sử
-        toast.success("Tạo đơn thành công (Chưa lấy được ID để thanh toán)");
-        navigate("/customer/history");
-        return;
+        toast.success("Tạo đơn thành công");
+        return navigate("/customer/history");
       }
-
-      toast.success("🎉 Tạo đơn thành công! Đang chuyển sang thanh toán...");
-
-      // 3. CHUYỂN HƯỚNG SANG TRANG THANH TOÁN KÈM DỮ LIỆU
+      toast.success("🎉 Đang chuyển sang thanh toán...");
       navigate("/customer/payment", {
         state: {
           shipment_id: newShipmentId,
@@ -228,8 +261,7 @@ export default function CustomerCreateShipment() {
         },
       });
     } catch (err) {
-      console.error(err);
-      toast.error("❌ Không thể tạo đơn hàng. Vui lòng thử lại!");
+      toast.error("❌ Không thể tạo đơn hàng.");
     } finally {
       setCreating(false);
     }
@@ -237,7 +269,7 @@ export default function CustomerCreateShipment() {
 
   return (
     <div className="animate-in fade-in duration-500 pb-20 max-w-6xl mx-auto px-4">
-      {/* Header */}
+      {/* HEADER */}
       <div className="mb-8 text-center pt-6">
         <h1 className="text-3xl font-extrabold text-[#113e48]">
           Tạo đơn hàng mới
@@ -251,268 +283,245 @@ export default function CustomerCreateShipment() {
         onSubmit={handleSubmit}
         className="grid grid-cols-1 lg:grid-cols-3 gap-8"
       >
-        {/* --- CỘT TRÁI --- */}
+        {/* --- CỘT TRÁI (FORM) --- */}
         <div className="lg:col-span-2 space-y-6">
-          {/* 1. THÔNG TIN NGƯỜI GỬI */}
-          <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 relative overflow-hidden">
+          {/* SENDER INFO */}
+          <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 relative">
             <div className="absolute top-0 left-0 w-1 h-full bg-blue-500"></div>
             <div className="flex justify-between items-center mb-4">
               <h3 className="text-lg font-bold text-[#113e48] flex items-center gap-2">
                 <div className="p-2 bg-blue-100 rounded-lg text-blue-600">
                   <User size={20} />
-                </div>
+                </div>{" "}
                 Thông tin người gửi
               </h3>
               <button
                 type="button"
                 onClick={() => openAddressBook("pickup")}
-                className="text-sm font-bold text-blue-600 bg-blue-50 hover:bg-blue-100 px-3 py-1.5 rounded-lg flex items-center gap-2 transition-colors"
+                className="text-sm font-bold text-blue-600 bg-blue-50 hover:bg-blue-100 px-3 py-1.5 rounded-lg flex items-center gap-2"
               >
                 <Book size={16} /> Chọn từ sổ địa chỉ
               </button>
             </div>
-
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
               <div>
-                <label className="text-xs font-bold text-gray-500 ml-1 mb-1 block">
+                <label className="text-xs font-bold text-gray-500 block mb-1">
                   Họ tên
                 </label>
                 <input
                   name="sender_name"
                   value={form.sender_name}
                   onChange={handleChange}
-                  placeholder="Nguyễn Văn A"
-                  className="w-full p-3 border border-gray-200 rounded-xl bg-gray-50 outline-none focus:border-blue-500 focus:bg-white transition-all"
+                  placeholder="VD: Trần Thị B"
+                  className="w-full p-3 border border-gray-200 rounded-xl outline-none focus:border-blue-500"
                   required
                 />
               </div>
               <div>
-                <label className="text-xs font-bold text-gray-500 ml-1 mb-1 block">
+                <label className="text-xs font-bold text-gray-500 block mb-1">
                   Số điện thoại
                 </label>
                 <input
                   name="sender_phone"
                   value={form.sender_phone}
                   onChange={handleChange}
-                  placeholder="0901234567"
-                  className="w-full p-3 border border-gray-200 rounded-xl bg-gray-50 outline-none focus:border-blue-500 focus:bg-white transition-all"
-                  required
                   maxLength={10}
+                  placeholder="VD: 0987654321"
+                  className="w-full p-3 border border-gray-200 rounded-xl outline-none focus:border-blue-500"
+                  required
                 />
               </div>
             </div>
-
-            <div className="mb-4">
-              <label className="text-xs font-bold text-gray-500 ml-1 mb-2 block">
-                Hình thức lấy hàng
+            {/* Pickup Option Radios */}
+            <div className="mb-4 flex gap-4">
+              <label
+                className={`flex-1 flex justify-center gap-2 p-3 rounded-xl border cursor-pointer ${pickupOption === "sender" ? "border-orange-500 bg-orange-50 font-bold" : "border-gray-200"}`}
+              >
+                <input
+                  type="radio"
+                  className="hidden"
+                  checked={pickupOption === "sender"}
+                  onChange={() => setPickupOption("sender")}
+                />
+                <Truck size={18} /> Lấy tận nơi
               </label>
-              <div className="flex gap-4">
-                <label
-                  className={`flex-1 flex items-center justify-center gap-2 p-3 rounded-xl border cursor-pointer transition-all ${
-                    pickupOption === "sender"
-                      ? "border-orange-500 bg-orange-50 text-orange-700 font-bold"
-                      : "border-gray-200 hover:bg-gray-50 text-gray-600"
-                  }`}
-                >
-                  <input
-                    type="radio"
-                    name="pickup"
-                    className="hidden"
-                    checked={pickupOption === "sender"}
-                    onChange={() => setPickupOption("sender")}
-                  />
-                  <Truck size={18} /> Lấy tận nơi
-                </label>
-                <label
-                  className={`flex-1 flex items-center justify-center gap-2 p-3 rounded-xl border cursor-pointer transition-all ${
-                    pickupOption === "warehouse"
-                      ? "border-orange-500 bg-orange-50 text-orange-700 font-bold"
-                      : "border-gray-200 hover:bg-gray-50 text-gray-600"
-                  }`}
-                >
-                  <input
-                    type="radio"
-                    name="pickup"
-                    className="hidden"
-                    checked={pickupOption === "warehouse"}
-                    onChange={() => setPickupOption("warehouse")}
-                  />
-                  <Package size={18} /> Gửi tại bưu cục
-                </label>
-              </div>
+              <label
+                className={`flex-1 flex justify-center gap-2 p-3 rounded-xl border cursor-pointer ${pickupOption === "warehouse" ? "border-orange-500 bg-orange-50 font-bold" : "border-gray-200"}`}
+              >
+                <input
+                  type="radio"
+                  className="hidden"
+                  checked={pickupOption === "warehouse"}
+                  onChange={() => setPickupOption("warehouse")}
+                />
+                <Package size={18} /> Gửi tại bưu cục
+              </label>
             </div>
-
+            {/* Address */}
             {form.pickup_address ? (
               <div className="relative group">
-                <label className="text-xs font-bold text-gray-500 ml-1 mb-1 block">
-                  Địa chỉ lấy hàng chi tiết
+                <label className="text-xs font-bold text-gray-500 block mb-1 uppercase">
+                  Địa chỉ lấy hàng
                 </label>
                 <textarea
                   value={form.pickup_address}
-                  onChange={(e) =>
-                    setForm({ ...form, pickup_address: e.target.value })
-                  }
-                  className="w-full p-3 border border-orange-300 bg-orange-50 rounded-xl outline-none focus:border-orange-500 transition-all font-medium resize-none"
+                  readOnly
+                  className="w-full p-4 pr-14 border-2 border-blue-100 bg-blue-50/30 rounded-2xl outline-none font-bold text-sm"
                   rows={3}
                 />
                 <button
                   type="button"
                   onClick={() => handleResetAddress("pickup")}
-                  className="absolute top-8 right-2 p-1 bg-gray-200 hover:bg-red-100 hover:text-red-600 rounded-full transition-all"
-                  title="Chọn lại địa chỉ khác"
+                  className="absolute top-6 right-3 p-2 bg-white hover:bg-red-50 hover:text-red-500 rounded-xl shadow-sm border"
                 >
-                  <X size={16} />
+                  <X size={20} />
                 </button>
               </div>
             ) : (
-              <div className="relative">
+              <div className="relative group">
                 <DiaChiSelector
                   label="Địa chỉ lấy hàng"
                   required
-                  onChange={(data) => {
-                    setForm((prev) => ({
-                      ...prev,
+                  onOpenMap={() => handleOpenMap("pickup")}
+                  onChange={(data) =>
+                    setForm((p) => ({
+                      ...p,
                       pickup_address: data.address,
                       pickup_lat: data.lat,
                       pickup_lng: data.lng,
-                    }));
-                  }}
+                    }))
+                  }
                 />
                 <button
                   type="button"
-                  onClick={() => setShowPickupMap(true)}
-                  className="absolute top-0 right-0 mt-1 text-xs font-bold text-blue-600 hover:underline flex items-center gap-1"
+                  onClick={() => handleOpenMap("pickup")}
+                  className="absolute top-12 right-2 px-4 py-2 bg-orange-500 text-white rounded-xl text-xs font-black uppercase flex items-center gap-2 shadow-lg"
                 >
-                  <Map size={14} /> Chọn trên bản đồ
+                  <Map size={16} /> Chọn trên bản đồ
                 </button>
               </div>
             )}
           </div>
 
-          {/* 2. THÔNG TIN NGƯỜI NHẬN */}
-          <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 relative overflow-hidden">
+          {/* RECEIVER INFO */}
+          <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 relative ">
             <div className="absolute top-0 left-0 w-1 h-full bg-green-500"></div>
             <div className="flex justify-between items-center mb-4">
-              <h3 className="text-lg font-bold text-[#113e48] mb-4 flex items-center gap-2">
+              <h3 className="text-lg font-bold text-[#113e48] flex items-center gap-2">
                 <div className="p-2 bg-green-100 rounded-lg text-green-600">
                   <MapPin size={20} />
-                </div>
+                </div>{" "}
                 Thông tin người nhận
               </h3>
               <button
                 type="button"
                 onClick={() => openAddressBook("delivery")}
-                className="text-sm font-bold text-green-600 bg-green-50 hover:bg-green-100 px-3 py-1.5 rounded-lg flex items-center gap-2 transition-colors"
+                className="text-sm font-bold text-green-600 bg-green-50 hover:bg-green-100 px-3 py-1.5 rounded-lg flex items-center gap-2"
               >
                 <Book size={16} /> Chọn từ sổ địa chỉ
               </button>
             </div>
-
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
               <div>
-                <label className="text-xs font-bold text-gray-500 ml-1 mb-1 block">
+                <label className="text-xs font-bold text-gray-500 block mb-1">
                   Họ tên
                 </label>
                 <input
                   name="receiver_name"
                   value={form.receiver_name}
                   onChange={handleChange}
-                  placeholder="Trần Thị B"
-                  className="w-full p-3 border border-gray-200 rounded-xl bg-gray-50 outline-none focus:border-green-500 focus:bg-white transition-all"
+                  placeholder="VD: Nguyễn Văn A"
+                  className="w-full p-3 border border-gray-200 rounded-xl outline-none focus:border-green-500"
                   required
                 />
               </div>
               <div>
-                <label className="text-xs font-bold text-gray-500 ml-1 mb-1 block">
+                <label className="text-xs font-bold text-gray-500 block mb-1">
                   Số điện thoại
                 </label>
                 <input
                   name="receiver_phone"
                   value={form.receiver_phone}
                   onChange={handleChange}
-                  placeholder="0912345678"
-                  className="w-full p-3 border border-gray-200 rounded-xl bg-gray-50 outline-none focus:border-green-500 focus:bg-white transition-all"
-                  required
                   maxLength={10}
+                  placeholder="VD: 0901234567"
+                  className="w-full p-3 border border-gray-200 rounded-xl outline-none focus:border-green-500"
+                  required
                 />
               </div>
             </div>
-
+            {/* Address */}
             {form.delivery_address ? (
               <div className="relative group">
-                <label className="text-xs font-bold text-gray-500 ml-1 mb-1 block">
-                  Địa chỉ giao hàng chi tiết
+                <label className="text-xs font-bold text-gray-500 block mb-1 uppercase">
+                  Địa chỉ giao hàng
                 </label>
                 <textarea
                   value={form.delivery_address}
-                  onChange={(e) =>
-                    setForm({ ...form, delivery_address: e.target.value })
-                  }
-                  className="w-full p-3 border border-green-300 bg-green-50 rounded-xl outline-none focus:border-green-500 transition-all font-medium resize-none"
+                  readOnly
+                  className="w-full p-4 pr-14 border-2 border-green-100 bg-green-50/30 rounded-2xl outline-none font-bold text-sm"
                   rows={3}
                 />
                 <button
                   type="button"
                   onClick={() => handleResetAddress("delivery")}
-                  className="absolute top-8 right-2 p-1 bg-gray-200 hover:bg-red-100 hover:text-red-600 rounded-full transition-all"
-                  title="Chọn lại địa chỉ khác"
+                  className="absolute top-6 right-3 p-2 bg-white hover:bg-red-50 hover:text-red-500 rounded-xl shadow-sm border"
                 >
-                  <X size={16} />
+                  <X size={20} />
                 </button>
               </div>
             ) : (
-              <div className="relative">
+              <div className="relative group">
                 <DiaChiSelector
                   label="Địa chỉ giao hàng"
                   required
-                  onChange={(data) => {
-                    setForm((prev) => ({
-                      ...prev,
+                  onOpenMap={() => handleOpenMap("delivery")}
+                  onChange={(data) =>
+                    setForm((p) => ({
+                      ...p,
                       delivery_address: data.address,
                       delivery_lat: data.lat,
                       delivery_lng: data.lng,
-                    }));
-                  }}
+                    }))
+                  }
                 />
                 <button
                   type="button"
-                  onClick={() => setShowDeliveryMap(true)}
-                  className="absolute top-0 right-0 mt-1 text-xs font-bold text-green-600 hover:underline flex items-center gap-1"
+                  onClick={() => handleOpenMap("delivery")}
+                  className="absolute top-12 right-2 px-4 py-2 bg-orange-500 text-white rounded-xl text-xs font-black uppercase flex items-center gap-2 shadow-lg"
                 >
-                  <Map size={14} /> Chọn trên bản đồ
+                  <Map size={16} /> Chọn trên bản đồ
                 </button>
               </div>
             )}
           </div>
 
-          {/* 3. THÔNG TIN HÀNG HÓA */}
+          {/* PACKAGE INFO */}
           <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 relative overflow-hidden">
             <div className="absolute top-0 left-0 w-1 h-full bg-orange-500"></div>
             <h3 className="text-lg font-bold text-[#113e48] mb-4 flex items-center gap-2">
               <div className="p-2 bg-orange-100 rounded-lg text-orange-600">
                 <Package size={20} />
-              </div>
+              </div>{" "}
               Thông tin hàng hóa
             </h3>
-
             <div className="space-y-4">
               <div>
-                <label className="text-xs font-bold text-gray-500 ml-1 mb-1 block">
-                  Tên hàng hóa chi tiết
+                <label className="text-xs font-bold text-gray-500 block mb-1">
+                  Tên hàng hóa
                 </label>
                 <input
                   name="item_name"
                   value={form.item_name}
                   onChange={handleChange}
-                  placeholder="VD: Quần áo, Sách vở..."
-                  className="w-full p-3 border border-gray-200 rounded-xl bg-gray-50 outline-none focus:border-orange-500 focus:bg-white transition-all font-medium"
+                  placeholder="VD: Quần áo, mỹ phẩm, sách..."
+                  className="w-full p-3 border border-gray-200 rounded-xl outline-none focus:border-orange-500"
                   required
                 />
               </div>
-
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                 <div>
-                  <label className="text-xs font-bold text-gray-500 ml-1 mb-1 flex items-center gap-1">
+                  <label className="text-xs font-bold text-gray-500 flex items-center gap-1 mb-1">
                     <Hash size={12} /> Số kiện
                   </label>
                   <input
@@ -520,253 +529,114 @@ export default function CustomerCreateShipment() {
                     name="quantity"
                     value={form.quantity}
                     onChange={handleChange}
-                    placeholder="1"
                     min="1"
-                    className="w-full p-3 border border-gray-200 rounded-xl bg-gray-50 outline-none focus:border-orange-500 focus:bg-white transition-all text-center font-bold"
+                    className="w-full p-3 border border-gray-200 rounded-xl outline-none focus:border-orange-500 text-center font-bold"
                     required
                   />
                 </div>
-
                 <div>
-                  <label className="text-xs font-bold text-gray-500 ml-1 mb-1 flex items-center gap-1">
-                    <Scale size={12} /> Khối lượng (kg)
-                  </label>
-                  <input
-                    type="number"
-                    name="weight_kg"
-                    value={form.weight_kg}
-                    onChange={handleChange}
-                    placeholder="0.5"
-                    step="0.1"
-                    min="0.1"
-                    className="w-full p-3 border border-gray-200 rounded-xl bg-gray-50 outline-none focus:border-orange-500 focus:bg-white transition-all text-center font-bold"
-                    required
-                  />
+                  <div>
+                    <label className="text-xs font-bold text-gray-500 flex items-center gap-1 mb-1">
+                      <Scale size={12} /> Khối lượng (kg)
+                    </label>
+                    <div className="relative">
+                      <input
+                        type="number"
+                        name="weight_kg"
+                        value={form.weight_kg}
+                        onChange={handleChange}
+                        placeholder="VD: 10"
+                        step="0.1"
+                        min="0"
+                        className="w-full p-3 pr-10 border border-gray-200 rounded-xl outline-none focus:border-orange-500 text-right font-bold text-orange-600"
+                        required
+                      />
+                      <span className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 font-bold text-sm pointer-events-none">
+                        kg
+                      </span>
+                    </div>
+                  </div>
                 </div>
-
                 <div>
-                  <label className="text-xs font-bold text-gray-500 ml-1 mb-1 flex items-center gap-1">
+                  <label className="text-xs font-bold text-gray-500 flex items-center gap-1 mb-1">
                     <DollarSign size={12} /> Thu hộ (COD)
                   </label>
-                  <input
-                    type="number"
-                    name="cod_amount"
-                    value={form.cod_amount}
-                    onChange={handleChange}
-                    placeholder="0"
-                    min="0"
-                    className="w-full p-3 border border-gray-200 rounded-xl bg-gray-50 outline-none focus:border-orange-500 focus:bg-white transition-all text-right font-bold text-orange-600"
-                    required
-                  />
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* --- CỘT PHẢI: DỊCH VỤ --- */}
-        <div className="lg:col-span-1">
-          <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 sticky top-6">
-            <h3 className="text-lg font-bold text-[#113e48] mb-4">
-              Chọn dịch vụ
-            </h3>
-            <div className="space-y-3">
-              {[
-                {
-                  key: "standard",
-                  label: "Tiêu chuẩn",
-                  time: "2-3 ngày",
-                  price: 0,
-                },
-                {
-                  key: "express",
-                  label: "Nhanh",
-                  time: "1-2 ngày",
-                  price: 20000,
-                },
-                {
-                  key: "fast",
-                  label: "Hỏa tốc",
-                  time: "Trong ngày",
-                  price: 40000,
-                },
-              ].map((opt) => (
-                <div
-                  key={opt.key}
-                  onClick={() => setServiceType(opt.key)}
-                  className={`p-4 rounded-xl border-2 cursor-pointer transition-all flex justify-between items-center ${
-                    serviceType === opt.key
-                      ? "border-orange-500 bg-orange-50"
-                      : "border-gray-100 hover:border-orange-200"
-                  }`}
-                >
-                  <div>
-                    <p
-                      className={`font-bold ${
-                        serviceType === opt.key
-                          ? "text-orange-700"
-                          : "text-gray-700"
-                      }`}
-                    >
-                      {opt.label}
-                    </p>
-                    <p className="text-xs text-gray-500">{opt.time}</p>
+                  <div className="relative">
+                    <input
+                      type="text"
+                      inputMode="numeric"
+                      name="cod_amount"
+                      value={
+                        form.cod_amount
+                          ? Number(form.cod_amount).toLocaleString("vi-VN")
+                          : ""
+                      }
+                      onChange={(e) => {
+                        const rawValue = e.target.value.replace(/\D/g, "");
+                        handleChange({
+                          target: {
+                            name: "cod_amount",
+                            value: rawValue,
+                          },
+                        });
+                      }}
+                      placeholder="VD: 150,000"
+                      className="w-full p-3 pr-12 border border-gray-200 rounded-xl outline-none focus:border-orange-500 text-right font-bold text-orange-600"
+                      required
+                    />
+                    <span className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 font-bold text-sm pointer-events-none">
+                      VNĐ
+                    </span>
                   </div>
-                  {serviceType === opt.key && (
-                    <CheckCircle size={20} className="text-orange-500" />
-                  )}
                 </div>
-              ))}
-            </div>
-
-            <div className="mt-6 pt-6 border-t border-gray-100">
-              <div className="flex justify-between mb-2 text-sm text-gray-600">
-                <span>Phí vận chuyển ({distanceKm}km)</span>
-                <span>
-                  {(
-                    estimatedFee - (SERVICE_PRICE[serviceType] || 0)
-                  ).toLocaleString()}
-                  ₫
-                </span>
-              </div>
-              <div className="flex justify-between mb-4 text-sm text-gray-600">
-                <span>Phí dịch vụ</span>
-                <span>{SERVICE_PRICE[serviceType]?.toLocaleString()}₫</span>
-              </div>
-              <div className="flex justify-between items-end">
-                <span className="font-bold text-[#113e48]">Tổng phí</span>
-                <span className="text-3xl font-extrabold text-orange-600">
-                  {estimatedFee.toLocaleString()}₫
-                </span>
               </div>
             </div>
-
-            <button
-              type="submit"
-              disabled={creating}
-              className="w-full mt-6 bg-[#113e48] hover:bg-[#0d2f36] text-white py-4 rounded-xl font-bold text-lg shadow-xl shadow-blue-900/20 transition-all flex items-center justify-center gap-2 disabled:opacity-70 hover:scale-[1.02]"
-            >
-              {creating ? "Đang xử lý..." : "Tạo đơn & Thanh toán"}
-            </button>
           </div>
         </div>
+
+        {/* ---  SUMMARY & SUBMIT) --- */}
+        <OrderSummarySidebar
+          serviceType={serviceType}
+          setServiceType={setServiceType}
+          distanceKm={distanceKm}
+          estimatedFee={estimatedFee}
+          creating={creating}
+          SERVICE_PRICE={SERVICE_PRICE}
+        />
       </form>
 
-      {/* --- MAP MODALS --- */}
-      {showPickupMap && (
-        <div className="fixed inset-0 bg-black/60 z-[9999] flex items-center justify-center backdrop-blur-sm p-4">
-          <div className="bg-white rounded-2xl overflow-hidden w-full max-w-3xl h-[500px] shadow-2xl relative">
-            <MapPicker
-              defaultPos={[
-                form.pickup_lat || 16.047,
-                form.pickup_lng || 108.206,
-              ]}
-              onConfirm={async (pos) => {
-                const addr = await reverseGeocode(pos.lat, pos.lng);
+      {/* --- MODAL BẢN ĐỒ --- */}
+      <LocationMapModal
+        isOpen={activeMap !== null}
+        onClose={() => setActiveMap(null)}
+        defaultPos={
+          activeMap === "pickup" && form.pickup_lat
+            ? [form.pickup_lat, form.pickup_lng]
+            : activeMap === "delivery" && form.delivery_lat
+              ? [form.delivery_lat, form.delivery_lng]
+              : null
+        }
+        onConfirm={({ lat, lng, address }) => {
+          const isPickup = activeMap === "pickup";
+          setForm((p) => ({
+            ...p,
+            [isPickup ? "pickup_lat" : "delivery_lat"]: lat,
+            [isPickup ? "pickup_lng" : "delivery_lng"]: lng,
+            [isPickup ? "pickup_address" : "delivery_address"]: address,
+          }));
+          setActiveMap(null);
+        }}
+      />
 
-                setForm((prev) => ({
-                  ...prev,
-                  pickup_lat: pos.lat,
-                  pickup_lng: pos.lng,
-                  pickup_address: addr, // ✅ ĐỊA CHỈ TỰ ĐIỀN
-                }));
-
-                setShowPickupMap(false);
-              }}
-              onCancel={() => setShowPickupMap(false)}
-            />
-          </div>
-        </div>
-      )}
-
-      {showDeliveryMap && (
-        <div className="fixed inset-0 bg-black/60 z-[9999] flex items-center justify-center backdrop-blur-sm p-4">
-          <div className="bg-white rounded-2xl overflow-hidden w-full max-w-3xl h-[500px] shadow-2xl relative">
-            <MapPicker
-              defaultPos={[
-                form.delivery_lat || 16.047,
-                form.delivery_lng || 108.206,
-              ]}
-              onConfirm={async (pos) => {
-                const addr = await reverseGeocode(pos.lat, pos.lng);
-
-                setForm((prev) => ({
-                  ...prev,
-                  delivery_lat: pos.lat,
-                  delivery_lng: pos.lng,
-                  delivery_address: addr, // ✅ ĐÚNG FIELD
-                }));
-
-                setShowDeliveryMap(false); // ✅ ĐÚNG MODAL
-              }}
-              onCancel={() => setShowDeliveryMap(false)}
-            />
-          </div>
-        </div>
-      )}
-
-      {/* --- MODAL SỔ ĐỊA CHỈ (MỚI) --- */}
-      {showAddressModal && (
-        <div className="fixed inset-0 bg-black/60 z-[9999] flex items-center justify-center backdrop-blur-sm p-4 animate-in fade-in duration-200">
-          <div className="bg-white rounded-2xl w-full max-w-md shadow-2xl overflow-hidden flex flex-col max-h-[80vh]">
-            <div className="p-4 border-b border-gray-100 flex justify-between items-center bg-gray-50">
-              <h3 className="font-bold text-[#113e48] flex items-center gap-2">
-                <Book size={18} /> Chọn địa chỉ{" "}
-                {addressTarget === "pickup" ? "gửi" : "nhận"}
-              </h3>
-              <button
-                onClick={() => setShowAddressModal(false)}
-                className="p-1 hover:bg-gray-200 rounded-full transition"
-              >
-                <X size={20} />
-              </button>
-            </div>
-
-            <div className="flex-1 overflow-y-auto p-4 space-y-3">
-              {loadingAddresses ? (
-                <p className="text-center text-gray-500 py-8">
-                  Đang tải danh sách...
-                </p>
-              ) : savedAddresses.length > 0 ? (
-                savedAddresses.map((addr) => (
-                  <div
-                    key={addr.id}
-                    onClick={() => handleSelectAddress(addr)}
-                    className="p-4 border border-gray-200 rounded-xl hover:border-orange-500 hover:bg-orange-50 cursor-pointer transition-all group"
-                  >
-                    <div className="flex justify-between items-start mb-1">
-                      <span className="font-bold text-[#113e48] group-hover:text-orange-700">
-                        {addr.name}
-                      </span>
-                      <span className="text-xs bg-gray-200 text-gray-600 px-2 py-0.5 rounded uppercase font-bold">
-                        {addr.type}
-                      </span>
-                    </div>
-                    <div className="text-sm text-gray-600 flex items-center gap-2 mb-1">
-                      <Phone size={14} /> {addr.phone}
-                    </div>
-                    <div className="text-sm text-gray-500 flex items-start gap-2">
-                      <MapPin size={14} className="mt-0.5 flex-shrink-0" />
-                      <span className="line-clamp-2">{addr.address}</span>
-                    </div>
-                  </div>
-                ))
-              ) : (
-                <div className="text-center py-8">
-                  <Home size={40} className="mx-auto text-gray-300 mb-2" />
-                  <p className="text-gray-500">Bạn chưa lưu địa chỉ nào.</p>
-                  <button
-                    onClick={() => navigate("/customer/addresses")}
-                    className="text-blue-600 font-bold hover:underline mt-2"
-                  >
-                    Thêm địa chỉ mới
-                  </button>
-                </div>
-              )}
-            </div>
-          </div>
-        </div>
-      )}
+      {/* --- MODAL SỔ ĐỊA CHỈ --- */}
+      <AddressBookModal
+        show={showAddressModal}
+        onClose={() => setShowAddressModal(false)}
+        target={addressTarget}
+        loading={loadingAddresses}
+        addresses={savedAddresses}
+        onSelect={handleSelectAddress}
+      />
     </div>
   );
 }
