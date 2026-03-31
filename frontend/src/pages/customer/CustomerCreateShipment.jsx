@@ -25,6 +25,15 @@ import {
   X,
 } from "lucide-react";
 
+// Địa chỉ kho mặc định của công ty
+const WAREHOUSE = {
+  address: "Số 123, Nguyễn Văn Linh, Thanh Khê, TP Đà Nẵng",
+  lat: 16.0600,
+  lng: 108.2130,
+  name: "Kho SpeedyShip Đà Nẵng",
+  phone: "0236 123 4567",
+};
+
 export default function CustomerCreateShipment() {
   const navigate = useNavigate();
 
@@ -50,7 +59,10 @@ export default function CustomerCreateShipment() {
   const [creating, setCreating] = useState(false);
   const [estimatedFee, setEstimatedFee] = useState(0);
   const [distanceKm, setDistanceKm] = useState(0);
-  const [serviceType, setServiceType] = useState("standard");
+  const [serviceType, setServiceType] = useState("express");
+
+  const [shippingData, setShippingData] = useState(null);
+  const [loadingFee, setLoadingFee] = useState(false);
 
   const [activeMap, setActiveMap] = useState(null);
   const [showAddressModal, setShowAddressModal] = useState(false);
@@ -58,7 +70,6 @@ export default function CustomerCreateShipment() {
   const [savedAddresses, setSavedAddresses] = useState([]);
   const [loadingAddresses, setLoadingAddresses] = useState(false);
 
-  const SERVICE_PRICE = { standard: 0, express: 20000, fast: 40000 };
   const customerId =
     JSON.parse(localStorage.getItem("user"))?.id ||
     localStorage.getItem("userId");
@@ -72,21 +83,54 @@ export default function CustomerCreateShipment() {
     });
   }, []);
 
+  // Gọi API tính phí vận chuyển từ Backend (debounce 1 giây)
   useEffect(() => {
-    if (!form.delivery_address) return;
-    setDistanceKm(Math.floor(Math.random() * 30) + 5);
-  }, [form.delivery_address]);
+    if (!form.pickup_address || !form.delivery_address) {
+      setShippingData(null);
+      return;
+    }
 
-  useEffect(() => {
-    if (!form.delivery_address) return;
-    const baseFee = 15000;
-    const distanceFee = distanceKm * 1000;
-    const weightFee = (parseFloat(form.weight_kg) || 0) * 5000;
-    const total =
-      baseFee + distanceFee + weightFee + SERVICE_PRICE[serviceType];
-    setEstimatedFee(total);
-    setForm((prev) => ({ ...prev, shipping_fee: total }));
-  }, [distanceKm, form.weight_kg, serviceType, form.delivery_address]);
+    const fetchShippingFee = async () => {
+      setLoadingFee(true);
+      try {
+        const response = await API.post("/shipping/calculate-fee", {
+          pickup_address: form.pickup_address,
+          receiver_address: form.delivery_address,
+          pickup_lat: form.pickup_lat,
+          pickup_lng: form.pickup_lng,
+          delivery_lat: form.delivery_lat,
+          delivery_lng: form.delivery_lng,
+          weight_kg: parseFloat(form.weight_kg) || 0.5,
+          service_type: serviceType,
+          cod_amount: parseFloat(form.cod_amount) || 0,
+        });
+
+        if (response.data.success) {
+          setShippingData(response.data);
+          setEstimatedFee(response.data.total_shipping);
+          setDistanceKm(parseFloat(response.data.distance_km) || 0);
+          setForm((prev) => ({
+            ...prev,
+            shipping_fee: response.data.total_shipping,
+          }));
+        }
+      } catch (error) {
+        console.error("Lỗi tính phí:", error);
+        toast.error("Không thể tính phí vận chuyển");
+      } finally {
+        setLoadingFee(false);
+      }
+    };
+
+    const timeoutId = setTimeout(fetchShippingFee, 1000);
+    return () => clearTimeout(timeoutId);
+  }, [
+    form.pickup_address,
+    form.delivery_address,
+    form.weight_kg,
+    form.cod_amount,
+    serviceType,
+  ]);
 
   const handleChange = (e) =>
     setForm((prev) => ({ ...prev, [e.target.name]: e.target.value }));
@@ -341,7 +385,16 @@ export default function CustomerCreateShipment() {
                   type="radio"
                   className="hidden"
                   checked={pickupOption === "sender"}
-                  onChange={() => setPickupOption("sender")}
+                  onChange={() => {
+                    setPickupOption("sender");
+                    // Xóa địa chỉ kho, để khách tự nhập
+                    setForm((p) => ({
+                      ...p,
+                      pickup_address: "",
+                      pickup_lat: null,
+                      pickup_lng: null,
+                    }));
+                  }}
                 />
                 <Truck size={18} /> Lấy tận nơi
               </label>
@@ -352,7 +405,18 @@ export default function CustomerCreateShipment() {
                   type="radio"
                   className="hidden"
                   checked={pickupOption === "warehouse"}
-                  onChange={() => setPickupOption("warehouse")}
+                  onChange={() => {
+                    setPickupOption("warehouse");
+                    // Tự động điền địa chỉ kho công ty
+                    setForm((p) => ({
+                      ...p,
+                      sender_name: WAREHOUSE.name,
+                      sender_phone: WAREHOUSE.phone,
+                      pickup_address: WAREHOUSE.address,
+                      pickup_lat: WAREHOUSE.lat,
+                      pickup_lng: WAREHOUSE.lng,
+                    }));
+                  }}
                 />
                 <Package size={18} /> Gửi tại bưu cục
               </label>
@@ -598,10 +662,10 @@ export default function CustomerCreateShipment() {
         <OrderSummarySidebar
           serviceType={serviceType}
           setServiceType={setServiceType}
-          distanceKm={distanceKm}
-          estimatedFee={estimatedFee}
           creating={creating}
-          SERVICE_PRICE={SERVICE_PRICE}
+          loading={loadingFee}
+          shippingData={shippingData}
+          codAmount={parseFloat(form.cod_amount) || 0}
         />
       </form>
 

@@ -1,5 +1,6 @@
 import db from "../config/db.js";
 import bcrypt from "bcryptjs";
+import { sendNotificationToCustomer } from "../server.js";
 
 //  Dashboard
 export const getDriverDashboard = async (req, res) => {
@@ -126,6 +127,27 @@ export const updateDriverShipmentStatus = async (req, res) => {
       status,
       shipment_id,
     ]);
+
+    // Gửi thông báo cho khách hàng
+    try {
+      const [shipment] = await db.query(
+        "SELECT customer_id, tracking_code FROM shipments WHERE id = ?",
+        [shipment_id]
+      );
+      if (shipment.length > 0 && shipment[0].customer_id) {
+        const { customer_id, tracking_code } = shipment[0];
+        
+        let msg = `Đơn hàng #${tracking_code} đã được cập nhật trạng thái mới.`;
+        if (status === 'picking') msg = `Tài xế đang trên đường đến lấy đơn hàng #${tracking_code}.`;
+        else if (status === 'delivering') msg = `Đơn hàng #${tracking_code} đang được giao đến bạn.`;
+        else if (status === 'completed') msg = `✅ Đơn hàng #${tracking_code} đã được giao thành công!`;
+        else if (status === 'failed') msg = `❌ Đơn hàng #${tracking_code} giao/lấy thất bại.`;
+
+        await sendNotificationToCustomer(customer_id, shipment_id, msg);
+      }
+    } catch (e) {
+      console.warn("⚠️ Không gửi được thông báo cho customer:", e);
+    }
 
     res.json({ message: "✅ Cập nhật trạng thái thành công" });
   } catch (err) {

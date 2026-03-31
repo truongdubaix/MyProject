@@ -3,9 +3,14 @@ import cors from "cors";
 import cookieParser from "cookie-parser";
 import dotenv from "dotenv";
 import pool from "./config/db.js";
+import { fileURLToPath } from "url";
+import path from "path";
 import { createServer } from "http";
 import { Server } from "socket.io";
 import initSocket from "./socket/initSocket.js";
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 // Import routes
 import authRoutes from "./routes/authRoutes.js";
@@ -27,6 +32,8 @@ import contactRoutes from "./routes/contactRoutes.js";
 import aiRoutes from "./routes/aiRoutes.js";
 import addressRoutes from "./routes/addressRoutes.js";
 import walletRoutes from "./routes/walletRoutes.js";
+import shippingRoutes from "./routes/shippingRoutes.js";
+import newsRoutes from "./routes/newsRoutes.js";
 
 dotenv.config();
 const app = express();
@@ -41,11 +48,13 @@ app.use(
       "http://127.0.0.1:5174",
     ],
     credentials: true,
-  })
+  }),
 );
 
 app.use(express.json({ limit: "50mb" }));
+app.use(express.urlencoded({ limit: "50mb", extended: true }));
 app.use(cookieParser({ limit: "50mb", extended: true }));
+app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 
 //  Kiểm tra kết nối MySQL
 pool
@@ -73,7 +82,7 @@ const io = new Server(server, {
 const socketService = initSocket(io, pool);
 
 //  Export các hàm thông báo để controller khác gọi được
-export const { sendNotificationToDriver, sendNotificationToDispatcher } =
+export const { sendNotificationToDriver, sendNotificationToDispatcher, sendNotificationToCustomer } =
   socketService;
 
 // ROUTES
@@ -96,14 +105,15 @@ app.use("/api/contact", contactRoutes);
 app.use("/api/ai", aiRoutes);
 app.use("/api/addresses", addressRoutes);
 app.use("/api/wallet", walletRoutes);
-
+app.use("/api/shipping", shippingRoutes);
+app.use("/api/news", newsRoutes);
 //  Kiểm tra API
 app.get("/", (_req, res) =>
-  res.send("🚀 SpeedyShip API running with realtime chat & notifications")
+  res.send("🚀 SpeedyShip API running with realtime chat & notifications"),
 );
 
 //  Khởi động server
 const PORT = process.env.PORT || 5000;
 server.listen(PORT, () =>
-  console.log(`Server đang chạy tại: http://localhost:${PORT}`)
+  console.log(`Server đang chạy tại: http://localhost:${PORT}`),
 );

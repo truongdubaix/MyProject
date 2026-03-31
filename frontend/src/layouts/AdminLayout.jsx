@@ -14,6 +14,7 @@ import {
   Bell,
   ChevronRight,
   ShieldCheck,
+  Newspaper,
 } from "lucide-react";
 
 export default function AdminLayout() {
@@ -64,6 +65,11 @@ export default function AdminLayout() {
       path: "/admin/contact",
       label: "Quản lý liên hệ",
       icon: <Phone size={20} />,
+    },
+    {
+      path: "/admin/news",
+      label: "Quản lý Tin tức",
+      icon: <Newspaper size={20} />,
     },
   ];
 

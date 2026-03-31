@@ -187,7 +187,7 @@ export default function DispatcherLayout() {
       {/* =============== MAIN CONTENT =============== */}
       <div className="flex-1 flex flex-col min-w-0">
         {/* HEADER BAR */}
-        <header className="h-20 bg-white shadow-sm border-b border-gray-100 flex items-center justify-between px-6 lg:px-10 z-10">
+        <header className="h-20 bg-white shadow-sm border-b border-gray-100 flex items-center justify-between px-6 lg:px-10 z-40 relative">
           <div className="flex items-center gap-4">
             <button
               onClick={() => setIsSidebarOpen(true)}

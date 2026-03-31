@@ -2,6 +2,7 @@ import { Routes, Route, useLocation, Outlet } from "react-router-dom";
 import Navbar from "./components/Navbar.jsx";
 import Footer from "./components/Footer.jsx";
 import ProtectedRoute from "./components/ProtectedRoute.jsx";
+import ScrollToTop from "./components/ScrollToTop.jsx";
 
 // 🌍 Public pages
 import Home from "./pages/Home.jsx";
@@ -11,6 +12,7 @@ import Services from "./pages/Services.jsx";
 import Contact from "./pages/Contact.jsx";
 import Login from "./pages/Login.jsx";
 import Register from "./pages/Register.jsx";
+import NewsDetail from "./pages/NewsDetail.jsx";
 import ForgotPassword from "./pages/ForgotPassword";
 import Logout from "./pages/Logout.jsx";
 import Unauthorized from "./pages/Unauthorized.jsx";
@@ -31,6 +33,7 @@ import AdminPayments from "./pages/admin/AdminPayments.jsx";
 import AdminUsers from "./pages/admin/AdminUsers.jsx";
 import AdminFeedbacks from "./pages/admin/AdminFeedbacks.jsx";
 import AdminContacts from "./pages/admin/AdminContacts";
+import AdminNews from "./pages/admin/AdminNews.jsx";
 
 // 🚛 Dispatcher pages
 import DispatcherDashboard from "./pages/dispatcher/DispatcherDashboard.jsx";
@@ -62,6 +65,7 @@ import PaymentResult from "./pages/customer/PaymentResult.jsx";
 import CustomerAddress from "./pages/customer/CustomerAddress.jsx";
 import CustomerWallet from "./pages/customer/CustomerWallet.jsx";
 import CustomerSupport from "./pages/customer/CustomerSupport.jsx";
+import CustomerInvoice from "./pages/customer/CustomerInvoice.jsx";
 
 // 📜 Policy & Services
 import PrivacyPolicy from "./pages/policy/PrivacyPolicy.jsx";
@@ -98,6 +102,7 @@ export default function App() {
   return (
     <ChatProvider>
       <div className="bg-gray-50 text-gray-800 min-h-screen flex flex-col relative font-sans">
+        <ScrollToTop />
         <Routes>
           {/* 🌍 PUBLIC ROUTES (Được bọc bởi Navbar & Footer) */}
           <Route element={<PublicLayout />}>
@@ -114,6 +119,7 @@ export default function App() {
             <Route path="/login" element={<Login />} />
             <Route path="/register" element={<Register />} />
             <Route path="/apply-driver" element={<ApplyDriver />} />
+            <Route path="/news/:id" element={<NewsDetail />} />
 
             {/* Policy Routes */}
             <Route path="/policy/privacy" element={<PrivacyPolicy />} />
@@ -139,11 +145,12 @@ export default function App() {
             <Route index element={<AdminDashboard />} />
             <Route path="shipments" element={<AdminShipments />} />
             <Route path="drivers" element={<AdminDrivers />} />
-            <Route path="users" element={<AdminUsers />} />
             <Route path="customers" element={<AdminCustomers />} />
             <Route path="payments" element={<AdminPayments />} />
+            <Route path="users" element={<AdminUsers />} />
             <Route path="feedbacks" element={<AdminFeedbacks />} />
             <Route path="contact" element={<AdminContacts />} />
+            <Route path="news" element={<AdminNews />} />
           </Route>
 
           {/* 🧩 DISPATCHER */}
@@ -209,6 +216,7 @@ export default function App() {
             <Route path="addresses" element={<CustomerAddress />} />
             <Route path="wallet" element={<CustomerWallet />} />
             <Route path="support" element={<CustomerSupport />} />
+            <Route path="invoices" element={<CustomerInvoice />} />
           </Route>
 
           {/* ❌ 404 Not Found */}

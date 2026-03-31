@@ -1,4 +1,8 @@
 import db from "../config/db.js";
+import {
+  sendNotificationToDriver,
+  sendNotificationToCustomer,
+} from "../server.js";
 
 // =======================================================
 // 1. LẤY ĐƠN CHƯA PHÂN CÔNG (THEO VÙNG)
@@ -107,6 +111,34 @@ export const assignShipment = async (req, res) => {
     await db.query(`UPDATE drivers SET status='delivering' WHERE id=?`, [
       driver_id,
     ]);
+
+    // Gửi thông báo cho tài xế
+    try {
+      await sendNotificationToDriver(
+        driver_id,
+        shipment_id,
+        `Bạn được phân công đơn #${shipment_id} từ điều phối viên`
+      );
+    } catch (e) {
+      console.warn("⚠️ Lỗi gửi thông báo driver:", e);
+    }
+
+    // Gửi thông báo cho khách hàng
+    try {
+      const [[shipment]] = await db.query(
+        "SELECT customer_id, tracking_code FROM shipments WHERE id = ?",
+        [shipment_id]
+      );
+      if (shipment && shipment.customer_id) {
+        await sendNotificationToCustomer(
+          shipment.customer_id,
+          shipment_id,
+          `🚚 Đơn hàng #${shipment.tracking_code} đã được phân công cho tài xế và đang chờ lấy hàng!`
+        );
+      }
+    } catch (e) {
+      console.warn("⚠️ Lỗi gửi thông báo customer:", e.message);
+    }
 
     res.json({ message: "✅ Đã phân công tài xế cho đơn hàng" });
   } catch (err) {
@@ -226,6 +258,25 @@ export const updateAssignmentStatus = async (req, res) => {
       ]);
     }
 
+    // Gửi thông báo trạng thái cho khách hàng
+    try {
+      const [[shipment]] = await db.query(
+        "SELECT customer_id, tracking_code FROM shipments WHERE id = ?",
+        [row.shipment_id]
+      );
+      if (shipment && shipment.customer_id) {
+        let msg = `Đơn hàng #${shipment.tracking_code} đã được cập nhật trạng thái mới.`;
+        if (shipmentStatus === 'picking') msg = `Tài xế đang trên đường đến lấy đơn hàng #${shipment.tracking_code}.`;
+        else if (shipmentStatus === 'delivering') msg = `Đơn hàng #${shipment.tracking_code} đang được giao đến bạn.`;
+        else if (shipmentStatus === 'delivered') msg = `✅ Đơn hàng #${shipment.tracking_code} đã được giao thành công!`;
+        else if (shipmentStatus === 'failed') msg = `❌ Đơn hàng #${shipment.tracking_code} giao/lấy thất bại.`;
+
+        await sendNotificationToCustomer(shipment.customer_id, row.shipment_id, msg);
+      }
+    } catch (e) {
+      console.warn("⚠️ Lỗi gửi thông báo customer (updateAssignmentStatus):", e.message);
+    }
+
     res.json({ message: "✅ Đã cập nhật trạng thái và đồng bộ tài xế" });
   } catch (err) {
     console.error("❌ updateAssignmentStatus error:", err);
@@ -286,11 +337,36 @@ export const getDispatcherDashboard = async (req, res) => {
       region_id ? [region_id] : []
     );
 
+    // 4. Doanh thu theo tháng (Shipping Fee của các đơn giao thành công trong năm nay)
+    // Chú ý: Lấy các đơn 'delivered'
+    const [revenueData] = await db.query(
+      `
+      SELECT MONTH(created_at) AS monthNo, SUM(shipping_fee) AS total
+      FROM shipments
+      WHERE YEAR(created_at) = YEAR(CURDATE()) 
+        AND status = 'delivered'
+        ${regionConditionShipment ? "AND " + regionConditionShipment.replace("WHERE ", "") : ""}
+      GROUP BY MONTH(created_at)
+      ORDER BY MONTH(created_at)
+    `,
+      region_id ? [region_id] : []
+    );
+
+    const monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+    const revenue = monthNames.map((name, index) => ({ month: name, total: 0 }));
+
+    revenueData.forEach((row) => {
+      // row.monthNo is 1-12
+      if (row.monthNo >= 1 && row.monthNo <= 12) {
+        revenue[row.monthNo - 1].total = Number(row.total || 0);
+      }
+    });
+
     res.json({
       shipments: shipmentStats,
       drivers: driverStats,
       topDrivers,
-      // Doanh thu thường tính chung hoặc cần bảng payments có region_id, tạm bỏ qua hoặc để chung
+      revenue, // Trả về doanh thu để vẽ BarChart
     });
   } catch (err) {
     console.error("❌ Lỗi dispatcher dashboard:", err);

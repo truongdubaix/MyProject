@@ -21,6 +21,14 @@ export default function initSocket(io, pool) {
     });
 
     // ============================================
+    // 👤 1.5. KHÁCH HÀNG: ĐĂNG KÝ NHẬN THÔNG BÁO
+    // ============================================
+    socket.on("joinCustomer", (customerId) => {
+      socket.join(`customer_${customerId}`);
+      console.log(`👤 Customer ${customerId} đã vào phòng thông báo`);
+    });
+
+    // ============================================
     // 🚚 2. TÀI XẾ: ĐĂNG KÝ
     // ============================================
     socket.on("registerDriver", (driverId) => {
@@ -219,7 +227,6 @@ export default function initSocket(io, pool) {
           "INSERT INTO notifications (receiver_id, target_role, shipment_id, message) VALUES (?, 'dispatcher', ?, ?)",
           [dispatcherId, shipmentId, message]
         );
-        // Gửi vào room chung
         io.to("dispatcherRoom").emit("newDispatcherNotification", {
           shipmentId,
           message,
@@ -227,6 +234,22 @@ export default function initSocket(io, pool) {
         });
       } catch (err) {
         console.error("❌ Lỗi gửi thông báo dispatcher:", err.message);
+      }
+    },
+
+    sendNotificationToCustomer: async (customerId, shipmentId, message) => {
+      try {
+        await pool.query(
+          "INSERT INTO notifications (receiver_id, target_role, shipment_id, message) VALUES (?, 'customer', ?, ?)",
+          [customerId, shipmentId, message]
+        );
+        io.to(`customer_${customerId}`).emit("newCustomerNotification", {
+          shipmentId,
+          message,
+          created_at: new Date(),
+        });
+      } catch (err) {
+        console.error("❌ Lỗi gửi thông báo customer:", err.message);
       }
     },
   };

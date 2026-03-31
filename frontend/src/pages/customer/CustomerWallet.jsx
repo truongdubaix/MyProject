@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import API from "../../services/api";
+import Pagination from "../../components/Pagination";
 import toast from "react-hot-toast";
 import { useSearchParams } from "react-router-dom";
 import {
@@ -25,6 +26,10 @@ export default function CustomerWallet() {
   const [showInputModal, setShowInputModal] = useState(false);
   const [amount, setAmount] = useState("");
   const [processing, setProcessing] = useState(false);
+
+  // Phân trang giao dịch
+  const [txPage, setTxPage] = useState(1);
+  const txPerPage = 8;
 
   // State Popup Iframe MoMo
   const [showMomoPopup, setShowMomoPopup] = useState(false);
@@ -151,6 +156,11 @@ export default function CustomerWallet() {
     )
     .reduce((sum, t) => sum + Number(t.amount), 0);
 
+  // Phân trang giao dịch
+  const txTotalPages = Math.ceil(transactions.length / txPerPage);
+  const txStart = (txPage - 1) * txPerPage;
+  const currentTransactions = transactions.slice(txStart, txStart + txPerPage);
+
   if (loading) {
     return (
       <div className="flex justify-center items-center h-64">
@@ -247,8 +257,8 @@ export default function CustomerWallet() {
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-50">
-              {transactions.length > 0 ? (
-                transactions.map((t) => (
+              {currentTransactions.length > 0 ? (
+                currentTransactions.map((t) => (
                   <tr key={t.id} className="hover:bg-gray-50/50">
                     <td className="px-6 py-4 font-mono text-gray-500 text-xs">
                       #{t.order_id || t.id}
@@ -314,6 +324,11 @@ export default function CustomerWallet() {
             </tbody>
           </table>
         </div>
+        <Pagination
+          currentPage={txPage}
+          totalPages={txTotalPages}
+          onPageChange={setTxPage}
+        />
       </div>
 
       {/* --- MODAL NHẬP TIỀN --- */}

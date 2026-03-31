@@ -1,391 +1,287 @@
 import { useState, useEffect, useRef } from "react";
-import io from "socket.io-client";
+import {
+  FaTimes,
+  FaMinus,
+  FaExpand,
+  FaPaperPlane,
+  FaRobot,
+} from "react-icons/fa";
+import API from "../services/api";
+import ReactMarkdown from "react-markdown";
+import remarkGfm from "remark-gfm";
 import { motion, AnimatePresence } from "framer-motion";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import {
-  faMinus,
-  faExpand,
-  faTimes,
-  faPaperPlane,
-  faUserTie,
-  faInfoCircle,
-} from "@fortawesome/free-solid-svg-icons";
+import { faCircleNotch, faLightbulb } from "@fortawesome/free-solid-svg-icons";
 
-export default function ChatBubble({ onClose }) {
+// --- DANH SÁCH CÂU HỎI GỢI Ý ---
+const SUGGESTED_QUESTIONS = [
+  "Tra cứu đơn hàng SPxxxx",
+  "Bảng giá vận chuyển nội thành?",
+  "Chính sách bảo hiểm hàng hóa?",
+  "Làm sao để tạo đơn hàng mới?",
+];
+
+export default function ChatPopupTop({ onClose }) {
   const [collapsed, setCollapsed] = useState(false);
-  const [chatId, setChatId] = useState(null);
-
-  // Thêm state để quản lý Toast thông báo
-  const [showToast, setShowToast] = useState(false);
-  const [isMobile, setIsMobile] = useState(false);
-
-  // Tin nhắn ban đầu
   const [messages, setMessages] = useState([
     {
-      role: "system",
-      content:
-        "Xin chào! 👋 Cảm ơn bạn đã liên hệ SpeedyShip. Chúng tôi có thể giúp gì cho bạn hôm nay?",
+      from: "bot",
+      text: "Xin chào! 👋 Tôi là trợ lý AI của SpeedyShip. Tôi có thể giúp bạn tra cứu đơn hàng hoặc tư vấn dịch vụ ngay lập tức.",
     },
   ]);
-
   const [input, setInput] = useState("");
-  const [ready, setReady] = useState(false); // Trạng thái kết nối
+  const [isTyping, setIsTyping] = useState(false);
+  const [showSuggestions, setShowSuggestions] = useState(true);
+
   const messagesEndRef = useRef(null);
 
-  // Ref để giữ instance của socket
-  const socketRef = useRef(null);
-
-  const userId = localStorage.getItem("userId");
-  const role = localStorage.getItem("role");
-
-  // Auto scroll
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
-  }, [messages, collapsed]);
+  }, [messages, isTyping, showSuggestions]);
 
-  // Hook kiểm tra kích thước màn hình
-  useEffect(() => {
-    const handleResize = () => setIsMobile(window.innerWidth < 768);
-    handleResize();
-    window.addEventListener("resize", handleResize);
-    return () => window.removeEventListener("resize", handleResize);
-  }, []);
+  const handleSend = async (text) => {
+    if (!text.trim()) return;
 
-  // 🟢 LOGIC KẾT NỐI SOCKET
-  useEffect(() => {
-    if (!userId || role !== "customer") {
-      alert("⚠ Vui lòng đăng nhập để chat!");
-      onClose();
-      return;
-    }
+    // 1. Ẩn gợi ý
+    setShowSuggestions(false);
 
-    if (!socketRef.current) {
-      console.log("🔌 Client: Đang khởi tạo Socket...");
-      socketRef.current = io("http://localhost:5000", {
-        transports: ["websocket"],
-        reconnectionAttempts: 5,
-      });
-    }
-
-    const socket = socketRef.current;
-
-    const onChatStarted = (id) => {
-      console.log("✅ Client: Chat Started! ID:", id);
-      setChatId(id);
-      setReady(true);
-      socket.emit("joinChat", id);
-
-      setMessages((prev) => {
-        if (
-          prev.length > 0 &&
-          prev[prev.length - 1].content.includes("kết nối")
-        ) {
-          return prev;
-        }
-        return [
-          ...prev,
-          { role: "system", content: "Đã kết nối với nhân viên hỗ trợ." },
-        ];
-      });
-    };
-
-    const onNewMessage = (msg) => {
-      console.log("📩 New Message:", msg);
-      setMessages((prev) => {
-        const exists = prev.some(
-          (m) =>
-            m.content === msg.content &&
-            m.role === msg.role &&
-            (Math.abs(new Date(m.created_at) - new Date(msg.created_at)) <
-              2000 ||
-              !m.created_at),
-        );
-        if (exists) return prev;
-        return [...prev, msg];
-      });
-    };
-
-    const onChatEnded = () => {
-      // 1. Hiển thị Toast
-      setShowToast(true);
-      // 2. Khóa chat
-      setReady(false);
-      // 3. Đảm bảo cửa sổ đang mở để người dùng thấy thông báo
-      setCollapsed(false);
-
-      // 4. Đợi 4 giây rồi mới đóng hẳn
-      setTimeout(() => {
-        onClose();
-      }, 4000);
-    };
-
-    const onConnectError = (err) => {
-      console.error("❌ Socket Error:", err);
-    };
-
-    socket.on("connect", () => {
-      console.log("🌐 Socket Connected:", socket.id);
-      socket.emit("startChat", userId);
-    });
-
-    socket.on("chatStarted", onChatStarted);
-    socket.on("newMessage", onNewMessage);
-    socket.on("chatEnded", onChatEnded);
-    socket.on("connect_error", onConnectError);
-
-    if (socket.connected) {
-      socket.emit("startChat", userId);
-    }
-
-    return () => {
-      console.log("🛑 Client: Cleanup Socket...");
-      socket.off("connect");
-      socket.off("chatStarted", onChatStarted);
-      socket.off("newMessage", onNewMessage);
-      socket.off("chatEnded", onChatEnded);
-      socket.off("connect_error", onConnectError);
-      socket.disconnect();
-      socketRef.current = null;
-    };
-  }, [userId, role, onClose]);
-
-  // 🟢 HÀM GỬI TIN NHẮN
-  const sendMessage = () => {
-    if (!input.trim()) return;
-
-    const tempMsg = {
-      role: "customer",
-      content: input.trim(),
-      created_at: new Date().toISOString(),
-    };
-    setMessages((prev) => [...prev, tempMsg]);
-
-    if (socketRef.current && chatId) {
-      socketRef.current.emit("sendMessage", {
-        chatId,
-        senderId: userId,
-        role: "customer",
-        content: input.trim(),
-      });
-    }
+    // 2. Hiện tin nhắn user
+    const userMsg = { from: "user", text: text };
+    setMessages((prev) => [...prev, userMsg]);
     setInput("");
-  };
+    setIsTyping(true);
 
-  const endChat = () => {
-    if (socketRef.current && chatId) {
-      socketRef.current.emit("endChat", userId);
+    try {
+      // 3. Gọi API thật
+      const res = await API.post("/ai/ask", { message: text });
+
+      const botMsg = { from: "bot", text: res.data.reply };
+      setMessages((prev) => [...prev, botMsg]);
+    } catch (error) {
+      console.error("AI Error:", error);
+      setMessages((prev) => [
+        ...prev,
+        {
+          from: "bot",
+          text: "Xin lỗi, tôi đang gặp sự cố kết nối tới máy chủ AI. Vui lòng thử lại sau!",
+        },
+      ]);
+    } finally {
+      setIsTyping(false);
     }
-    onClose();
   };
 
   return (
     <motion.div
-      // 🔥 MAGIC PROP: Giúp animate mượt mà
-      layout
-      initial={{ opacity: 0, y: 50, scale: 0.95 }}
-      animate={{ opacity: 1, y: 0, scale: 1 }}
-      exit={{ opacity: 0, y: 50, scale: 0.95 }}
-      transition={{ duration: 0.3, ease: "easeOut" }}
-      className={`
-        bg-white shadow-2xl flex flex-col overflow-hidden border border-gray-200 font-sans z-[9999]
-        origin-bottom-right
-        ${
-          isMobile && !collapsed
-            ? "fixed inset-0 w-full h-[100dvh] rounded-none border-0"
-            : "w-[90vw] sm:w-[400px] rounded-t-xl"
-        }
-      `}
-      style={{
-        height: collapsed ? "auto" : isMobile ? "100dvh" : "600px",
+      // 1. Animation Layout
+      initial={{ opacity: 0, scale: 0.9 }}
+      animate={{
+        opacity: 1,
+        scale: 1,
+        width: 400,
+        height: collapsed ? 50 : 600,
       }}
+      exit={{ opacity: 0, scale: 0.9 }}
+      transition={{ type: "spring", stiffness: 300, damping: 30 }}
+      className="bg-white rounded-t-xl shadow-2xl flex flex-col overflow-hidden border border-gray-200 font-sans"
     >
-      {/* --- 🔥 TOAST THÔNG BÁO KẾT THÚC --- */}
-      <AnimatePresence>
-        {showToast && (
-          <motion.div
-            initial={{ opacity: 0, y: -20 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0 }}
-            className="absolute top-16 left-0 right-0 mx-auto w-max z-50 flex items-center gap-2 bg-black/80 text-white px-4 py-2 rounded-full text-xs shadow-lg backdrop-blur-sm"
-          >
-            <FontAwesomeIcon icon={faInfoCircle} className="text-yellow-400" />
-            <span>Cuộc trò chuyện đã kết thúc</span>
-          </motion.div>
-        )}
-      </AnimatePresence>
-
       {/* HEADER */}
-      <motion.div
-        layout="position"
-        className={`bg-gradient-to-r from-orange-600 to-blue-500 text-white px-4 py-3 flex justify-between items-center cursor-pointer select-none shrink-0 z-10 ${
-          isMobile && !collapsed ? "pt-safe" : ""
-        }`}
+      <div
+        className="bg-gradient-to-r from-[#113e48] to-blue-500 text-white px-4 py-3 flex justify-between items-center cursor-pointer select-none"
         onClick={() => setCollapsed(!collapsed)}
       >
         <div className="flex items-center gap-3">
-          <div className="w-8 h-8 md:w-9 md:h-9 rounded-full bg-white/20 flex items-center justify-center relative shrink-0">
-            <div
-              className={`absolute bottom-0 right-0 w-2 h-2 md:w-2.5 md:h-2.5 border-2 border-blue-600 rounded-full ${
-                ready ? "bg-green-400" : "bg-yellow-400"
-              }`}
-            ></div>
-            <FontAwesomeIcon
-              icon={faUserTie}
-              className="text-sm md:text-base"
-            />
+          <div className="w-9 h-9 rounded-full bg-white/10 flex items-center justify-center relative">
+            <div className="absolute top-0 right-0 w-2.5 h-2.5 bg-green-500 border-2 border-[#113e48] rounded-full"></div>
+            <FaRobot />
           </div>
           <div>
-            <h3 className="font-bold text-sm md:text-base leading-tight">
-              HỖ TRỢ TRỰC TUYẾN
-            </h3>
-            <AnimatePresence>
-              {!collapsed && (
-                <motion.p
-                  initial={{ opacity: 0, height: 0 }}
-                  animate={{ opacity: 1, height: "auto" }}
-                  exit={{ opacity: 0, height: 0 }}
-                  className="text-[10px] md:text-[11px] text-blue-100 opacity-90"
-                >
-                  {ready ? "Đang trực tuyến" : "Đang kết nối..."}
-                </motion.p>
-              )}
-            </AnimatePresence>
+            <h3 className="font-bold text-base leading-tight"> SPEEDY AI</h3>
+            {!collapsed && (
+              <p className="text-[11px] text-gray-300 opacity-80">
+                Luôn sẵn sàng hỗ trợ
+              </p>
+            )}
           </div>
         </div>
 
-        <div className="flex items-center gap-4 md:gap-3 text-white/80 shrink-0">
+        <div className="flex items-center gap-3 text-white/70">
           {collapsed ? (
-            <FontAwesomeIcon
-              icon={faExpand}
-              className="hover:text-white transition-colors text-sm md:text-base"
-              title="Mở rộng"
-            />
+            <FaExpand className="hover:text-white transition-colors text-base" />
           ) : (
-            <FontAwesomeIcon
-              icon={faMinus}
-              className="hover:text-white transition-colors text-sm md:text-base"
-              title="Thu nhỏ"
-            />
+            <FaMinus className="hover:text-white transition-colors text-base" />
           )}
-          <FontAwesomeIcon
-            icon={faTimes}
+          <FaTimes
             onClick={(e) => {
               e.stopPropagation();
-              endChat();
+              onClose();
             }}
-            className="hover:text-red-200 transition-colors text-lg md:text-base ml-1"
-            title="Kết thúc chat"
+            className="hover:text-red-400 transition-colors ml-1 text-base"
           />
         </div>
-      </motion.div>
+      </div>
 
       {/* BODY */}
-      <AnimatePresence>
-        {!collapsed && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.2 }}
-            className="flex-1 flex flex-col overflow-hidden"
-          >
-            <div className="flex-1 p-3 md:p-4 overflow-y-auto bg-slate-50 scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-transparent">
-              <div className="text-center mb-4 md:mb-6">
-                <p className="text-[9px] md:text-[10px] text-gray-400 uppercase font-semibold">
-                  Cuộc trò chuyện được bảo mật
-                </p>
-              </div>
-
-              <AnimatePresence>
-                {messages.map((m, i) => (
-                  <motion.div
-                    key={i}
-                    initial={{ opacity: 0, y: 10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    className={`flex w-full mb-3 md:mb-4 ${
-                      m.role === "customer"
-                        ? "justify-end"
-                        : m.role === "system"
-                          ? "justify-center"
-                          : "justify-start"
-                    }`}
-                  >
-                    {m.role !== "customer" && m.role !== "system" && (
-                      <div className="w-7 h-7 md:w-8 md:h-8 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center mr-2 mt-1 flex-shrink-0 text-[10px] md:text-xs border border-blue-200">
-                        <FontAwesomeIcon icon={faUserTie} />
-                      </div>
-                    )}
-
-                    {m.role === "system" ? (
-                      <div className="max-w-[85%] text-center">
-                        <span className="text-[9px] md:text-[10px] text-gray-500 bg-gray-100 px-3 py-1 rounded-full inline-block border border-gray-200">
-                          {m.content}
-                        </span>
-                      </div>
-                    ) : (
-                      <div
-                        className={`p-2.5 md:p-3 rounded-2xl text-[13px] md:text-sm max-w-[85%] md:max-w-[75%] leading-relaxed shadow-sm ${
-                          m.role === "customer"
-                            ? "bg-blue-600 text-white rounded-br-none"
-                            : "bg-white text-gray-800 border border-gray-100 rounded-bl-none"
-                        }`}
-                      >
-                        {m.content}
-                      </div>
-                    )}
-                  </motion.div>
-                ))}
-              </AnimatePresence>
-              <div ref={messagesEndRef} />
+      {!collapsed && (
+        <>
+          <div className="flex-1 p-4 overflow-y-auto bg-slate-50 scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-transparent">
+            <div className="text-center text-[10px] text-gray-400 mb-4 uppercase tracking-wider font-semibold">
+              Hôm nay
             </div>
 
-            {/* INPUT */}
-            <div className="p-2 md:p-3 bg-white border-t border-gray-100 relative z-20 shrink-0 pb-safe">
-              <div
-                className={`relative flex items-center bg-gray-100 rounded-full px-3 md:px-4 py-1.5 md:py-2 border border-transparent transition-all duration-300 ${
-                  ready
-                    ? "focus-within:bg-white focus-within:ring-1 focus-within:ring-blue-500"
-                    : "opacity-70 cursor-not-allowed"
+            {messages.map((m, i) => (
+              <motion.div
+                key={i}
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                className={`flex w-full mb-4 ${
+                  m.from === "user" ? "justify-end" : "justify-start"
                 }`}
               >
-                <input
-                  className="flex-1 bg-transparent border-none outline-none text-[13px] md:text-sm text-gray-700 placeholder-gray-400 disabled:cursor-not-allowed w-full"
-                  placeholder={ready ? "Nhập tin nhắn..." : "Đang kết nối..."}
-                  value={input}
-                  onChange={(e) => setInput(e.target.value)}
-                  onKeyDown={(e) => e.key === "Enter" && sendMessage()}
-                  disabled={!ready}
-                  autoFocus
-                />
-                <button
-                  onClick={sendMessage}
-                  disabled={!ready || !input.trim()}
-                  className={`ml-2 w-7 h-7 md:w-8 md:h-8 shrink-0 flex items-center justify-center rounded-full transition-all duration-300 shadow-sm ${
-                    ready && input.trim()
-                      ? "bg-blue-600 text-white hover:bg-blue-700"
-                      : "bg-gray-300 text-gray-500 cursor-not-allowed"
+                {m.from === "bot" && (
+                  <div className="w-8 h-8 rounded-full bg-[#113e48] text-white flex items-center justify-center mr-2 mt-1 flex-shrink-0 text-xs">
+                    <FaRobot />
+                  </div>
+                )}
+
+                <div
+                  className={`p-3 rounded-2xl text-sm max-w-[80%] leading-relaxed shadow-sm ${
+                    m.from === "user"
+                      ? "bg-orange-500 text-white rounded-br-none"
+                      : "bg-white text-gray-800 border border-gray-100 rounded-bl-none"
                   }`}
                 >
+                  {m.from === "bot" ? (
+                    <ReactMarkdown
+                      remarkPlugins={[remarkGfm]}
+                      components={{
+                        a: ({ node, ...props }) => (
+                          <a
+                            {...props}
+                            className="text-blue-600 font-semibold hover:underline"
+                            target="_blank"
+                            rel="noreferrer"
+                          />
+                        ),
+                        ul: ({ node, ...props }) => (
+                          <ul
+                            {...props}
+                            className="list-disc ml-4 my-2 space-y-1"
+                          />
+                        ),
+                        li: ({ node, ...props }) => (
+                          <li {...props} className="marker:text-orange-500" />
+                        ),
+                        strong: ({ node, ...props }) => (
+                          <strong
+                            {...props}
+                            className="font-bold text-[#113e48]"
+                          />
+                        ),
+                      }}
+                    >
+                      {m.text}
+                    </ReactMarkdown>
+                  ) : (
+                    m.text
+                  )}
+                </div>
+              </motion.div>
+            ))}
+
+            <AnimatePresence>
+              {showSuggestions && !isTyping && (
+                <motion.div
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0, height: 0 }}
+                  className="mb-6 flex flex-col gap-2 items-center w-full px-4"
+                >
+                  <p className="text-xs text-gray-400 mb-2 flex items-center gap-1">
+                    <FontAwesomeIcon
+                      icon={faLightbulb}
+                      className="text-yellow-500"
+                    />
+                    Gợi ý cho bạn:
+                  </p>
+                  <div className="flex flex-wrap justify-center gap-2 w-full">
+                    {SUGGESTED_QUESTIONS.map((q, idx) => (
+                      <motion.button
+                        key={idx}
+                        onClick={() => handleSend(q)}
+                        whileHover={{
+                          scale: 1.05,
+                          backgroundColor: "#f0f9ff",
+                          borderColor: "#3b82f6",
+                        }}
+                        className="text-center text-xs text-[#113e48] bg-white border border-gray-200 px-3 py-1.5 rounded-full shadow-sm hover:text-blue-600 transition-all"
+                      >
+                        {q}
+                      </motion.button>
+                    ))}
+                  </div>
+                </motion.div>
+              )}
+            </AnimatePresence>
+
+            {isTyping && (
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                className="flex w-full mb-4 justify-start"
+              >
+                <div className="w-8 h-8 rounded-full bg-[#113e48] text-white flex items-center justify-center mr-2 flex-shrink-0 text-xs">
+                  <FaRobot />
+                </div>
+                <div className="bg-white border border-gray-100 p-3 rounded-2xl rounded-bl-none shadow-sm flex items-center gap-1">
                   <FontAwesomeIcon
-                    icon={faPaperPlane}
-                    className="text-[10px] md:text-xs pr-[2px]"
+                    icon={faCircleNotch}
+                    spin
+                    className="text-gray-400"
                   />
-                </button>
-              </div>
-              <div className="text-center mt-1.5 md:mt-2">
-                <p className="text-[9px] md:text-[10px] text-gray-400 flex items-center justify-center gap-1">
-                  <span
-                    className={`w-1.5 h-1.5 rounded-full ${
-                      ready ? "bg-green-500" : "bg-yellow-500 animate-pulse"
-                    }`}
-                  ></span>
-                  {ready ? "Kết nối ổn định" : "Đang kết nối server..."}
-                </p>
-              </div>
+                  <span className="text-xs text-gray-400 ml-1">
+                    AI đang trả lời...
+                  </span>
+                </div>
+              </motion.div>
+            )}
+            <div ref={messagesEndRef} />
+          </div>
+
+          {/* INPUT */}
+          <div className="p-3 bg-white border-t border-gray-100">
+            <div className="relative flex items-center bg-gray-100 rounded-full px-4 py-2 border border-transparent focus-within:bg-white focus-within:ring-1 focus-within:ring-orange-500 transition-all">
+              <input
+                className="flex-1 bg-transparent border-none outline-none text-sm text-gray-700 placeholder-gray-400"
+                placeholder="Nhập tin nhắn..."
+                value={input}
+                onChange={(e) => setInput(e.target.value)}
+                onKeyDown={(e) => e.key === "Enter" && handleSend(input)}
+              />
+              <button
+                onClick={() => handleSend(input)}
+                disabled={!input.trim() || isTyping}
+                className={`ml-2 w-8 h-8 shrink-0 flex items-center justify-center rounded-full transition-all ${
+                  input.trim()
+                    ? "bg-[#113e48] text-white hover:bg-orange-500"
+                    : "bg-gray-300 text-gray-500 cursor-not-allowed"
+                }`}
+              >
+                {isTyping ? (
+                  <FontAwesomeIcon icon={faCircleNotch} spin />
+                ) : (
+                  <FaPaperPlane className="text-xs" />
+                )}
+              </button>
             </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
+            <div className="text-center mt-2">
+              <p className="text-[10px] text-gray-400">
+                Powered by SpeedyShip AI
+              </p>
+            </div>
+          </div>
+        </>
+      )}
     </motion.div>
   );
 }

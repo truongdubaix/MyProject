@@ -1,43 +1,30 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
+import { Link } from "react-router-dom";
 import { FaUser, FaComments, FaArrowRight, FaBox } from "react-icons/fa";
-
-const newsData = [
-  {
-    id: 1,
-    // Ảnh minh họa: Vận chuyển đường biển/quốc tế
-    image:
-      "https://ship-fast.monamedia.net/wp-content/uploads/2023/04/blog-s-1-2-414x273.jpg",
-    date: { day: "20", month: "Th12" },
-    author: "Admin",
-    comments: 5,
-    title: "Giải pháp vận chuyển hàng hóa xuyên biên giới tối ưu 2024",
-    desc: "Khám phá các phương thức vận tải đa phương thức giúp tiết kiệm chi phí và thời gian cho doanh nghiệp xuất nhập khẩu.",
-  },
-  {
-    id: 2,
-    // Ảnh minh họa: Xe tải/Giao hàng
-    image:
-      "https://ship-fast.monamedia.net/wp-content/uploads/2023/04/blog-s-1-3-414x273.jpg",
-    date: { day: "18", month: "Th12" },
-    author: "SpeedyTeam",
-    comments: 12,
-    title: "Đừng để hàng hóa bị kẹt: Chọn đội xe tải SpeedyShip",
-    desc: "Với đội xe hùng hậu và công nghệ định vị GPS real-time, chúng tôi cam kết giao hàng đúng hẹn bất chấp mọi điều kiện.",
-  },
-  {
-    id: 3,
-    // Ảnh minh họa: Kho bãi/Logistics
-    image:
-      "https://ship-fast.monamedia.net/wp-content/uploads/2023/04/blog-s-1-4-414x273.jpg",
-    date: { day: "15", month: "Th12" },
-    author: "Ban Biên Tập",
-    comments: 8,
-    title: "Đối tác Logistics hoàn hảo: Chìa khóa bứt phá doanh thu",
-    desc: "Tìm hiểu cách một hệ thống logistics chuyên nghiệp có thể giúp bạn giảm 30% chi phí vận hành và tăng trải nghiệm khách hàng.",
-  },
-];
+import API from "../../services/api";
 
 export default function NewsSection() {
+  const [newsData, setNewsData] = useState([]);
+
+  const getImageUrl = (url) => {
+    if (!url) return "";
+    if (url.startsWith("http")) return url;
+    return `http://localhost:5000${url}`;
+  };
+
+  useEffect(() => {
+    const fetchNews = async () => {
+      try {
+        const res = await API.get("/news");
+        // Lấy tối đa 3 tin tức mới nhất hiển thị trang chủ
+        setNewsData(res.data.slice(0, 3));
+      } catch (err) {
+        console.error("Lỗi tải tin tức trang chủ:", err);
+      }
+    };
+    fetchNews();
+  }, []);
+
   return (
     <section className="py-24 bg-white font-sans">
       <div className="max-w-7xl mx-auto px-6">
@@ -68,7 +55,7 @@ export default function NewsSection() {
               {/* 1. ẢNH & NGÀY THÁNG */}
               <div className="relative h-64 overflow-hidden">
                 <img
-                  src={item.image}
+                  src={getImageUrl(item.image)}
                   alt={item.title}
                   className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
                 />
@@ -76,13 +63,13 @@ export default function NewsSection() {
                 {/* Lớp phủ màu đen mờ khi hover */}
                 <div className="absolute inset-0 bg-[#113e48]/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
 
-                {/* Badge Ngày tháng (Góc trái trên - Style Elementor cũ nhưng đẹp hơn) */}
+                {/* Badge Ngày tháng */}
                 <div className="absolute top-4 left-4 bg-white/95 backdrop-blur rounded-lg shadow-md p-2 min-w-[60px] text-center border-t-4 border-orange-500">
                   <span className="block text-2xl font-extrabold text-[#113e48] leading-none">
-                    {item.date.day}
+                    {new Date(item.created_at).getDate()}
                   </span>
                   <span className="block text-xs font-bold text-gray-500 uppercase">
-                    {item.date.month}
+                    Th{new Date(item.created_at).getMonth() + 1}
                   </span>
                 </div>
               </div>
@@ -101,21 +88,24 @@ export default function NewsSection() {
                   </div>
                 </div>
 
-                {/* Tiêu đề */}
-                <h3 className="text-xl font-bold text-[#113e48] mb-4 line-clamp-2 leading-snug group-hover:text-orange-500 transition-colors">
-                  <a href="#">{item.title}</a>
+                {/* Tiêu đề \& Mô tả */}
+                <h3 className="text-xl font-bold text-[#113e48] mb-3 line-clamp-2 leading-snug group-hover:text-orange-500 transition-colors">
+                  <Link to={`/news/${item.id}`}>{item.title}</Link>
                 </h3>
+                <p className="text-sm text-gray-500 mb-6 line-clamp-3 leading-relaxed">
+                  {item.desc}
+                </p>
 
-                {/* Nút Xem thêm (Style gạch chân + mũi tên) */}
-                <a
-                  href="#"
+                {/* Nút Xem thêm */}
+                <Link
+                  to={`/news/${item.id}`}
                   className="inline-flex items-center gap-2 text-sm font-bold text-gray-400 group-hover:text-[#113e48] transition-all group/btn"
                 >
                   XEM THÊM
                   <span className="bg-gray-100 group-hover:bg-orange-500 group-hover:text-white w-8 h-8 rounded-full flex items-center justify-center transition-all duration-300">
                     <FaArrowRight className="text-xs transform group-hover/btn:translate-x-0.5 transition-transform" />
                   </span>
-                </a>
+                </Link>
               </div>
 
               {/* Đường kẻ trang trí dưới cùng */}

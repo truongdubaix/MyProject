@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { Bell, Package } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import API from "../services/api";
@@ -11,6 +11,18 @@ export default function DispatcherNotifications({ dispatcherId }) {
   const [show, setShow] = useState(false);
   const [notifications, setNotifications] = useState([]);
   const [hasNew, setHasNew] = useState(false);
+  const dropdownRef = useRef(null);
+
+  // Click ra ngoài để đóng
+  useEffect(() => {
+    function handleClickOutside(event) {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+        setShow(false);
+      }
+    }
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
 
   // 🧾 Lấy danh sách thông báo dispatcher
   const fetchNotifications = async () => {
@@ -61,8 +73,10 @@ export default function DispatcherNotifications({ dispatcherId }) {
     }
   };
 
+  const unreadCount = notifications.filter((n) => !n.is_read).length;
+
   return (
-    <div className="relative select-none">
+    <div className="relative select-none" ref={dropdownRef}>
       {/* 🔔 Nút chuông */}
       <motion.button
         whileTap={{ scale: 0.9 }}
@@ -71,17 +85,19 @@ export default function DispatcherNotifications({ dispatcherId }) {
         onClick={() => {
           setShow(!show);
           setHasNew(false);
+          if (!show) fetchNotifications();
         }}
-        className="relative bg-white border rounded-full p-2 shadow hover:bg-gray-100"
+        className="relative p-2 text-gray-400 hover:text-orange-500 hover:bg-orange-50 rounded-full transition-all"
+        title="Thông báo"
       >
-        <Bell className="text-orange-600 w-6 h-6" />
-        {notifications.some((n) => !n.is_read) && (
+        <Bell size={20} />
+        {unreadCount > 0 && (
           <motion.span
             layoutId="dot"
             initial={{ scale: 0 }}
             animate={{ scale: 1 }}
             transition={{ type: "spring", stiffness: 300 }}
-            className="absolute top-0 right-0 w-3 h-3 bg-red-500 rounded-full"
+            className="absolute top-1 right-1 w-2.5 h-2.5 bg-red-500 rounded-full border border-white"
           />
         )}
       </motion.button>
@@ -94,56 +110,67 @@ export default function DispatcherNotifications({ dispatcherId }) {
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -10 }}
             transition={{ duration: 0.25 }}
-            className="absolute right-0 mt-2 w-80 bg-white border rounded-xl shadow-2xl overflow-hidden z-10"
+            className="absolute right-0 mt-3 w-80 sm:w-96 bg-white border border-gray-100 rounded-2xl shadow-2xl overflow-hidden z-50 transform origin-top-right"
           >
-            <div className="p-3 border-b font-semibold text-orange-700 bg-orange-50 flex justify-between items-center">
-              <span>📦 Thông báo điều phối viên</span>
+            <div className="p-4 border-b border-gray-100 font-semibold text-[#113e48] bg-gray-50 flex justify-between items-center">
+              <span className="flex items-center gap-2">
+                Thông báo điều phối viên
+                {unreadCount > 0 && (
+                  <span className="bg-orange-500 text-white text-xs px-2 py-0.5 rounded-full">
+                    {unreadCount} mới
+                  </span>
+                )}
+              </span>
               <button
                 onClick={fetchNotifications}
-                className="text-xs text-orange-600 hover:underline"
+                className="text-xs text-orange-600 hover:text-orange-700 font-medium"
               >
                 Làm mới
               </button>
             </div>
 
-            <div className="max-h-80 overflow-y-auto">
+            <div className="max-h-[400px] overflow-y-auto no-scrollbar bg-white rounded-b-2xl">
               {notifications.length > 0 ? (
                 notifications.map((n) => (
-                  <motion.div
+                  <div
                     key={n.id}
-                    initial={{ opacity: 0, x: 30 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    transition={{ duration: 0.2 }}
                     onClick={() => markAsRead(n.id)}
-                    className={`p-3 border-b cursor-pointer transition-all ${
+                    className={`p-4 border-b border-gray-50 cursor-pointer transition-all flex gap-3 hover:bg-orange-100 ${
                       n.is_read
-                        ? "bg-gray-50 hover:bg-gray-100"
-                        : "bg-orange-50 hover:bg-orange-100"
+                        ? "bg-white text-gray-600"
+                        : "bg-orange-50 text-[#113e48]"
                     }`}
                   >
-                    <div className="flex items-start gap-2">
-                      <Package
-                        className={`w-5 h-5 ${
-                          n.is_read ? "text-gray-400" : "text-orange-500"
+                    <div className="shrink-0 mt-1">
+                      <div
+                        className={`p-2 rounded-full ${
+                          n.is_read
+                            ? "bg-gray-100 text-gray-400"
+                            : "bg-orange-100 text-orange-500"
                         }`}
-                      />
-                      <div>
-                        <p
-                          className={`text-sm ${
-                            n.is_read ? "text-gray-600" : "text-gray-900"
-                          }`}
-                        >
-                          {n.message}
-                        </p>
-                        <span className="text-xs text-gray-500">
-                          {new Date(n.created_at).toLocaleString("vi-VN")}
-                        </span>
+                      >
+                        <Package size={16} />
                       </div>
                     </div>
-                  </motion.div>
+                    <div>
+                      <p
+                        className={`text-sm leading-snug ${
+                          n.is_read
+                            ? "text-gray-600"
+                            : "text-[#113e48] font-semibold tracking-tight"
+                        }`}
+                      >
+                        {n.message}
+                      </p>
+                      <span className="text-[11px] text-gray-400 mt-1 block">
+                        {new Date(n.created_at).toLocaleString("vi-VN")}
+                      </span>
+                    </div>
+                  </div>
                 ))
               ) : (
-                <div className="p-4 text-gray-500 italic text-center">
+                <div className="p-8 text-gray-400 text-sm text-center flex flex-col items-center gap-2">
+                  <Bell size={24} className="text-gray-300" />
                   Không có thông báo nào.
                 </div>
               )}

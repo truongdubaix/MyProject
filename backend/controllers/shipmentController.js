@@ -2,6 +2,7 @@ import pool from "../config/db.js"; // Sử dụng pool thay vì db
 import {
   sendNotificationToDriver,
   sendNotificationToDispatcher,
+  sendNotificationToCustomer,
 } from "../server.js";
 
 // ==========================
@@ -178,6 +179,15 @@ export const createShipment = async (req, res) => {
         result.insertId,
         `🆕 Đơn hàng mới tại ${regionInfo.prefix}: #${tracking_code}`,
       );
+
+      // Thông báo cho khách hàng
+      if (customer_id) {
+        await sendNotificationToCustomer(
+          customer_id,
+          result.insertId,
+          `🎉 Đơn hàng #${tracking_code} của bạn đã được tạo thành công!`,
+        );
+      }
     } catch (notifyErr) {
       console.warn("⚠️ Không gửi được thông báo:", notifyErr.message);
     }
@@ -277,7 +287,7 @@ export const assignShipment = async (req, res) => {
       [shipment_id, driver_id],
     );
 
-    // Gửi thông báo
+    // Gửi thông báo cho tài xế
     try {
       await sendNotificationToDriver(
         driver_id,
@@ -286,6 +296,23 @@ export const assignShipment = async (req, res) => {
       );
     } catch (e) {
       console.warn("⚠️ Lỗi gửi thông báo driver");
+    }
+
+    // Gửi thông báo cho khách hàng
+    try {
+      const [[shipment]] = await pool.query(
+        "SELECT customer_id, tracking_code FROM shipments WHERE id = ?",
+        [shipment_id]
+      );
+      if (shipment && shipment.customer_id) {
+        await sendNotificationToCustomer(
+          shipment.customer_id,
+          shipment_id,
+          `🚚 Đơn hàng #${shipment.tracking_code} đã được phân công cho tài xế và đang chờ đi lấy!`
+        );
+      }
+    } catch (e) {
+      console.warn("⚠️ Lỗi gửi thông báo customer:", e.message);
     }
 
     res.json({ message: "Đã phân công tài xế" });
@@ -433,12 +460,32 @@ export const assignShipmentsBulk = async (req, res) => {
 
     await connection.commit();
 
-    // Gửi thông báo
+    // Gửi thông báo cho tài xế
     sendNotificationToDriver(
       driver_id,
       null,
       `Bạn vừa được phân công ${shipment_ids.length} đơn hàng mới!`,
     ).catch(() => {});
+
+    // Gửi thông báo cho từng khách hàng
+    try {
+      const [shipments] = await connection.query(
+        "SELECT id, customer_id, tracking_code FROM shipments WHERE id IN (?)",
+        [shipment_ids]
+      );
+
+      for (const ship of shipments) {
+        if (ship.customer_id) {
+          await sendNotificationToCustomer(
+            ship.customer_id,
+            ship.id,
+            `🚚 Đơn hàng #${ship.tracking_code} đã được phân công cho tài xế và đang chờ đi lấy!`
+          );
+        }
+      }
+    } catch (e) {
+      console.warn("⚠️ Lỗi gửi thông báo customer (bulk):", e.message);
+    }
 
     res.json({
       message: `Đã phân công thành công ${shipment_ids.length} đơn hàng!`,

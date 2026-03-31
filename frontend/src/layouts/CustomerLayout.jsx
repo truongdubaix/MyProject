@@ -1,5 +1,6 @@
 import { NavLink, Outlet, useNavigate, useLocation } from "react-router-dom";
 import { useState, useEffect } from "react";
+import CustomerNotifications from "../components/CustomerNotifications";
 import {
   LogOut,
   Home,
@@ -15,12 +16,14 @@ import {
   Gift,
   Menu,
   X,
+  FileText,
 } from "lucide-react";
 
 export default function CustomerLayout() {
   const navigate = useNavigate();
   const location = useLocation();
   const username = localStorage.getItem("username") || "Khách hàng";
+  const customerId = localStorage.getItem("customer_id") || localStorage.getItem("userId");
 
   // State quản lý việc mở/đóng sidebar trên mobile
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
@@ -64,6 +67,8 @@ export default function CustomerLayout() {
         return "Ví & Thanh toán";
       case "/customer/support":
         return "Hỗ trợ khách hàng";
+      case "/customer/invoices":
+        return "Xuất hóa đơn";
       case "/customer/profile":
         return "Hồ sơ cá nhân";
       default:
@@ -155,6 +160,9 @@ export default function CustomerLayout() {
               <NavLink to="/customer/support" className={navLinkClasses}>
                 <Headphones size={18} /> <span>Hỗ trợ</span>
               </NavLink>
+              <NavLink to="/customer/invoices" className={navLinkClasses}>
+                <FileText size={18} /> <span>Xuất hóa đơn</span>
+              </NavLink>
             </nav>
           </div>
 
@@ -213,10 +221,7 @@ export default function CustomerLayout() {
           </div>
 
           <div className="flex items-center gap-2 md:gap-4 shrink-0">
-            <button className="p-2 text-gray-400 hover:text-orange-500 hover:bg-orange-50 rounded-full transition-all relative">
-              <Bell size={20} />
-              <span className="absolute top-2 right-2 w-2 h-2 bg-red-500 rounded-full border border-white animate-pulse"></span>
-            </button>
+            <CustomerNotifications customerId={customerId} />
             <div className="hidden md:block h-6 w-[1px] bg-gray-200"></div>
             <button
               onClick={() => navigate("/")}
