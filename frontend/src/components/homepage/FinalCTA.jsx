@@ -65,7 +65,7 @@ export default function FinalCTA({ onChat }) {
           <div className="flex flex-col sm:flex-row gap-4 shrink-0">
             {/* Nút Tạo Đơn (Màu Cam - Điểm nhấn chính) */}
             <Link
-              to="/customer/create"
+              to="/customer/create-order"
               className="group inline-flex items-center justify-center gap-3 px-8 py-4 rounded-full bg-orange-500 hover:bg-orange-600 text-white font-bold text-lg shadow-xl shadow-orange-500/30 transition-all transform hover:-translate-y-1"
             >
               <FaRocket className="group-hover:animate-pulse" />

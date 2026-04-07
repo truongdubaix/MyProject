@@ -21,7 +21,6 @@ export default function Terms() {
     window.scrollTo(0, 0);
   }, []);
 
-  // Sidebar Links (Active dòng 3)
   const sidebarLinks = [
     {
       name: "Bảo mật thông tin",
@@ -38,7 +37,7 @@ export default function Terms() {
     {
       name: "Điều khoản sử dụng",
       path: "/policy/terms",
-      active: true, // Đang ở trang này
+      active: true,
       icon: <FaFileContract />,
     },
     {

@@ -51,7 +51,7 @@ export default function PriceList() {
           </h1>
           <div data-aos="fade-up" data-aos-delay="200">
             <Link
-              to="/customer/create"
+              to="/register"
               className="inline-flex items-center gap-2 bg-orange-500 hover:bg-orange-600 text-white px-8 py-3 rounded-full font-bold transition-all shadow-lg hover:shadow-orange-500/40 transform hover:-translate-y-1"
             >
               <FaCalculator /> Tra cứu cước phí tự động
@@ -358,7 +358,7 @@ export default function PriceList() {
               Liên hệ nhận báo giá <FaArrowRight />
             </Link>
             <Link
-              to="/customer/create"
+              to="/register"
               className="px-8 py-4 bg-orange-500 border border-orange-500 text-white font-bold rounded-full hover:bg-orange-600 transition-all flex items-center justify-center gap-2 shadow-lg hover:shadow-orange-500/30"
             >
               Đăng ký tài khoản ngay

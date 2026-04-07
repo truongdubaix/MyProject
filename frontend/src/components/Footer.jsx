@@ -23,7 +23,7 @@ export default function Footer() {
               <img
                 src="/assets/logo/logoSpeedyShip.png"
                 alt="SpeedyShip Logo"
-                className="w-10 h-10 object-contain brightness-0 invert" // Đổi màu logo sang trắng nếu là ảnh PNG đen
+                className="w-10 h-10 object-contain brightness-0 invert"
               />
               <span className="text-2xl font-extrabold tracking-tight">
                 SpeedyShip<span className="text-orange-500">VN</span>
@@ -45,27 +45,69 @@ export default function Footer() {
                   >
                     <Icon size={14} />
                   </a>
-                )
+                ),
               )}
             </div>
           </div>
 
           {/* Cột 2: Liên kết nhanh */}
           <div data-aos="fade-up" data-aos-delay="100">
-            <h4 className="text-lg font-bold text-white mb-6 uppercase tracking-wider">
+            <h4 className="text-lg font-bold text-white mb-5 uppercase tracking-wider">
               Liên kết nhanh
             </h4>
-            <ul className="space-y-3 text-sm text-gray-400">
-              {[
-                "Về chúng tôi",
-                "Dịch vụ vận chuyển",
-                "Bảng giá",
-                "Tuyển dụng tài xế",
-                "Tin tức & Sự kiện",
-              ].map((item, idx) => (
+            <ul className="mt-2 space-y-3 text-sm text-gray-400">
+              {["Về chúng tôi"].map((item, idx) => (
                 <li key={idx}>
                   <Link
-                    to="#"
+                    to="about"
+                    className="hover:text-orange-500 transition-colors flex items-center gap-2"
+                  >
+                    <span className="text-orange-500/50">›</span> {item}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+            <ul className="mt-2 space-y-3 text-sm text-gray-400">
+              {["Dịch vụ vận chuyển"].map((item, idx) => (
+                <li key={idx}>
+                  <Link
+                    to="services/road"
+                    className="hover:text-orange-500 transition-colors flex items-center gap-2"
+                  >
+                    <span className="text-orange-500/50">›</span> {item}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+            <ul className="mt-2 space-y-3 text-sm text-gray-400">
+              {["Bảng giá"].map((item, idx) => (
+                <li key={idx}>
+                  <Link
+                    to="services/price-list"
+                    className="hover:text-orange-500 transition-colors flex items-center gap-2"
+                  >
+                    <span className="text-orange-500/50">›</span> {item}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+            <ul className="mt-2 space-y-3 text-sm text-gray-400 top-1">
+              {["Tuyển dụng tài xế"].map((item, idx) => (
+                <li key={idx}>
+                  <Link
+                    to="/apply-driver"
+                    className="hover:text-orange-500 transition-colors flex items-center gap-2"
+                  >
+                    <span className="text-orange-500/50">›</span> {item}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+            <ul className="mt-2 space-y-3 text-sm text-gray-400">
+              {["Giao hàng hỏa tốc"].map((item, idx) => (
+                <li key={idx}>
+                  <Link
+                    to="services/express"
                     className="hover:text-orange-500 transition-colors flex items-center gap-2"
                   >
                     <span className="text-orange-500/50">›</span> {item}

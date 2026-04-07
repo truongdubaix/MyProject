@@ -93,7 +93,7 @@ export default function ExpressDelivery() {
             </p>
             <div className="flex flex-col sm:flex-row gap-4">
               <Link
-                to="/customer/create"
+                to="/customer/create-order"
                 className="px-8 py-4 bg-red-600 hover:bg-red-700 text-white font-bold rounded-full shadow-lg hover:shadow-red-500/40 transition-all flex items-center justify-center gap-2"
               >
                 Đặt xe Hỏa Tốc <FaArrowRight />
@@ -205,7 +205,7 @@ export default function ExpressDelivery() {
                   ))}
                 </ul>
                 <Link
-                  to="/customer/create"
+                  to="/customer/create-order"
                   className={`block w-full py-3 rounded-xl font-bold text-center transition-all 
                     ${
                       pkg.recommeded
@@ -301,7 +301,7 @@ export default function ExpressDelivery() {
             trội ngay hôm nay.
           </p>
           <Link
-            to="/customer/create"
+            to="/customer/create-order"
             className="inline-block px-10 py-4 bg-white text-red-600 font-bold rounded-full shadow-lg hover:shadow-xl transition-all transform hover:-translate-y-1"
           >
             Tạo đơn Hỏa tốc ngay

@@ -79,7 +79,7 @@ export default function ComingSoon({ title = "Dịch vụ mới", icon }) {
 
       {/* Footer text */}
       <p className="absolute bottom-8 text-gray-500 text-sm">
-        © 2024 SpeedyShip. All rights reserved.
+        © 2026 SpeedyShip. All rights reserved.
       </p>
     </div>
   );

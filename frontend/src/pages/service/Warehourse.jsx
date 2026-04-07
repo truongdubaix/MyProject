@@ -305,7 +305,7 @@ export default function Warehouse() {
           </p>
           <div className="flex flex-col sm:flex-row justify-center gap-4">
             <Link
-              to="/customer/create"
+              to="/customer/create-order"
               className="px-8 py-3 bg-orange-500 hover:bg-orange-600 text-white font-bold rounded-full shadow-lg hover:shadow-orange-500/30 transition-all flex items-center justify-center gap-2"
             >
               Tạo đơn hàng ngay <FaArrowRight />
