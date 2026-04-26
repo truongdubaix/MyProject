@@ -4,7 +4,7 @@ export default function ServicePlans({ onCreate }) {
   const navigate = useNavigate();
 
   const handleCreateShipment = () => {
-    // Nếu cha truyền callback xuống → ưu tiên
+
     if (onCreate) return onCreate();
 
     const role = localStorage.getItem("role");

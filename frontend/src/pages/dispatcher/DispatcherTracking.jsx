@@ -4,34 +4,35 @@ import toast from "react-hot-toast";
 import API from "../../services/api";
 import { Truck, MapPin, Calendar, Activity, ArrowRight } from "lucide-react";
 
-// 👇 SỬA LẠI ĐƯỜNG DẪN IMPORT Ở ĐÂY (Bỏ chữ common đi)
+
 import Pagination from "../../components/Pagination";
 
+// Theo dõi vận chuyển thời gian thực
 export default function DispatcherTracking() {
   const navigate = useNavigate();
 
   const [assignments, setAssignments] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  // ===== PAGINATION STATE =====
+
   const ITEMS_PER_PAGE = 10;
   const [page, setPage] = useState(1);
 
-  // Tính toán dữ liệu phân trang
+
   const totalPages = Math.ceil(assignments.length / ITEMS_PER_PAGE);
   const paginatedAssignments = assignments.slice(
     (page - 1) * ITEMS_PER_PAGE,
     page * ITEMS_PER_PAGE
   );
 
-  // ================== LẤY DỮ LIỆU ==================
+
+// Tải dữ liệu từ server
   const fetchData = async () => {
     setLoading(true);
     try {
       const res = await API.get("/dispatcher/assignments");
       setAssignments(res.data);
     } catch (err) {
-      console.error("❌ Lỗi load dữ liệu:", err);
       toast.error("Không thể tải danh sách vận đơn!");
     } finally {
       setLoading(false);
@@ -42,7 +43,8 @@ export default function DispatcherTracking() {
     fetchData();
   }, []);
 
-  // ================== CẬP NHẬT TRẠNG THÁI ==================
+
+// Cập nhật trạng thái
   const handleStatusUpdate = async (id, status, e) => {
     e.stopPropagation();
     try {
@@ -50,12 +52,12 @@ export default function DispatcherTracking() {
       toast.success("Cập nhật trạng thái thành công!");
       fetchData();
     } catch (err) {
-      console.error("❌ updateStatus error:", err);
       toast.error("Lỗi khi cập nhật!");
     }
   };
 
-  // ================== XỬ LÝ CLICK DÒNG ==================
+
+// Xử lý click vào dòng bảng
   const handleRowClick = (shipmentId) => {
     navigate(`/dispatcher/tracking/${shipmentId}`);
   };
@@ -81,7 +83,7 @@ export default function DispatcherTracking() {
         </div>
       </div>
 
-      {/* DANH SÁCH ĐƠN ĐANG GIAO */}
+      {}
       <div className="bg-white rounded-xl shadow-sm border border-gray-200 flex flex-col">
         <div className="overflow-x-auto">
           <table className="w-full text-sm text-left">
@@ -108,7 +110,7 @@ export default function DispatcherTracking() {
                     onClick={() => handleRowClick(a.shipment_id)}
                     className="hover:bg-blue-50/50 cursor-pointer transition-colors group"
                   >
-                    {/* Cột thông tin đơn */}
+                    {}
                     <td className="px-6 py-4">
                       <div className="font-bold text-[#113e48] text-base mb-1">
                         {a.tracking_code}
@@ -124,7 +126,7 @@ export default function DispatcherTracking() {
                       </div>
                     </td>
 
-                    {/* Cột Tài xế */}
+                    {}
                     <td className="px-6 py-4">
                       <div className="font-medium text-gray-800">
                         {a.driver_name}
@@ -134,7 +136,7 @@ export default function DispatcherTracking() {
                       </div>
                     </td>
 
-                    {/* Cột Địa chỉ */}
+                    {}
                     <td className="px-6 py-4 max-w-[250px]">
                       <div className="flex items-start gap-2">
                         <MapPin
@@ -156,7 +158,7 @@ export default function DispatcherTracking() {
                       </div>
                     </td>
 
-                    {/* Cột Trạng thái */}
+                    {}
                     <td className="px-6 py-4 text-center">
                       <span
                         className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold border ${
@@ -169,19 +171,17 @@ export default function DispatcherTracking() {
                             : "bg-blue-50 text-blue-700 border-blue-200"
                         }`}
                       >
-                        {a.assignment_status === "assigned"
-                          ? "Đã gán"
-                          : a.assignment_status === "picking"
-                          ? "Đang lấy"
-                          : a.assignment_status === "delivering"
-                          ? "Đang giao"
-                          : a.assignment_status === "completed"
-                          ? "Hoàn tất"
-                          : a.assignment_status}
+                      {({
+                          assigned: "Đã gán",
+                          picking: "Đang lấy hàng",
+                          delivering: "Đang giao",
+                          completed: "Hoàn tất",
+                          failed: "Giao thất bại",
+                        }[a.assignment_status] || a.assignment_status)}
                       </span>
                     </td>
 
-                    {/* Cột Hành động */}
+                    {}
                     <td className="px-6 py-4 text-center">
                       <div
                         className="relative inline-block"
@@ -229,7 +229,7 @@ export default function DispatcherTracking() {
           </table>
         </div>
 
-        {/* 👇 GỌI COMPONENT PHÂN TRANG */}
+        {}
         <Pagination
           currentPage={page}
           totalPages={totalPages}

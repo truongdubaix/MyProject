@@ -15,6 +15,7 @@ import {
 } from "lucide-react";
 import Pagination from "../../components/Pagination";
 
+// Quản lý liên hệ từ khách
 export default function AdminContacts() {
   const [contacts, setContacts] = useState([]);
   const [dispatchers, setDispatchers] = useState([]);
@@ -23,17 +24,17 @@ export default function AdminContacts() {
   const [search, setSearch] = useState("");
   const [loading, setLoading] = useState(true);
 
-  // Modal State
+
   const [showAssignModal, setShowAssignModal] = useState(false);
   const [showDetailModal, setShowDetailModal] = useState(false);
   const [selectedContact, setSelectedContact] = useState(null);
   const [selectedDispatcher, setSelectedDispatcher] = useState("");
 
-  // Pagination State
+
   const [page, setPage] = useState(1);
   const itemsPerPage = 8;
 
-  // 🔹 1. Fetch Data
+
   const fetchContacts = async () => {
     setLoading(true);
     try {
@@ -61,7 +62,7 @@ export default function AdminContacts() {
     fetchDispatchers();
   }, []);
 
-  // 🔍 2. Filter Logic
+
   useEffect(() => {
     const keyword = search.toLowerCase();
     const result = contacts.filter(
@@ -74,7 +75,8 @@ export default function AdminContacts() {
     setPage(1);
   }, [search, contacts]);
 
-  // 📦 3. Giao điều phối viên
+
+// Xử lý phân công đơn hàng
   const handleAssign = async () => {
     if (!selectedDispatcher) {
       toast.error("Vui lòng chọn điều phối viên!");
@@ -94,7 +96,8 @@ export default function AdminContacts() {
     }
   };
 
-  // 🎨 Helper: Badge Status (Đã sửa lỗi xuống dòng)
+
+// Tạo badge hiển thị trạng thái
   const getStatusBadge = (status) => {
     const map = {
       pending: {
@@ -119,7 +122,7 @@ export default function AdminContacts() {
     };
 
     return (
-      // Sử dụng inline-flex và whitespace-nowrap để giữ trên 1 dòng
+
       <span
         className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-bold border whitespace-nowrap ${s.color}`}
       >
@@ -128,14 +131,14 @@ export default function AdminContacts() {
     );
   };
 
-  // Pagination Logic
+
   const totalPages = Math.ceil(filtered.length / itemsPerPage);
   const startIndex = (page - 1) * itemsPerPage;
   const currentContacts = filtered.slice(startIndex, startIndex + itemsPerPage);
 
   return (
     <div className="space-y-6 animate-in fade-in duration-500 font-sans">
-      {/* HEADER & SEARCH */}
+      {}
       <div className="bg-white p-5 rounded-xl shadow-sm border border-gray-100 flex flex-col sm:flex-row justify-between items-center gap-4">
         <div>
           <h1 className="text-xl font-bold text-[#113e48] flex items-center gap-2">
@@ -163,7 +166,7 @@ export default function AdminContacts() {
         </div>
       </div>
 
-      {/* TABLE */}
+      {}
       <div className="bg-white border border-gray-100 rounded-xl shadow-sm overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full text-sm text-left">
@@ -271,7 +274,7 @@ export default function AdminContacts() {
           </table>
         </div>
 
-        {/* Pagination */}
+        {}
         <Pagination
           currentPage={page}
           totalPages={totalPages}
@@ -279,7 +282,7 @@ export default function AdminContacts() {
         />
       </div>
 
-      {/* 🧩 Modal Giao Điều Phối Viên */}
+      {}
       {showAssignModal && (
         <div className="fixed inset-0 bg-black/40 flex justify-center items-center z-50 backdrop-blur-sm animate-in fade-in">
           <div className="bg-white p-6 rounded-2xl shadow-2xl w-full max-w-sm">
@@ -327,11 +330,11 @@ export default function AdminContacts() {
         </div>
       )}
 
-      {/* 👁️ Modal Chi tiết */}
+      {}
       {showDetailModal && (
         <div className="fixed inset-0 bg-black/40 flex justify-center items-center z-50 backdrop-blur-sm animate-in fade-in">
           <div className="bg-white p-0 rounded-2xl shadow-2xl w-full max-w-lg overflow-hidden">
-            {/* Header */}
+            {}
             <div className="bg-gray-50 px-6 py-4 border-b border-gray-100 flex justify-between items-center">
               <h2 className="text-lg font-bold text-[#113e48] flex items-center gap-2">
                 <MessageSquare size={18} className="text-orange-500" /> Chi tiết
@@ -345,7 +348,7 @@ export default function AdminContacts() {
               </button>
             </div>
 
-            {/* Body */}
+            {}
             <div className="p-6 space-y-4">
               <div className="flex items-start gap-4">
                 <div className="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 font-bold shrink-0">
@@ -375,9 +378,9 @@ export default function AdminContacts() {
                 </p>
               </div>
 
-              {/* Phần trạng thái và ghi chú - Đã tách 2 hàng */}
+              {}
               <div className="flex flex-col gap-4 pt-4 border-t border-dashed mt-4">
-                {/* Hàng 1: Trạng thái */}
+                {}
                 <div className="flex items-center gap-2 text-sm">
                   <span className="font-bold text-[#113e48]">
                     Trạng thái xử lý:
@@ -385,7 +388,7 @@ export default function AdminContacts() {
                   {getStatusBadge(selectedContact?.status)}
                 </div>
 
-                {/* Hàng 2: Ghi chú (nếu có) */}
+                {}
                 {selectedContact?.note && (
                   <div className="flex flex-col gap-1 bg-yellow-50 p-3 rounded-lg border border-yellow-100">
                     <span className="text-xs font-bold text-red-500 uppercase">
@@ -399,7 +402,7 @@ export default function AdminContacts() {
               </div>
             </div>
 
-            {/* Footer */}
+            {}
             <div className="px-6 py-4 bg-gray-50 border-t border-gray-100 flex justify-end">
               <button
                 onClick={() => setShowDetailModal(false)}

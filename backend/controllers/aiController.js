@@ -9,15 +9,15 @@ export const askBot = async (req, res) => {
 
     const msg = message.toLowerCase();
 
-    // Intent 1: hỏi trạng thái đơn hàng
+
     const askTrackingIntent =
       /(đơn.*đâu|đang ở đâu|tới đâu rồi|đơn hàng của tôi|đơn của tôi)/i;
 
-    // 1. KIỂM TRA MÃ VẬN ĐƠN SPxxxxxx
+
 
     const codeMatch = message.toUpperCase().match(/SP[0-9]{6,}/);
 
-    // Nếu hỏi đơn nhưng chưa có mã
+
     if (askTrackingIntent.test(msg) && !codeMatch) {
       return res.json({
         reply:
@@ -25,7 +25,7 @@ export const askBot = async (req, res) => {
       });
     }
 
-    // Nếu có mã → trả về chi tiết đơn hàng
+
     if (codeMatch) {
       const trackingCode = codeMatch[0];
 
@@ -56,9 +56,9 @@ http://localhost:5173/tracking?code=${trackingCode}
       }
     }
 
-    // 2. INTENT FAQ (không gửi AI)
 
-    //  Website
+
+
     if (/website|web|trang web|link web|liên hệ website/.test(msg)) {
       return res.json({
         reply: `
@@ -70,7 +70,7 @@ https://speedyship.vn
       });
     }
 
-    // Hotline
+
     if (/hotline|sdt|số điện thoại|gọi điện|tư vấn/.test(msg)) {
       return res.json({
         reply: `
@@ -80,7 +80,7 @@ https://speedyship.vn
       });
     }
 
-    // Email
+
     if (/email|mail|gửi mail|hỗ trợ mail|support/.test(msg)) {
       return res.json({
         reply: `
@@ -92,7 +92,7 @@ support@speedyship.vn
       });
     }
 
-    // Facebook/Fanpage
+
     if (/facebook|fanpage|page|fb/.test(msg)) {
       return res.json({
         reply: `
@@ -104,7 +104,7 @@ https://facebook.com/speedyship.vn
       });
     }
 
-    // Địa chỉ văn phòng
+
     if (/địa chỉ|văn phòng|ở đâu|tới đâu/i.test(msg)) {
       return res.json({
         reply: `
@@ -115,7 +115,7 @@ https://facebook.com/speedyship.vn
       });
     }
 
-    // Giờ làm việc
+
     if (/giờ mở cửa|giờ làm việc|làm lúc nào/.test(msg)) {
       return res.json({
         reply: `
@@ -125,7 +125,7 @@ https://facebook.com/speedyship.vn
       });
     }
 
-    // 🔮 3. Không thuộc FAQ → gọi Groq AI
+
 
     const GROQ_API_KEY = process.env.GROQ_API_KEY;
 
@@ -164,7 +164,6 @@ Thông tin mẫu:
       reply: response.data.choices[0].message.content,
     });
   } catch (err) {
-    console.error("❌ Bot error:", err.response?.data || err.message);
     return res.status(500).json({ error: "Chatbot bị lỗi" });
   }
 };

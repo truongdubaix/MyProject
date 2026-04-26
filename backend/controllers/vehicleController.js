@@ -1,9 +1,8 @@
 import db from "../config/db.js";
 
-// ==========================================
-// 1. LẤY DỮ LIỆU XE
-// ==========================================
 
+
+// Lấy danh sách phương tiện
 export const getAllVehicles = async (req, res) => {
   try {
     const [rows] = await db.query(`
@@ -19,16 +18,14 @@ export const getAllVehicles = async (req, res) => {
       ORDER BY v.id DESC
     `);
 
-    // Map lại key để frontend dễ dùng (capacity_kg -> capacity) nếu muốn,
-    // hoặc frontend dùng trực tiếp capacity_kg
+
     const data = rows.map((r) => ({
       ...r,
-      capacity: r.capacity_kg, // Frontend đang dùng .capacity nên map lại cho khớp
+      capacity: r.capacity_kg,
     }));
 
     res.json(data);
   } catch (error) {
-    console.error("❌ Lỗi getAllVehicles:", error);
     res.status(500).json({ message: "Lỗi khi lấy danh sách xe" });
   }
 };
@@ -44,29 +41,27 @@ export const getAvailableVehicles = async (req, res) => {
     `);
     res.json(rows);
   } catch (error) {
-    console.error("❌ Lỗi getAvailableVehicles:", error);
     res.status(500).json({ message: "Lỗi khi lấy danh sách xe trống" });
   }
 };
 
-// ==========================================
-// 2. CHỨC NĂNG THÊM / SỬA / XÓA (CRUD)
-// ==========================================
 
-// 🔹 Thêm xe mới
+
+
+// Thêm phương tiện mới
 export const createVehicle = async (req, res) => {
   try {
-    // Frontend gửi lên: { plate_no, type, capacity, status }
+
     const { plate_no, type, capacity, status } = req.body;
 
-    // Validate cơ bản
+
     if (!plate_no || !type) {
       return res
         .status(400)
         .json({ message: "Thiếu thông tin biển số hoặc loại xe" });
     }
 
-    // Kiểm tra biển số trùng
+
     const [exist] = await db.query(
       "SELECT id FROM vehicles WHERE plate_no = ?",
       [plate_no]
@@ -75,10 +70,10 @@ export const createVehicle = async (req, res) => {
       return res.status(400).json({ message: "Biển số xe đã tồn tại!" });
     }
 
-    // Xử lý capacity (nếu rỗng thì cho = 0)
+
     const capValue = capacity ? parseFloat(capacity) : 0;
 
-    // ✅ SỬA: Đổi 'capacity' thành 'capacity_kg' trong câu INSERT
+
     await db.query(
       "INSERT INTO vehicles (plate_no, type, capacity_kg, status, created_at) VALUES (?, ?, ?, ?, NOW())",
       [plate_no, type, capValue, status || "available"]
@@ -86,18 +81,18 @@ export const createVehicle = async (req, res) => {
 
     res.json({ message: "✅ Thêm phương tiện thành công" });
   } catch (err) {
-    console.error("❌ Lỗi createVehicle:", err); // Xem log này trong terminal VS Code để biết chi tiết lỗi
     res.status(500).json({ message: "Lỗi khi thêm xe: " + err.message });
   }
 };
 
-// 🔹 Cập nhật thông tin xe
+
+// Cập nhật thông tin phương tiện
 export const updateVehicle = async (req, res) => {
   try {
     const { plate_no, type, capacity, status } = req.body;
     const { id } = req.params;
 
-    // Kiểm tra biển số trùng (nếu thay đổi biển số)
+
     const [exist] = await db.query(
       "SELECT id FROM vehicles WHERE plate_no = ? AND id != ?",
       [plate_no, id]
@@ -107,7 +102,7 @@ export const updateVehicle = async (req, res) => {
 
     const capValue = capacity ? parseFloat(capacity) : 0;
 
-    // ✅ SỬA: Đổi 'capacity' thành 'capacity_kg'
+
     await db.query(
       "UPDATE vehicles SET plate_no=?, type=?, capacity_kg=?, status=?, updated_at=NOW() WHERE id=?",
       [plate_no, type, capValue, status, id]
@@ -115,17 +110,17 @@ export const updateVehicle = async (req, res) => {
 
     res.json({ message: "✅ Cập nhật xe thành công" });
   } catch (err) {
-    console.error("❌ Lỗi updateVehicle:", err);
     res.status(500).json({ message: "Lỗi khi cập nhật xe" });
   }
 };
 
-// 🔹 Xóa xe
+
+// Xóa phương tiện
 export const deleteVehicle = async (req, res) => {
   try {
     const { id } = req.params;
 
-    // Kiểm tra xe đang được dùng không
+
     const [driver] = await db.query(
       "SELECT id, name FROM drivers WHERE vehicle_id = ?",
       [id]
@@ -139,7 +134,6 @@ export const deleteVehicle = async (req, res) => {
     await db.query("DELETE FROM vehicles WHERE id=?", [id]);
     res.json({ message: "🗑️ Đã xóa phương tiện" });
   } catch (err) {
-    console.error("❌ Lỗi deleteVehicle:", err);
     res.status(500).json({ message: "Lỗi khi xóa xe" });
   }
 };

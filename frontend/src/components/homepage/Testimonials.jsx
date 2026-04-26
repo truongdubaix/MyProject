@@ -1,7 +1,7 @@
 import React from "react";
 import { FaStar, FaQuoteLeft, FaBoxOpen } from "react-icons/fa";
 
-// Dữ liệu mẫu
+
 const testimonialsData = [
   {
     id: 1,
@@ -35,15 +35,15 @@ const testimonialsData = [
   },
 ];
 
-// Component hiển thị sao (Đã sửa thành MÀU VÀNG)
+
 const RatingStars = ({ rating }) => (
   <div className="flex gap-1 text-yellow-400 mb-3 text-sm">
     {" "}
-    {/* 🔥 Sửa text-[#113e48] thành text-yellow-400 */}
+    {}
     {[...Array(5)].map((_, i) => (
       <FaStar
         key={i}
-        // Nếu số sao < rating thì hiện màu vàng, ngược lại hiện màu xám mờ
+
         className={i < rating ? "opacity-100" : "text-gray-300"}
       />
     ))}
@@ -54,26 +54,26 @@ export default function TestimonialsSection() {
   return (
     <section className="py-20 bg-white font-sans">
       <div className="max-w-7xl mx-auto px-6">
-        {/* HEADER SECTION */}
+        {}
         <div className="mb-12" data-aos="fade-up">
-          {/* Nút Tag "Phản hồi" màu cam */}
+          {}
           <div className="inline-flex items-center gap-2 bg-orange-100 text-orange-600 px-4 py-2 rounded-full font-bold text-sm uppercase tracking-wide mb-4 shadow-sm border border-orange-200">
             <FaBoxOpen /> <span>Phản hồi</span>
           </div>
 
-          {/* Tiêu đề lớn */}
+          {}
           <h2 className="text-3xl md:text-5xl font-extrabold text-[#113e48] mb-4 uppercase tracking-tight">
             ĐÁNH GIÁ TỪ KHÁCH HÀNG
           </h2>
 
-          {/* Mô tả */}
+          {}
           <p className="text-gray-500 max-w-2xl text-lg">
             Những chia sẻ chân thực từ khách hàng đã sử dụng dịch vụ SpeedyShip
             là minh chứng rõ nhất cho chất lượng và cam kết của chúng tôi.
           </p>
         </div>
 
-        {/* GRID CARDS */}
+        {}
         <div className="grid md:grid-cols-3 gap-8">
           {testimonialsData.map((item, i) => (
             <div
@@ -82,9 +82,9 @@ export default function TestimonialsSection() {
               data-aos="fade-up"
               data-aos-delay={i * 100}
             >
-              {/* Header Card: Ảnh + Tiêu đề + Sao */}
+              {}
               <div className="flex items-start gap-4 mb-4">
-                {/* Quote icon mờ làm nền trang trí */}
+                {}
                 <FaQuoteLeft className="text-4xl text-gray-200 shrink-0 group-hover:text-orange-200 transition-colors" />
 
                 <div>
@@ -95,12 +95,12 @@ export default function TestimonialsSection() {
                 </div>
               </div>
 
-              {/* Nội dung đánh giá */}
+              {}
               <p className="text-gray-600 text-sm leading-relaxed mb-8 min-h-[80px]">
                 "{item.content}"
               </p>
 
-              {/* User Info (Avatar + Tên) */}
+              {}
               <div className="flex items-center gap-3 pt-6 border-t border-gray-200">
                 <img
                   src={item.avatar}

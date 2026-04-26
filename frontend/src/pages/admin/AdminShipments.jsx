@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
 import API from "../../services/api";
-// Import component chọn địa chỉ (Đảm bảo đường dẫn đúng)
+
 import DiaChiSelector from "../../components/DiaChiSelector";
 import {
   Plus,
@@ -19,6 +19,7 @@ import {
 } from "lucide-react";
 import Pagination from "../../components/Pagination";
 
+// Quản lý tất cả đơn hàng
 export default function AdminShipments() {
   const [shipments, setShipments] = useState([]);
   const [filtered, setFiltered] = useState([]);
@@ -28,7 +29,7 @@ export default function AdminShipments() {
   const [showForm, setShowForm] = useState(false);
   const [editing, setEditing] = useState(null);
 
-  // Form state
+
   const [form, setForm] = useState({
     tracking_code: "",
     sender_name: "",
@@ -50,7 +51,8 @@ export default function AdminShipments() {
   const perPage = 8;
   const totalPages = Math.ceil(filtered.length / perPage);
 
-  // 🔹 1. Fetch Data
+
+// Tải danh sách đơn hàng
   const fetchShipments = async () => {
     setLoading(true);
     try {
@@ -68,7 +70,7 @@ export default function AdminShipments() {
     fetchShipments();
   }, []);
 
-  // 🔹 2. Filter Logic
+
   useEffect(() => {
     const keyword = search.toLowerCase();
     const filteredData = shipments.filter(
@@ -85,7 +87,7 @@ export default function AdminShipments() {
   const handleChange = (e) =>
     setForm({ ...form, [e.target.name]: e.target.value });
 
-  // 🔹 3. Xử lý khi chọn địa chỉ từ Component con
+
   const handlePickupAddressChange = (data) => {
     setForm((prev) => ({
       ...prev,
@@ -104,7 +106,8 @@ export default function AdminShipments() {
     }));
   };
 
-  // 🔹 4. Submit Form
+
+// Xử lý submit form
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
@@ -123,7 +126,8 @@ export default function AdminShipments() {
     }
   };
 
-  // 🔹 5. Delete Item
+
+// Xử lý xóa dữ liệu
   const handleDelete = async (id) => {
     if (confirm("Xóa đơn hàng này khỏi hệ thống?")) {
       try {
@@ -138,7 +142,8 @@ export default function AdminShipments() {
 
   const paginatedData = filtered.slice((page - 1) * perPage, page * perPage);
 
-  // 🎨 Status Badge Helper (Việt hóa)
+
+// Tạo badge hiển thị trạng thái
   const getStatusBadge = (status) => {
     const styles = {
       pending: "bg-yellow-100 text-yellow-800 border-yellow-200",
@@ -175,7 +180,7 @@ export default function AdminShipments() {
 
   return (
     <div className="space-y-6 animate-in fade-in duration-500 font-sans">
-      {/* --- HEADER --- */}
+      {}
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-white p-5 rounded-xl border border-gray-100 shadow-sm">
         <div>
           <h1 className="text-xl font-bold text-[#113e48] flex items-center gap-2">
@@ -226,7 +231,7 @@ export default function AdminShipments() {
         </div>
       </div>
 
-      {/* --- TABLE --- */}
+      {}
       <div className="bg-white border border-gray-100 rounded-xl shadow-sm overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full text-sm text-left">
@@ -278,7 +283,7 @@ export default function AdminShipments() {
                     key={s.id}
                     className="hover:bg-gray-50/50 transition-colors group"
                   >
-                    {/* Cột Mã */}
+                    {}
                     <td className="px-6 py-4">
                       <span className="font-bold text-[#113e48] text-base">
                         #{s.tracking_code}
@@ -289,7 +294,7 @@ export default function AdminShipments() {
                       </p>
                     </td>
 
-                    {/* Cột Gửi */}
+                    {}
                     <td className="px-6 py-4 max-w-[200px]">
                       <div className="flex items-center gap-2 mb-1">
                         <User size={14} className="text-gray-400" />
@@ -320,7 +325,7 @@ export default function AdminShipments() {
                       </div>
                     </td>
 
-                    {/* Cột Nhận */}
+                    {}
                     <td className="px-6 py-4 max-w-[200px]">
                       <div className="flex items-center gap-2 mb-1">
                         <User size={14} className="text-gray-400" />
@@ -351,12 +356,12 @@ export default function AdminShipments() {
                       </div>
                     </td>
 
-                    {/* Cột Trạng thái */}
+                    {}
                     <td className="px-6 py-4 text-center">
                       {getStatusBadge(s.status)}
                     </td>
 
-                    {/* Cột COD */}
+                    {}
                     <td className="px-6 py-4 text-right">
                       <span className="font-bold text-[#113e48]">
                         {Number(s.cod_amount).toLocaleString("vi-VN")}
@@ -364,7 +369,7 @@ export default function AdminShipments() {
                       <span className="text-xs text-gray-400 ml-1">₫</span>
                     </td>
 
-                    {/* Cột Thao tác */}
+                    {}
                     <td className="px-6 py-4 text-center">
                       <div className="flex items-center justify-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
                         <button
@@ -407,7 +412,7 @@ export default function AdminShipments() {
           </table>
         </div>
 
-        {/* --- PAGINATION --- */}
+        {}
         <Pagination
           currentPage={page}
           totalPages={totalPages}
@@ -415,11 +420,11 @@ export default function AdminShipments() {
         />
       </div>
 
-      {/* --- MODAL FORM --- */}
+      {}
       {showForm && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-[#113e48]/50 backdrop-blur-sm animate-in fade-in duration-200">
           <div className="bg-white rounded-2xl shadow-2xl w-full max-w-3xl overflow-hidden animate-in zoom-in-95 duration-200 flex flex-col max-h-[90vh]">
-            {/* Modal Header */}
+            {}
             <div className="px-6 py-4 border-b border-gray-100 flex justify-between items-center bg-gray-50 shrink-0">
               <div>
                 <h3 className="text-lg font-bold text-[#113e48]">
@@ -437,13 +442,13 @@ export default function AdminShipments() {
               </button>
             </div>
 
-            {/* Modal Body (Scrollable) */}
+            {}
             <form
               onSubmit={handleSubmit}
               className="p-6 overflow-y-auto custom-scrollbar flex-1"
             >
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                {/* Cột Trái: Người Gửi */}
+                {}
                 <div className="space-y-4">
                   <div className="flex items-center gap-2 text-[#113e48] font-bold border-b pb-2 mb-2">
                     <div className="w-6 h-6 rounded-full bg-orange-100 text-orange-600 flex items-center justify-center text-xs">
@@ -491,13 +496,13 @@ export default function AdminShipments() {
                     </div>
                   </div>
 
-                  {/* COMPONENT ĐỊA CHỈ (GỬI) */}
+                  {}
                   <DiaChiSelector
                     label="Địa chỉ lấy hàng"
                     onChange={handlePickupAddressChange}
-                    // Nếu đang edit thì có thể truyền giá trị cũ vào (cần update component con hỗ trợ defaultValue nếu muốn hiển thị lại)
+
                   />
-                  {/* Fallback input nếu component lỗi hoặc muốn sửa tay */}
+                  {}
                   <input
                     name="pickup_address"
                     placeholder="Chi tiết số nhà/đường..."
@@ -507,7 +512,7 @@ export default function AdminShipments() {
                   />
                 </div>
 
-                {/* Cột Phải: Người Nhận */}
+                {}
                 <div className="space-y-4">
                   <div className="flex items-center gap-2 text-[#113e48] font-bold border-b pb-2 mb-2">
                     <div className="w-6 h-6 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center text-xs">
@@ -543,7 +548,7 @@ export default function AdminShipments() {
                     </div>
                   </div>
 
-                  {/* COMPONENT ĐỊA CHỈ (NHẬN) */}
+                  {}
                   <DiaChiSelector
                     label="Địa chỉ giao hàng"
                     onChange={handleDeliveryAddressChange}
@@ -558,7 +563,7 @@ export default function AdminShipments() {
                 </div>
               </div>
 
-              {/* Thông tin hàng hóa (Full width) */}
+              {}
               <div className="mt-6 pt-4 border-t border-dashed border-gray-200">
                 <div className="flex items-center gap-2 text-[#113e48] font-bold mb-4">
                   <div className="w-6 h-6 rounded-full bg-green-100 text-green-600 flex items-center justify-center text-xs">
@@ -626,7 +631,7 @@ export default function AdminShipments() {
               </div>
             </form>
 
-            {/* Modal Footer */}
+            {}
             <div className="px-6 py-4 border-t border-gray-100 flex justify-end gap-3 bg-gray-50 shrink-0">
               <button
                 type="button"

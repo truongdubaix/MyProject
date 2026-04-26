@@ -7,12 +7,13 @@ import {
   Send,
 } from "lucide-react";
 
+// Hỗ trợ khách hàng
 export default function CustomerSupport() {
-  const [activeTab, setActiveTab] = useState("new"); // new | history | faq
+  const [activeTab, setActiveTab] = useState("new");
 
   return (
     <div className="space-y-6 animate-in fade-in duration-500">
-      {/* HEADER */}
+      {}
       <div className="bg-gradient-to-r from-blue-600 to-blue-800 p-8 rounded-2xl text-white shadow-lg relative overflow-hidden">
         <div className="relative z-10">
           <h1 className="text-2xl font-bold mb-2 flex items-center gap-2">
@@ -28,7 +29,7 @@ export default function CustomerSupport() {
         </div>
       </div>
 
-      {/* TABS */}
+      {}
       <div className="flex gap-4 border-b border-gray-200">
         <button
           onClick={() => setActiveTab("new")}
@@ -62,9 +63,9 @@ export default function CustomerSupport() {
         </button>
       </div>
 
-      {/* CONTENT AREA */}
+      {}
       <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 min-h-[400px]">
-        {/* 1. NEW TICKET FORM */}
+        {}
         {activeTab === "new" && (
           <div className="max-w-2xl mx-auto space-y-5">
             <h3 className="text-lg font-bold text-[#113e48] mb-4 text-center">
@@ -111,7 +112,7 @@ export default function CustomerSupport() {
           </div>
         )}
 
-        {/* 2. HISTORY */}
+        {}
         {activeTab === "history" && (
           <div className="text-center py-10">
             <div className="bg-gray-50 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
@@ -121,7 +122,7 @@ export default function CustomerSupport() {
           </div>
         )}
 
-        {/* 3. FAQ */}
+        {}
         {activeTab === "faq" && (
           <div className="space-y-3">
             {[

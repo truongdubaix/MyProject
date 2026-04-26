@@ -10,20 +10,22 @@ import {
   User,
   Package,
 } from "lucide-react";
-// Import component phân trang đã tạo ở bước trước
+
 import Pagination from "../../components/Pagination";
 
+// Quản lý đánh giá phản hồi
 export default function AdminFeedbacks() {
   const [feedbacks, setFeedbacks] = useState([]);
   const [filtered, setFiltered] = useState([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
 
-  // Pagination State
+
   const [page, setPage] = useState(1);
   const itemsPerPage = 8;
 
-  // 📦 1. Fetch Data
+
+// Tải danh sách đánh giá
   const fetchFeedbacks = async () => {
     setLoading(true);
     try {
@@ -41,7 +43,7 @@ export default function AdminFeedbacks() {
     fetchFeedbacks();
   }, []);
 
-  // 🔍 2. Filter Logic
+
   useEffect(() => {
     const keyword = search.toLowerCase();
     const result = feedbacks.filter(
@@ -51,10 +53,11 @@ export default function AdminFeedbacks() {
         f.content?.toLowerCase().includes(keyword)
     );
     setFiltered(result);
-    setPage(1); // Reset về trang 1 khi tìm kiếm
+    setPage(1);
   }, [search, feedbacks]);
 
-  // 🗑️ 3. Delete Handler
+
+// Xử lý xóa dữ liệu
   const handleDelete = async (id) => {
     if (confirm("Bạn có chắc muốn xóa đánh giá này không?")) {
       try {
@@ -67,7 +70,7 @@ export default function AdminFeedbacks() {
     }
   };
 
-  // ⭐ 4. Helper: Render Stars
+
   const renderStars = (rating) => {
     return (
       <div className="flex gap-0.5">
@@ -84,7 +87,7 @@ export default function AdminFeedbacks() {
     );
   };
 
-  // 📦 5. Pagination Logic
+
   const totalPages = Math.ceil(filtered.length / itemsPerPage);
   const startIndex = (page - 1) * itemsPerPage;
   const currentFeedbacks = filtered.slice(
@@ -94,7 +97,7 @@ export default function AdminFeedbacks() {
 
   return (
     <div className="space-y-6 animate-in fade-in duration-500 font-sans">
-      {/* HEADER & SEARCH */}
+      {}
       <div className="bg-white p-5 rounded-xl shadow-sm border border-gray-100 flex flex-col sm:flex-row justify-between items-center gap-4">
         <div>
           <h1 className="text-xl font-bold text-[#113e48] flex items-center gap-2">
@@ -123,7 +126,7 @@ export default function AdminFeedbacks() {
         </div>
       </div>
 
-      {/* TABLE */}
+      {}
       <div className="bg-white border border-gray-100 rounded-xl shadow-sm overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full text-sm text-left">
@@ -210,7 +213,7 @@ export default function AdminFeedbacks() {
           </table>
         </div>
 
-        {/* PAGINATION */}
+        {}
         <Pagination
           currentPage={page}
           totalPages={totalPages}

@@ -1,20 +1,19 @@
-import { useState, useEffect } from "react"; // 1. Import useEffect
+import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { useChat } from "../hooks/useChat"; // 2. Import Context
+import { useChat } from "../hooks/useChat";
 
 import FloatingActions from "./FloatingActions";
 import ChatPopupTop from "./ChatPopupTop";
 import ChatBubble from "./ChatBubble";
 
 export default function ChatLayout() {
-  // --- LẤY DATA TỪ CONTEXT ---
-  // Để lắng nghe khi nào bên ngoài gọi lệnh mở
+
   const { isOpen, activeTab, closeChat } = useChat();
 
-  // State quản lý danh sách chat đang mở (dạng mảng - Logic cũ của bạn)
+
   const [activeChats, setActiveChats] = useState([]);
 
-  // --- HÀM LOCAL: Mở chat ---
+
   const handleOpenChat = (type) => {
     const isAlreadyOpen = activeChats.find((chat) => chat === type);
     if (!isAlreadyOpen) {
@@ -22,18 +21,15 @@ export default function ChatLayout() {
     }
   };
 
-  // --- HÀM LOCAL: Đóng chat ---
+
   const handleCloseChat = (type) => {
     setActiveChats((prev) => prev.filter((chat) => chat !== type));
 
-    // Quan trọng: Khi đóng bằng tay, cũng báo cho Context biết là đã đóng
-    // Để lần sau bấm nút bên ngoài nó còn nhận diện được sự thay đổi
+
     closeChat();
   };
 
-  // --- 🔥 PHẦN MỚI THÊM: ĐỒNG BỘ CONTEXT -> LOCAL STATE ---
-  // Khi bạn bấm nút ở Banner, Context thay đổi (isOpen = true),
-  // useEffect này sẽ bắt được và tự động mở cửa sổ tương ứng.
+
   useEffect(() => {
     if (isOpen) {
       if (activeTab === "ai") {
@@ -79,9 +75,8 @@ export default function ChatLayout() {
         </AnimatePresence>
       </div>
 
-      {/* --- NÚT BẤM (FloatingActions) --- */}
-      {/* Nút này gọi thẳng hàm local handleOpenChat hoặc gọi Context đều được.
-          Ở đây mình gọi local cho nhanh vì đang ở trong component này rồi */}
+      {}
+      {}
       <FloatingActions
         onOpenChatTop={() => handleOpenChat("bot")}
         onOpenChatBubble={() => handleOpenChat("support")}

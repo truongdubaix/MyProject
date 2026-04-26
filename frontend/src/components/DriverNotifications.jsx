@@ -4,16 +4,17 @@ import { motion, AnimatePresence } from "framer-motion";
 import API from "../services/api";
 import { io } from "socket.io-client";
 
-// ⚡ Khởi tạo kết nối socket
+
 const socket = io("http://localhost:5000", { transports: ["websocket"] });
 
+// Thông báo cho tài xế
 export default function DriverNotifications({ driverId }) {
   const [show, setShow] = useState(false);
   const [notifications, setNotifications] = useState([]);
   const [hasNew, setHasNew] = useState(false);
   const dropdownRef = useRef(null);
 
-  // Click ra ngoài để đóng
+
   useEffect(() => {
     function handleClickOutside(event) {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
@@ -24,25 +25,25 @@ export default function DriverNotifications({ driverId }) {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  // 🧾 Lấy danh sách thông báo từ backend
+
+// Tải danh sách thông báo
   const fetchNotifications = async () => {
     try {
       const res = await API.get(`/notifications/driver/${driverId}`);
       setNotifications(res.data);
     } catch (err) {
-      console.error("❌ Lỗi khi tải thông báo:", err);
     }
   };
 
-  // ⚡ Khi mở dropdown lần đầu → load thông báo
+
   useEffect(() => {
     if (show && driverId) fetchNotifications();
   }, [show, driverId]);
 
-  // 🔔 Nhận thông báo realtime từ Socket.io
+
   useEffect(() => {
     if (!driverId) return;
-    socket.emit("registerDriver", driverId); // đăng ký driver
+    socket.emit("registerDriver", driverId);
 
     socket.on("newNotification", (notif) => {
       setHasNew(true);
@@ -60,7 +61,8 @@ export default function DriverNotifications({ driverId }) {
     return () => socket.off("newNotification");
   }, [driverId]);
 
-  // 🔘 Đánh dấu đã đọc
+
+// Đánh dấu thông báo đã đọc
   const markAsRead = async (id) => {
     try {
       await API.put(`/notifications/${id}/read`);
@@ -68,7 +70,6 @@ export default function DriverNotifications({ driverId }) {
         prev.map((n) => (n.id === id ? { ...n, is_read: 1 } : n))
       );
     } catch (err) {
-      console.error("❌ Lỗi khi cập nhật:", err);
     }
   };
 
@@ -76,7 +77,7 @@ export default function DriverNotifications({ driverId }) {
 
   return (
     <div className="relative select-none" ref={dropdownRef}>
-      {/* 🔔 Nút chuông */}
+      {}
       <motion.button
         whileTap={{ scale: 0.9 }}
         animate={hasNew ? { rotate: [0, -15, 15, -15, 15, 0] } : {}}
@@ -101,7 +102,7 @@ export default function DriverNotifications({ driverId }) {
         )}
       </motion.button>
 
-      {/* 📜 Panel thông báo */}
+      {}
       <AnimatePresence>
         {show && (
           <motion.div

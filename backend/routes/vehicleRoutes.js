@@ -1,7 +1,7 @@
 import express from "express";
 import {
   getAllVehicles,
-  getAvailableVehicles, // Thêm hàm này vào route nếu cần dùng riêng
+  getAvailableVehicles,
   createVehicle,
   updateVehicle,
   deleteVehicle,
@@ -10,7 +10,7 @@ import {
 const router = express.Router();
 
 router.get("/", getAllVehicles);
-router.get("/available", getAvailableVehicles); // API lấy xe rảnh
+router.get("/available", getAvailableVehicles);
 router.post("/", createVehicle);
 router.put("/:id", updateVehicle);
 router.delete("/:id", deleteVehicle);

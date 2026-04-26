@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import API from "../../services/api";
 import Pagination from "../../components/Pagination";
 import toast, { Toaster } from "react-hot-toast";
@@ -14,13 +14,83 @@ import {
   Eye,
   Loader2,
   Package,
+  PackageOpen,
   Clock,
   CheckCircle,
   Truck,
   XCircle,
+  Ban,
   Receipt,
+  ChevronDown,
+  ClipboardList,
+  AlertTriangle,
 } from "lucide-react";
 
+const STATUS_OPTIONS = [
+  { value: "all", label: "Tất cả", icon: Filter, color: "text-gray-500", bg: "bg-gray-100" },
+  { value: "pending", label: "Chờ xử lý", icon: Clock, color: "text-yellow-600", bg: "bg-yellow-100" },
+  { value: "assigned", label: "Đã phân công", icon: ClipboardList, color: "text-gray-600", bg: "bg-gray-100" },
+  { value: "picking", label: "Đang lấy hàng", icon: PackageOpen, color: "text-orange-600", bg: "bg-orange-100" },
+  { value: "delivering", label: "Đang giao hàng", icon: Truck, color: "text-blue-600", bg: "bg-blue-100" },
+  { value: "delivered", label: "Đã giao", icon: Package, color: "text-green-600", bg: "bg-green-100" },
+  { value: "completed", label: "Hoàn thành", icon: CheckCircle, color: "text-green-600", bg: "bg-green-100" },
+  { value: "failed", label: "Giao thất bại", icon: AlertTriangle, color: "text-red-600", bg: "bg-red-100" },
+  { value: "cancelled", label: "Đã hủy", icon: Ban, color: "text-gray-500", bg: "bg-gray-100" },
+];
+
+function StatusFilterDropdown({ value, onChange }) {
+  const [open, setOpen] = useState(false);
+  const ref = useRef(null);
+  const selected = STATUS_OPTIONS.find((o) => o.value === value) || STATUS_OPTIONS[0];
+  const SelectedIcon = selected.icon;
+
+  useEffect(() => {
+    const handleClick = (e) => { if (ref.current && !ref.current.contains(e.target)) setOpen(false); };
+    document.addEventListener("mousedown", handleClick);
+    return () => document.removeEventListener("mousedown", handleClick);
+  }, []);
+
+  return (
+    <div className="relative" ref={ref}>
+      <button
+        onClick={() => setOpen(!open)}
+        className="flex items-center gap-2 px-3 py-2.5 border border-gray-200 rounded-xl bg-white hover:border-orange-400 hover:ring-2 hover:ring-orange-500/10 transition-all text-sm font-medium text-gray-700 min-w-[160px] justify-between shadow-sm"
+      >
+        <div className="flex items-center gap-2">
+          <span className={`p-1 rounded-lg ${selected.bg} ${selected.color}`}>
+            <SelectedIcon size={13} />
+          </span>
+          <span>{selected.label}</span>
+        </div>
+        <ChevronDown size={14} className={`text-gray-400 transition-transform duration-200 ${open ? "rotate-180" : ""}`} />
+      </button>
+
+      {open && (
+        <div className="absolute right-0 top-full mt-2 w-56 bg-white border border-gray-100 rounded-2xl shadow-xl z-50 overflow-hidden py-1 animate-in fade-in slide-in-from-top-2 duration-150">
+          {STATUS_OPTIONS.map((opt) => {
+            const Icon = opt.icon;
+            const isActive = opt.value === value;
+            return (
+              <button
+                key={opt.value}
+                onClick={() => { onChange(opt.value); setOpen(false); }}
+                className={`w-full flex items-center gap-3 px-3 py-2.5 text-sm transition-colors hover:bg-orange-50 ${isActive ? "bg-orange-50/60 font-semibold" : ""}`}
+              >
+                <span className={`p-1.5 rounded-lg ${opt.bg} ${opt.color} flex-shrink-0`}>
+                  <Icon size={13} />
+                </span>
+                <span className={isActive ? "text-orange-700" : "text-gray-700"}>{opt.label}</span>
+                {isActive && <span className="ml-auto w-1.5 h-1.5 rounded-full bg-orange-500" />}
+              </button>
+            );
+          })}
+        </div>
+      )}
+    </div>
+  );
+}
+
+// Xuất hóa đơn PDF đơn hàng
 export default function CustomerInvoice() {
   const [shipments, setShipments] = useState([]);
   const [filtered, setFiltered] = useState([]);
@@ -30,7 +100,6 @@ export default function CustomerInvoice() {
   const [downloading, setDownloading] = useState(null);
   const [previewData, setPreviewData] = useState(null);
 
-  // Phân trang
   const [page, setPage] = useState(1);
   const itemsPerPage = 8;
 
@@ -66,76 +135,56 @@ export default function CustomerInvoice() {
       );
     }
     setFiltered(result);
-    setPage(1); // Reset về trang 1 khi filter thay đổi
+    setPage(1);
   }, [filterStatus, search, shipments]);
 
-  // Tính toán phân trang
   const totalPages = Math.ceil(filtered.length / itemsPerPage);
   const startIndex = (page - 1) * itemsPerPage;
   const currentItems = filtered.slice(startIndex, startIndex + itemsPerPage);
 
+// Định dạng số tiền theo chuẩn Việt Nam
   const fmt = (num) => Number(num || 0).toLocaleString("vi-VN");
 
+// Lấy nhãn tên trạng thái tiếng Việt
   const getStatusLabel = (status) => {
     const map = {
       pending: "Chờ xử lý",
+      assigned: "Đã phân công",
       picking: "Đang lấy hàng",
       delivering: "Đang giao",
       delivered: "Đã giao",
-      completed: "Hoàn tất",
-      failed: "Thất bại",
+      completed: "Hoàn thành",
+      failed: "Giao thất bại",
       cancelled: "Đã hủy",
+      express: "Hỏa tốc",
+      standard: "Thường",
+      fast: "Hỏa tốc",
+      normal: "Thường",
     };
     return map[status] || status;
   };
 
+// Tạo badge hiển thị trạng thái
   const getStatusBadge = (status) => {
     const config = {
-      pending: {
-        color: "bg-yellow-100 text-yellow-700 border-yellow-200",
-        icon: <Clock size={12} />,
-      },
-      picking: {
-        color: "bg-orange-100 text-orange-700 border-orange-200",
-        icon: <Package size={12} />,
-      },
-      delivering: {
-        color: "bg-blue-100 text-blue-700 border-blue-200",
-        icon: <Truck size={12} />,
-      },
-      delivered: {
-        color: "bg-green-100 text-green-700 border-green-200",
-        icon: <CheckCircle size={12} />,
-      },
-      completed: {
-        color: "bg-green-100 text-green-700 border-green-200",
-        icon: <CheckCircle size={12} />,
-      },
-      failed: {
-        color: "bg-red-100 text-red-700 border-red-200",
-        icon: <XCircle size={12} />,
-      },
-      cancelled: {
-        color: "bg-gray-100 text-gray-600 border-gray-200",
-        icon: <XCircle size={12} />,
-      },
+      pending: { color: "bg-yellow-100 text-yellow-700 border-yellow-200", icon: <Clock size={12} /> },
+      assigned: { color: "bg-gray-100 text-gray-600 border-gray-200", icon: <Package size={12} /> },
+      picking: { color: "bg-orange-100 text-orange-700 border-orange-200", icon: <Package size={12} /> },
+      delivering: { color: "bg-blue-100 text-blue-700 border-blue-200", icon: <Truck size={12} /> },
+      delivered: { color: "bg-green-100 text-green-700 border-green-200", icon: <CheckCircle size={12} /> },
+      completed: { color: "bg-green-100 text-green-700 border-green-200", icon: <CheckCircle size={12} /> },
+      failed: { color: "bg-red-100 text-red-700 border-red-200", icon: <XCircle size={12} /> },
+      cancelled: { color: "bg-gray-100 text-gray-600 border-gray-200", icon: <XCircle size={12} /> },
     };
-    const s = config[status] || {
-      color: "bg-gray-100 text-gray-600",
-      icon: null,
-    };
+    const s = config[status] || { color: "bg-gray-100 text-gray-600", icon: null };
     return (
-      <span
-        className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-bold border whitespace-nowrap ${s.color}`}
-      >
+      <span className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-bold border whitespace-nowrap ${s.color}`}>
         {s.icon} {getStatusLabel(status)}
       </span>
     );
   };
 
-  // =========================
-  // LOAD FONT TIẾNG VIỆT
-  // =========================
+// Tải font tiếng Việt cho PDF
   const loadVietnameseFont = async (doc) => {
     const toBase64 = (buffer) => {
       const bytes = new Uint8Array(buffer);
@@ -146,22 +195,18 @@ export default function CustomerInvoice() {
       return btoa(binary);
     };
 
-    // Load Regular
     const resRegular = await fetch("/fonts/Roboto-Regular.ttf");
     const bufRegular = await resRegular.arrayBuffer();
     doc.addFileToVFS("Roboto-Regular.ttf", toBase64(bufRegular));
     doc.addFont("Roboto-Regular.ttf", "Roboto", "normal");
 
-    // Load Bold
     const resBold = await fetch("/fonts/Roboto-Bold.ttf");
     const bufBold = await resBold.arrayBuffer();
     doc.addFileToVFS("Roboto-Bold.ttf", toBase64(bufBold));
     doc.addFont("Roboto-Bold.ttf", "Roboto", "bold");
   };
 
-  // =========================
-  // LOGIC XUẤT PDF
-  // =========================
+// Tạo và xuất file PDF hóa đơn
   const generatePDF = async (shipment) => {
     setDownloading(shipment.id);
 
@@ -170,11 +215,9 @@ export default function CustomerInvoice() {
       const pageWidth = doc.internal.pageSize.getWidth();
       const margin = 15;
 
-      // Load font hỗ trợ tiếng Việt
       await loadVietnameseFont(doc);
       doc.setFont("Roboto", "normal");
 
-      // --- HEADER ---
       doc.setFillColor(17, 62, 72);
       doc.rect(0, 0, pageWidth, 45, "F");
 
@@ -188,7 +231,6 @@ export default function CustomerInvoice() {
       doc.text("Hệ thống vận chuyển nhanh & tin cậy", margin, 28);
       doc.text("Hotline: 0236 123 4567 | Email: contact@speedyship.vn", margin, 34);
 
-      // Invoice Title
       doc.setFontSize(11);
       doc.setFont("Roboto", "bold");
       doc.text("HÓA ĐƠN VẬN CHUYỂN", pageWidth - margin, 20, { align: "right" });
@@ -205,11 +247,9 @@ export default function CustomerInvoice() {
         { align: "right" }
       );
 
-      // --- SENDER & RECEIVER INFO ---
       let y = 55;
       const colWidth = (pageWidth - margin * 2) / 2;
 
-      // Sender
       doc.setTextColor(17, 62, 72);
       doc.setFontSize(10);
       doc.setFont("Roboto", "bold");
@@ -226,7 +266,6 @@ export default function CustomerInvoice() {
       );
       doc.text(pickupLines, margin, y + 21);
 
-      // Receiver
       const rxStart = margin + colWidth + 5;
       doc.setTextColor(17, 62, 72);
       doc.setFontSize(10);
@@ -244,14 +283,12 @@ export default function CustomerInvoice() {
       );
       doc.text(deliveryLines, rxStart, y + 21);
 
-      // Dashed line chia
       y += 40;
       doc.setDrawColor(200, 200, 200);
       doc.setLineDashPattern([2, 2], 0);
       doc.line(margin, y, pageWidth - margin, y);
       doc.setLineDashPattern([], 0);
 
-      // --- BẢNG CHI TIẾT HÀNG HÓA ---
       y += 8;
       doc.setTextColor(17, 62, 72);
       doc.setFontSize(10);
@@ -287,7 +324,6 @@ export default function CustomerInvoice() {
         tableLineWidth: 0.2,
       });
 
-      // --- BẢNG THANH TOÁN ---
       const afterTableY = doc.lastAutoTable.finalY + 10;
 
       doc.setTextColor(17, 62, 72);
@@ -333,7 +369,6 @@ export default function CustomerInvoice() {
         tableLineWidth: 0.2,
       });
 
-      // --- TRẠNG THÁI ---
       const afterPayY = doc.lastAutoTable.finalY + 10;
       doc.setFillColor(245, 245, 245);
       doc.roundedRect(margin, afterPayY, pageWidth - margin * 2, 16, 3, 3, "F");
@@ -351,7 +386,6 @@ export default function CustomerInvoice() {
         afterPayY + 13
       );
 
-      // --- FOOTER ---
       const footerY = doc.internal.pageSize.getHeight() - 25;
       doc.setDrawColor(230, 230, 230);
       doc.line(margin, footerY, pageWidth - margin, footerY);
@@ -377,18 +411,16 @@ export default function CustomerInvoice() {
         { align: "center" }
       );
 
-      // SAVE
       doc.save(`HoaDon_${shipment.tracking_code}.pdf`);
       toast.success(`Đã tải hóa đơn ${shipment.tracking_code}`);
     } catch (error) {
-      console.error("PDF Error:", error);
       toast.error("Lỗi khi tạo PDF!");
     } finally {
       setDownloading(null);
     }
   };
 
-  // Xuất nhiều hóa đơn
+// Xuất tất cả hóa đơn
   const exportAll = () => {
     if (filtered.length === 0) return toast.error("Không có đơn nào để xuất!");
     filtered.forEach((s, i) => {
@@ -400,7 +432,7 @@ export default function CustomerInvoice() {
     <div className="animate-in fade-in duration-500 space-y-6 pb-10">
       <Toaster position="top-right" />
 
-      {/* HEADER */}
+      {}
       <div
         className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 bg-white p-5 rounded-2xl shadow-sm border border-gray-100"
         data-aos="fade-up"
@@ -415,7 +447,7 @@ export default function CustomerInvoice() {
         </div>
 
         <div className="flex flex-col sm:flex-row gap-3 w-full md:w-auto">
-          {/* Search */}
+          {}
           <div className="relative group">
             <Search
               className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-orange-500 transition-colors"
@@ -430,29 +462,10 @@ export default function CustomerInvoice() {
             />
           </div>
 
-          {/* Filter */}
-          <div className="relative">
-            <Filter
-              className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"
-              size={16}
-            />
-            <select
-              value={filterStatus}
-              onChange={(e) => setFilterStatus(e.target.value)}
-              className="pl-9 pr-8 py-2.5 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 bg-white cursor-pointer appearance-none w-full sm:w-44 transition-all font-medium text-gray-700"
-            >
-              <option value="all">Tất cả</option>
-              <option value="completed">✅ Hoàn tất</option>
-              <option value="delivered">📦 Đã giao</option>
-              <option value="delivering">🚚 Đang giao</option>
-              <option value="pending">⏳ Chờ xử lý</option>
-            </select>
-            <div className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-gray-400 text-[10px]">
-              ▼
-            </div>
-          </div>
+          {}
+          <StatusFilterDropdown value={filterStatus} onChange={(v) => { setFilterStatus(v); setPage(1); }} />
 
-          {/* Xuất tất cả */}
+          {}
           <button
             onClick={exportAll}
             className="flex items-center gap-2 bg-[#113e48] hover:bg-[#1a5c6a] text-white px-4 py-2.5 rounded-xl text-sm font-bold transition-colors shadow-sm"
@@ -462,7 +475,7 @@ export default function CustomerInvoice() {
         </div>
       </div>
 
-      {/* TABLE */}
+      {}
       <div
         className="bg-white border border-gray-100 rounded-2xl shadow-sm overflow-hidden"
         data-aos="fade-up"
@@ -530,7 +543,7 @@ export default function CustomerInvoice() {
                     </td>
                     <td className="px-6 py-4 text-center">
                       <div className="flex justify-center gap-2">
-                        {/* Preview */}
+                        {}
                         <button
                           onClick={() =>
                             setPreviewData(
@@ -542,7 +555,7 @@ export default function CustomerInvoice() {
                         >
                           <Eye size={16} />
                         </button>
-                        {/* Download PDF */}
+                        {}
                         <button
                           onClick={() => generatePDF(s)}
                           disabled={downloading === s.id}
@@ -570,86 +583,72 @@ export default function CustomerInvoice() {
         />
       </div>
 
-      {/* PREVIEW CARD */}
+      {}
       {previewData && (
-        <div
-          className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 space-y-4"
-          data-aos="fade-up"
-        >
-          <div className="flex justify-between items-center">
-            <h3 className="font-bold text-[#113e48] flex items-center gap-2">
-              <FileText size={20} className="text-orange-500" />
-              Xem trước hóa đơn — {previewData.tracking_code}
+        <div className="fixed bottom-6 right-6 z-50 w-full max-w-lg bg-white rounded-2xl shadow-2xl border border-gray-200 overflow-hidden animate-in slide-in-from-bottom-4 duration-300">
+          {}
+          <div className="flex justify-between items-center px-5 py-3 bg-[#113e48] text-white">
+            <h3 className="font-bold flex items-center gap-2 text-sm">
+              <FileText size={16} className="text-orange-400" />
+              Xem trước — {previewData.tracking_code}
             </h3>
-            <button
-              onClick={() => generatePDF(previewData)}
-              className="flex items-center gap-2 bg-orange-500 hover:bg-orange-600 text-white px-4 py-2 rounded-xl text-sm font-bold transition-colors"
-            >
-              <Download size={16} /> Tải PDF
-            </button>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {/* Người gửi */}
-            <div className="bg-blue-50/50 p-4 rounded-xl border border-blue-100">
-              <p className="text-xs font-bold text-blue-600 uppercase mb-2">
-                Người gửi
-              </p>
-              <p className="font-bold text-[#113e48]">
-                {previewData.sender_name}
-              </p>
-              <p className="text-sm text-gray-600">
-                {previewData.sender_phone}
-              </p>
-              <p className="text-sm text-gray-500 mt-1">
-                {previewData.pickup_address}
-              </p>
-            </div>
-
-            {/* Người nhận */}
-            <div className="bg-green-50/50 p-4 rounded-xl border border-green-100">
-              <p className="text-xs font-bold text-green-600 uppercase mb-2">
-                Người nhận
-              </p>
-              <p className="font-bold text-[#113e48]">
-                {previewData.receiver_name}
-              </p>
-              <p className="text-sm text-gray-600">
-                {previewData.receiver_phone}
-              </p>
-              <p className="text-sm text-gray-500 mt-1">
-                {previewData.delivery_address}
-              </p>
+            <div className="flex items-center gap-2">
+              <button
+                onClick={() => generatePDF(previewData)}
+                className="flex items-center gap-1.5 bg-orange-500 hover:bg-orange-600 text-white px-3 py-1.5 rounded-lg text-xs font-bold transition-colors"
+              >
+                <Download size={13} /> Tải PDF
+              </button>
+              <button
+                onClick={() => setPreviewData(null)}
+                className="text-white/70 hover:text-white transition-colors p-1"
+              >
+                <XCircle size={18} />
+              </button>
             </div>
           </div>
 
-          {/* Tổng tiền */}
-          <div className="bg-[#113e48] text-white p-5 rounded-xl flex justify-between items-center">
-            <div className="space-y-1">
-              <div className="flex justify-between gap-10 text-sm">
-                <span className="text-white/60">Phí vận chuyển:</span>
-                <span className="font-bold">
-                  {fmt(previewData.shipping_fee)}₫
-                </span>
+          {}
+          <div className="p-4 space-y-3 max-h-[60vh] overflow-y-auto">
+            <div className="grid grid-cols-2 gap-3">
+              {}
+              <div className="bg-blue-50 p-3 rounded-xl border border-blue-100">
+                <p className="text-[10px] font-bold text-blue-600 uppercase mb-1">Người gửi</p>
+                <p className="font-bold text-[#113e48] text-sm">{previewData.sender_name}</p>
+                <p className="text-xs text-gray-500">{previewData.sender_phone}</p>
+                <p className="text-xs text-gray-400 mt-1 line-clamp-2">{previewData.pickup_address}</p>
               </div>
-              <div className="flex justify-between gap-10 text-sm">
-                <span className="text-white/60">Thu hộ COD:</span>
-                <span className="font-bold">
-                  {fmt(previewData.cod_amount)}₫
-                </span>
+              {}
+              <div className="bg-green-50 p-3 rounded-xl border border-green-100">
+                <p className="text-[10px] font-bold text-green-600 uppercase mb-1">Người nhận</p>
+                <p className="font-bold text-[#113e48] text-sm">{previewData.receiver_name}</p>
+                <p className="text-xs text-gray-500">{previewData.receiver_phone}</p>
+                <p className="text-xs text-gray-400 mt-1 line-clamp-2">{previewData.delivery_address}</p>
               </div>
             </div>
-            <div className="text-right">
-              <p className="text-[10px] text-orange-400 uppercase font-bold tracking-wider">
-                Tổng thu
-              </p>
-              <p className="text-2xl font-black">
-                {fmt(
-                  Number(previewData.cod_amount) +
-                    Number(previewData.shipping_fee)
-                )}
-                ₫
-              </p>
+
+            {}
+            <div className="bg-[#113e48] text-white p-4 rounded-xl flex justify-between items-center">
+              <div className="space-y-1">
+                <div className="flex justify-between gap-8 text-xs">
+                  <span className="text-white/60">Phí vận chuyển:</span>
+                  <span className="font-bold">{fmt(previewData.shipping_fee)}₫</span>
+                </div>
+                <div className="flex justify-between gap-8 text-xs">
+                  <span className="text-white/60">Thu hộ COD:</span>
+                  <span className="font-bold">{fmt(previewData.cod_amount)}₫</span>
+                </div>
+                <div className="pt-1 border-t border-white/20 flex justify-between gap-8 text-xs">
+                  <span className="text-white/60">Trạng thái:</span>
+                  <span className="font-bold text-orange-300">{getStatusLabel(previewData.status)}</span>
+                </div>
+              </div>
+              <div className="text-right">
+                <p className="text-[10px] text-orange-400 uppercase font-bold tracking-wider">Tổng thu</p>
+                <p className="text-xl font-black">
+                  {fmt(Number(previewData.cod_amount) + Number(previewData.shipping_fee))}₫
+                </p>
+              </div>
             </div>
           </div>
         </div>

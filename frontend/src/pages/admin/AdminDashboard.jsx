@@ -23,18 +23,18 @@ import {
   Award,
 } from "lucide-react";
 
+// Trang tổng quan quản trị hệ thống
 export default function AdminDashboard() {
   const [stats, setStats] = useState(null);
   const [loading, setLoading] = useState(true);
 
+// Tải dữ liệu thống kê
   const fetchStats = async () => {
     try {
-      // Giả lập delay để test loading
-      // await new Promise(resolve => setTimeout(resolve, 1000));
+
       const res = await API.get("/admin/stats");
       setStats(res.data);
     } catch (error) {
-      console.error("Error fetching stats:", error);
     } finally {
       setLoading(false);
     }
@@ -52,12 +52,12 @@ export default function AdminDashboard() {
       </div>
     );
 
-  // Hàm format tiền tệ: 100.000.000 VNĐ
+
   const formatCurrency = (value) => {
     return new Intl.NumberFormat("vi-VN").format(value) + " VNĐ";
   };
 
-  // Xử lý dữ liệu biểu đồ
+
   const shipmentData = stats.shipmentStats.map((s) => ({
     name:
       s.status === "pending"
@@ -74,17 +74,17 @@ export default function AdminDashboard() {
     value: s.count,
     fill:
       s.status === "delivered"
-        ? "#10B981" // Xanh lá
+        ? "#10B981"
         : s.status === "failed"
-        ? "#EF4444" // Đỏ
+        ? "#EF4444"
         : s.status === "delivering"
-        ? "#3B82F6" // Xanh dương
-        : "#F59E0B", // Cam/Vàng
+        ? "#3B82F6"
+        : "#F59E0B",
   }));
 
   return (
     <div className="space-y-8 animate-in fade-in duration-500">
-      {/* Header */}
+      {}
       <div>
         <h1 className="text-2xl font-extrabold text-[#113e48] flex items-center gap-2">
           <Activity className="text-orange-500" /> Tổng quan hệ thống
@@ -94,7 +94,7 @@ export default function AdminDashboard() {
         </p>
       </div>
 
-      {/* 1. Thống kê nhanh (Stats Cards) */}
+      {}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
         <StatCard
           title="Tổng đơn hàng"
@@ -102,7 +102,7 @@ export default function AdminDashboard() {
           icon={<Package size={24} className="text-white" />}
           color="bg-blue-500"
           trend="+12%"
-          to="/admin/shipments" // 👈 Link tới Quản lý đơn hàng
+          to="/admin/shipments"
         />
         <StatCard
           title="Tổng tài xế"
@@ -110,7 +110,7 @@ export default function AdminDashboard() {
           icon={<Truck size={24} className="text-white" />}
           color="bg-orange-500"
           trend="+5%"
-          to="/admin/drivers" // 👈 Link tới Quản lý tài xế
+          to="/admin/drivers"
         />
         <StatCard
           title="Khách hàng"
@@ -118,7 +118,7 @@ export default function AdminDashboard() {
           icon={<Users size={24} className="text-white" />}
           color="bg-purple-500"
           trend="+8%"
-          to="/admin/customers" // 👈 Link tới Quản lý khách hàng
+          to="/admin/customers"
         />
         <StatCard
           title="Doanh thu"
@@ -126,12 +126,12 @@ export default function AdminDashboard() {
           icon={<DollarSign size={24} className="text-white" />}
           color="bg-green-500"
           trend="+20%"
-          to="/admin/payments" // 👈 Link tới Quản lý thanh toán/doanh thu
+          to="/admin/payments"
         />
       </div>
-      {/* 2. Biểu đồ (Charts Section) */}
+      {}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-        {/* Biểu đồ cột: Trạng thái đơn hàng */}
+        {}
         <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
           <h2 className="text-lg font-bold text-[#113e48] mb-6 flex items-center gap-2">
             <span className="w-1 h-6 bg-blue-500 rounded-full"></span>
@@ -170,14 +170,14 @@ export default function AdminDashboard() {
                   radius={[0, 4, 4, 0]}
                   label={{ position: "right", fill: "#6B7280", fontSize: 12 }}
                 >
-                  {/* Tự động fill màu theo config ở trên */}
+                  {}
                 </Bar>
               </BarChart>
             </ResponsiveContainer>
           </div>
         </div>
 
-        {/* Biểu đồ đường: Doanh thu */}
+        {}
         <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
           <h2 className="text-lg font-bold text-[#113e48] mb-6 flex items-center gap-2">
             <span className="w-1 h-6 bg-green-500 rounded-full"></span>
@@ -234,7 +234,7 @@ export default function AdminDashboard() {
         </div>
       </div>
 
-      {/* 3. Top Tài xế */}
+      {}
       <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
         <div className="flex items-center justify-between mb-6">
           <h2 className="text-lg font-bold text-[#113e48] flex items-center gap-2">
@@ -329,7 +329,7 @@ export default function AdminDashboard() {
   );
 }
 
-// --- Component phụ: Thẻ thống kê (Đã sửa) ---
+
 function StatCard({ title, value, icon, color, trend, to }) {
   const content = (
     <>
@@ -353,7 +353,7 @@ function StatCard({ title, value, icon, color, trend, to }) {
     </>
   );
 
-  // Nếu có link 'to', bọc trong thẻ Link
+
   if (to) {
     return (
       <Link
@@ -365,7 +365,7 @@ function StatCard({ title, value, icon, color, trend, to }) {
     );
   }
 
-  // Nếu không có link, render div bình thường
+
   return (
     <div className="bg-white p-5 rounded-2xl shadow-sm border border-gray-100 flex items-start justify-between">
       {content}
@@ -373,7 +373,7 @@ function StatCard({ title, value, icon, color, trend, to }) {
   );
 }
 
-// --- Component phụ: Loading Skeleton ---
+
 function DashboardSkeleton() {
   return (
     <div className="space-y-8 animate-pulse">

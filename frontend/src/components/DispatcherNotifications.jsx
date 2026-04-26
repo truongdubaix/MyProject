@@ -4,16 +4,17 @@ import { motion, AnimatePresence } from "framer-motion";
 import API from "../services/api";
 import { io } from "socket.io-client";
 
-// ⚡ Kết nối socket
+
 const socket = io("http://localhost:5000", { transports: ["websocket"] });
 
+// Thông báo cho điều phối viên
 export default function DispatcherNotifications({ dispatcherId }) {
   const [show, setShow] = useState(false);
   const [notifications, setNotifications] = useState([]);
   const [hasNew, setHasNew] = useState(false);
   const dropdownRef = useRef(null);
 
-  // Click ra ngoài để đóng
+
   useEffect(() => {
     function handleClickOutside(event) {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
@@ -24,22 +25,22 @@ export default function DispatcherNotifications({ dispatcherId }) {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  // 🧾 Lấy danh sách thông báo dispatcher
+
+// Tải danh sách thông báo
   const fetchNotifications = async () => {
     try {
       const res = await API.get(`/notifications/dispatcher/${dispatcherId}`);
       setNotifications(res.data);
     } catch (err) {
-      console.error("❌ Lỗi khi tải thông báo dispatcher:", err);
     }
   };
 
-  // ⚡ Khi mở dropdown → load thông báo
+
   useEffect(() => {
     if (show && dispatcherId) fetchNotifications();
   }, [show, dispatcherId]);
 
-  // 🔔 Đăng ký socket realtime
+
   useEffect(() => {
     if (!dispatcherId) return;
 
@@ -61,7 +62,8 @@ export default function DispatcherNotifications({ dispatcherId }) {
     return () => socket.off("newDispatcherNotification");
   }, [dispatcherId]);
 
-  // 🔘 Đánh dấu đã đọc
+
+// Đánh dấu thông báo đã đọc
   const markAsRead = async (id) => {
     try {
       await API.put(`/notifications/${id}/read`);
@@ -69,7 +71,6 @@ export default function DispatcherNotifications({ dispatcherId }) {
         prev.map((n) => (n.id === id ? { ...n, is_read: 1 } : n))
       );
     } catch (err) {
-      console.error("❌ Lỗi khi đánh dấu đã đọc:", err);
     }
   };
 
@@ -77,7 +78,7 @@ export default function DispatcherNotifications({ dispatcherId }) {
 
   return (
     <div className="relative select-none" ref={dropdownRef}>
-      {/* 🔔 Nút chuông */}
+      {}
       <motion.button
         whileTap={{ scale: 0.9 }}
         animate={hasNew ? { rotate: [0, -15, 15, -15, 15, 0] } : {}}
@@ -102,7 +103,7 @@ export default function DispatcherNotifications({ dispatcherId }) {
         )}
       </motion.button>
 
-      {/* 📜 Panel thông báo */}
+      {}
       <AnimatePresence>
         {show && (
           <motion.div

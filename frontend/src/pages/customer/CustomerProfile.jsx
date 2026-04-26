@@ -22,11 +22,11 @@ import {
   Lock,
   X,
   KeyRound,
-  BookUser, // Icon sổ địa chỉ
-  CheckCircle2, // Icon chọn
+  BookUser,
+  CheckCircle2,
 } from "lucide-react";
 
-/** Helper lấy UserId */
+
 function getCurrentUserId() {
   try {
     const u = localStorage.getItem("user");
@@ -37,11 +37,12 @@ function getCurrentUserId() {
   return localStorage.getItem("userId");
 }
 
+// Hồ sơ cá nhân khách hàng
 export default function CustomerProfile() {
   const navigate = useNavigate();
   const userId = getCurrentUserId();
 
-  // --- STATE HỒ SƠ ---
+
   const [profile, setProfile] = useState({
     name: "",
     email: "",
@@ -56,7 +57,7 @@ export default function CustomerProfile() {
   const [isEditing, setIsEditing] = useState(false);
   const [loading, setLoading] = useState(true);
 
-  // --- STATE ĐỔI MẬT KHẨU ---
+
   const [showPassModal, setShowPassModal] = useState(false);
   const [passData, setPassData] = useState({
     currentPassword: "",
@@ -65,12 +66,12 @@ export default function CustomerProfile() {
   });
   const [passLoading, setPassLoading] = useState(false);
 
-  // --- STATE SỔ ĐỊA CHỈ (Lazy Load) ---
+
   const [showAddressModal, setShowAddressModal] = useState(false);
   const [savedAddresses, setSavedAddresses] = useState([]);
   const [loadingAddresses, setLoadingAddresses] = useState(false);
 
-  // 1. Load Profile
+
   useEffect(() => {
     AOS.init({ duration: 600, once: true });
 
@@ -98,7 +99,6 @@ export default function CustomerProfile() {
           address: data.address || "",
         });
       } catch (err) {
-        console.error(err);
         toast.error("Lỗi tải hồ sơ!");
       } finally {
         setLoading(false);
@@ -108,7 +108,7 @@ export default function CustomerProfile() {
     fetchProfile();
   }, [userId]);
 
-  // 2. Cập nhật hồ sơ
+
   const handleUpdate = async (e) => {
     e.preventDefault();
     try {
@@ -120,7 +120,7 @@ export default function CustomerProfile() {
     }
   };
 
-  // 3. Đổi Avatar
+
   const handleAvatarChange = (e) => {
     const file = e.target.files[0];
     if (file) {
@@ -132,7 +132,7 @@ export default function CustomerProfile() {
     }
   };
 
-  // 4. Đổi Mật Khẩu
+
   const handleChangePassword = async (e) => {
     e.preventDefault();
     if (passData.newPassword !== passData.confirmPassword) {
@@ -162,18 +162,17 @@ export default function CustomerProfile() {
     }
   };
 
-  // 5. Hàm Mở Sổ Địa Chỉ (Lazy Load)
+
   const openAddressBook = async () => {
     setShowAddressModal(true);
 
-    // Chỉ gọi API nếu chưa có dữ liệu
+
     if (savedAddresses.length === 0) {
       setLoadingAddresses(true);
       try {
         const res = await API.get(`/addresses/${userId}`);
         setSavedAddresses(res.data);
       } catch (error) {
-        console.error("Lỗi lấy sổ địa chỉ:", error);
         toast.error("Không tải được sổ địa chỉ");
       } finally {
         setLoadingAddresses(false);
@@ -181,9 +180,9 @@ export default function CustomerProfile() {
     }
   };
 
-  // 6. Chọn địa chỉ từ sổ
+
   const handleSelectAddress = (addr) => {
-    // Ghép địa chỉ đầy đủ (nếu bạn lưu tách biệt thì ghép lại ở đây)
+
     setProfile({ ...profile, address: addr.address });
     setShowAddressModal(false);
     toast.success("Đã chọn địa chỉ!");
@@ -198,7 +197,7 @@ export default function CustomerProfile() {
 
   return (
     <div className="min-h-screen bg-[#F8FAFC] pb-20 font-sans relative">
-      {/* --- BANNER HEADER --- */}
+      {}
       <div className="h-60 bg-gradient-to-r from-[#113e48] to-[#0f2a30] relative overflow-hidden">
         <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] opacity-10"></div>
         <div className="absolute top-0 right-0 w-64 h-64 bg-white/5 rounded-full blur-3xl translate-x-1/2 -translate-y-1/2"></div>
@@ -206,9 +205,9 @@ export default function CustomerProfile() {
 
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 -mt-24 relative z-10">
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          {/* --- CỘT TRÁI: AVATAR & VÍ --- */}
+          {}
           <div className="lg:col-span-1 space-y-6">
-            {/* Card Profile */}
+            {}
             <div
               className="bg-white rounded-3xl shadow-xl p-6 text-center border border-gray-100 relative overflow-visible"
               data-aos="fade-up"
@@ -256,7 +255,7 @@ export default function CustomerProfile() {
                     Điểm tích lũy
                   </p>
                   <p className="text-xl font-extrabold text-orange-500 mt-1">
-                    {/* Giả lập điểm */}
+                    {}
                     {Math.floor(
                       Number(profile.wallet_balance) / 1000
                     ).toLocaleString()}
@@ -265,7 +264,7 @@ export default function CustomerProfile() {
               </div>
             </div>
 
-            {/* Wallet Card */}
+            {}
             <div
               className="bg-gradient-to-br from-[#1e293b] to-[#0f172a] rounded-3xl p-6 text-white shadow-2xl relative overflow-hidden group"
               data-aos="fade-up"
@@ -305,7 +304,7 @@ export default function CustomerProfile() {
             </div>
           </div>
 
-          {/* --- CỘT PHẢI: FORM THÔNG TIN --- */}
+          {}
           <div className="lg:col-span-2" data-aos="fade-left">
             <div className="bg-white rounded-3xl shadow-xl border border-gray-100 p-8 h-full">
               <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
@@ -350,7 +349,7 @@ export default function CustomerProfile() {
                 className={isEditing ? "animate-in fade-in duration-300" : ""}
               >
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6">
-                  {/* Tên */}
+                  {}
                   <div className="space-y-2">
                     <label className="text-sm font-bold text-gray-700">
                       Họ và tên
@@ -375,7 +374,7 @@ export default function CustomerProfile() {
                     </div>
                   </div>
 
-                  {/* SĐT */}
+                  {}
                   <div className="space-y-2">
                     <label className="text-sm font-bold text-gray-700">
                       Số điện thoại
@@ -400,7 +399,7 @@ export default function CustomerProfile() {
                     </div>
                   </div>
 
-                  {/* Email */}
+                  {}
                   <div className="space-y-2 md:col-span-2">
                     <label className="text-sm font-bold text-gray-700 flex justify-between">
                       Email
@@ -421,14 +420,14 @@ export default function CustomerProfile() {
                     </div>
                   </div>
 
-                  {/* --- ĐỊA CHỈ GIAO HÀNG (CÓ NÚT SỔ ĐỊA CHỈ) --- */}
+                  {}
                   <div className="space-y-2 md:col-span-2">
                     <div className="flex justify-between items-end">
                       <label className="text-sm font-bold text-gray-700">
                         Địa chỉ giao hàng mặc định
                       </label>
 
-                      {/* 👇 Nút mở Sổ địa chỉ (Chỉ hiện khi Edit) */}
+                      {}
                       {isEditing && (
                         <button
                           type="button"
@@ -478,7 +477,7 @@ export default function CustomerProfile() {
         </div>
       </div>
 
-      {/* --- MODAL ĐỔI MẬT KHẨU --- */}
+      {}
       {showPassModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm animate-in fade-in duration-200">
           <div className="bg-white rounded-3xl shadow-2xl w-full max-w-md overflow-hidden animate-in zoom-in-95 duration-200">
@@ -573,11 +572,11 @@ export default function CustomerProfile() {
         </div>
       )}
 
-      {/* --- MODAL SỔ ĐỊA CHỈ (RENDER TRỰC TIẾP TRONG FILE) --- */}
+      {}
       {showAddressModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm animate-in fade-in duration-200">
           <div className="bg-white rounded-3xl shadow-2xl w-full max-w-lg overflow-hidden animate-in zoom-in-95 duration-200 flex flex-col max-h-[80vh]">
-            {/* Header Modal */}
+            {}
             <div className="bg-[#113e48] p-5 text-white flex justify-between items-center relative shrink-0">
               <h3 className="text-lg font-bold flex items-center gap-2">
                 <BookUser size={20} /> Chọn từ sổ địa chỉ
@@ -590,7 +589,7 @@ export default function CustomerProfile() {
               </button>
             </div>
 
-            {/* Body Modal */}
+            {}
             <div className="p-4 overflow-y-auto flex-1 bg-gray-50/50">
               {loadingAddresses ? (
                 <div className="flex flex-col items-center justify-center py-10 text-gray-400">

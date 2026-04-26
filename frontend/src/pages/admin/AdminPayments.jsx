@@ -4,17 +4,18 @@ import toast from "react-hot-toast";
 import { CreditCard, Search, Trash2, DollarSign, Wallet } from "lucide-react";
 import Pagination from "../../components/Pagination";
 
+// Quản lý thanh toán
 export default function AdminPayments() {
   const [payments, setPayments] = useState([]);
   const [filtered, setFiltered] = useState([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
 
-  // 🧭 State Phân trang
-  const [page, setPage] = useState(1);
-  const perPage = 8; // Số lượng item mỗi trang
 
-  // 🧾 Lấy danh sách thanh toán
+  const [page, setPage] = useState(1);
+  const perPage = 8;
+
+
   const fetchPayments = async () => {
     setLoading(true);
     try {
@@ -32,7 +33,7 @@ export default function AdminPayments() {
     fetchPayments();
   }, []);
 
-  // 🔍 Filter Logic
+
   useEffect(() => {
     const keyword = search.toLowerCase();
     const result = payments.filter(
@@ -41,10 +42,10 @@ export default function AdminPayments() {
         p.customer_name?.toLowerCase().includes(keyword)
     );
     setFiltered(result);
-    setPage(1); // ✅ Sửa: Reset về trang 1 khi tìm kiếm
+    setPage(1);
   }, [search, payments]);
 
-  // ✏️ Cập nhật trạng thái
+
   const handleUpdate = async (id, status) => {
     try {
       await API.put(`/payments/${id}`, { status });
@@ -55,7 +56,8 @@ export default function AdminPayments() {
     }
   };
 
-  // 🗑️ Xóa thanh toán
+
+// Xử lý xóa dữ liệu
   const handleDelete = async (id) => {
     if (confirm("Bạn có chắc muốn xóa lịch sử thanh toán này không?")) {
       try {
@@ -68,12 +70,12 @@ export default function AdminPayments() {
     }
   };
 
-  // 📦 Logic phân trang (Đã sửa tên biến cho khớp với state)
+
   const totalPages = Math.ceil(filtered.length / perPage);
   const startIndex = (page - 1) * perPage;
   const currentPayments = filtered.slice(startIndex, startIndex + perPage);
 
-  // 🎨 Helper Render
+
   const getMethodBadge = (method) => {
     const m = method?.toLowerCase();
     if (m === "momo")
@@ -97,7 +99,7 @@ export default function AdminPayments() {
 
   return (
     <div className="space-y-6 animate-in fade-in duration-500 font-sans">
-      {/* 1. Header & Search */}
+      {}
       <div className="bg-white p-5 rounded-xl shadow-sm border border-gray-100 flex flex-col sm:flex-row justify-between items-center gap-4">
         <div>
           <h1 className="text-xl font-bold text-[#113e48] flex items-center gap-2">
@@ -126,7 +128,7 @@ export default function AdminPayments() {
         </div>
       </div>
 
-      {/* 2. Table */}
+      {}
       <div className="bg-white border border-gray-100 rounded-xl shadow-sm overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full text-sm text-left">
@@ -211,7 +213,7 @@ export default function AdminPayments() {
           </table>
         </div>
 
-        {/* 3. Pagination Component */}
+        {}
         <Pagination
           currentPage={page}
           totalPages={totalPages}

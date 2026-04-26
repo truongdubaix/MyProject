@@ -1,4 +1,4 @@
-// src/pages/driver/DriverShipmentDetail.jsx
+
 import { useEffect, useState, useRef } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import API from "../../services/api";
@@ -27,7 +27,7 @@ import { motion, AnimatePresence } from "framer-motion";
 const MAPBOX_TOKEN = import.meta.env.VITE_MAPBOX_TOKEN;
 mapboxgl.accessToken = MAPBOX_TOKEN;
 
-// --- MARKER COMPONENTS ---
+
 const DriverMarker = () => (
   <div className="relative flex items-center justify-center w-10 h-10">
     <span className="absolute w-full h-full bg-blue-400 rounded-full opacity-30 animate-ping"></span>
@@ -47,7 +47,7 @@ const LocationMarker = ({ type }) => (
   </div>
 );
 
-// --- STATUS CONFIG ---
+
 const STATUS_OPTIONS = [
   {
     value: "assigned",
@@ -170,6 +170,7 @@ const StatusDropdown = ({ currentStatus, onChange, disabled }) => {
   );
 };
 
+// Chi tiết đơn hàng tài xế đang xử lý
 export default function DriverShipmentDetail() {
   const { id, shipmentId } = useParams();
   const navigate = useNavigate();
@@ -178,14 +179,14 @@ export default function DriverShipmentDetail() {
   const [shipment, setShipment] = useState(null);
   const [loading, setLoading] = useState(true);
 
-  // Mặc định là TP.HCM nếu chưa load được
+
   const [coords, setCoords] = useState({
     driver: { lat: 10.762622, lng: 106.660172 },
     pickup: { lat: 10.762622, lng: 106.660172 },
     delivery: { lat: 10.762622, lng: 106.660172 },
   });
 
-  // ✅ HÀM GEOCODING: Chuyển địa chỉ thành tọa độ dùng Mapbox API
+
   const geocodeAddress = async (address) => {
     try {
       const response = await fetch(
@@ -199,58 +200,56 @@ export default function DriverShipmentDetail() {
         return { lat, lng };
       }
     } catch (error) {
-      console.error("Geocoding error:", error);
     }
-    return null; // Trả về null nếu lỗi
+    return null;
   };
 
   const fetchShipmentAndCoords = async () => {
     setLoading(true);
     try {
-      // 1. Lấy thông tin đơn hàng từ Backend
+
       const res = await API.get(`/shipments/${shipmentId}`);
       const data = res.data;
       setShipment(data);
 
-      // 2. Lấy vị trí thực tế của Tài xế (GPS Browser)
+
       let driverPos = coords.driver;
       if ("geolocation" in navigator) {
         navigator.geolocation.getCurrentPosition(
           (pos) => {
             driverPos = { lat: pos.coords.latitude, lng: pos.coords.longitude };
-            // Cập nhật state driver ngay lập tức
+
             setCoords((prev) => ({ ...prev, driver: driverPos }));
           },
           (err) => console.error("GPS Error:", err)
         );
       }
 
-      // 3. Geocode địa chỉ Lấy hàng & Giao hàng (Chạy song song cho nhanh)
+
       const [pickupCoords, deliveryCoords] = await Promise.all([
         geocodeAddress(data.pickup_address),
         geocodeAddress(data.delivery_address),
       ]);
 
-      // 4. Cập nhật tọa độ vào state
+
       setCoords((prev) => ({
         ...prev,
         pickup: pickupCoords || prev.pickup,
         delivery: deliveryCoords || prev.delivery,
       }));
 
-      // 5. Tự động zoom bản đồ để thấy các điểm (Fit Bounds)
+
       if (pickupCoords && deliveryCoords && mapRef.current) {
-        // Chờ map render xong rồi fitBounds (nếu cần xử lý phức tạp hơn)
-        // Hiện tại để map tự center vào driver hoặc pickup là ổn
+
       }
     } catch (err) {
-      console.error(err);
       toast.error("Không thể tải thông tin đơn hàng");
     } finally {
       setLoading(false);
     }
   };
 
+// Xử lý thay đổi trạng thái
   const handleStatusChange = async (newStatus) => {
     const toastId = toast.loading("Đang cập nhật...");
     try {
@@ -295,7 +294,7 @@ export default function DriverShipmentDetail() {
     <div className="min-h-screen bg-[#F8FAFC] pb-24">
       <Toaster position="top-center" />
 
-      {/* 1. HEADER */}
+      {}
       <div className="bg-white px-4 py-4 sticky top-0 z-30 shadow-sm border-b border-gray-100 flex items-center justify-between">
         <button
           onClick={() => navigate(-1)}
@@ -313,7 +312,7 @@ export default function DriverShipmentDetail() {
       </div>
 
       <div className="p-4 lg:p-8 max-w-5xl mx-auto space-y-6">
-        {/* 2. MAP SECTION */}
+        {}
         <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden relative">
           <div className="absolute top-4 left-4 z-10 bg-white/90 backdrop-blur-sm px-3 py-1.5 rounded-lg shadow-sm border border-gray-100 text-xs font-bold text-gray-600 flex items-center gap-2">
             <MapPin size={14} className="text-blue-500" /> Lộ trình vận chuyển
@@ -322,7 +321,7 @@ export default function DriverShipmentDetail() {
             <Map
               ref={mapRef}
               initialViewState={{
-                latitude: coords.pickup.lat, // Mặc định focus vào điểm lấy hàng
+                latitude: coords.pickup.lat,
                 longitude: coords.pickup.lng,
                 zoom: 12,
               }}
@@ -332,7 +331,7 @@ export default function DriverShipmentDetail() {
             >
               <NavigationControl position="bottom-right" showCompass={false} />
 
-              {/* Marker Tài xế (Vị trí thực) */}
+              {}
               <Marker
                 latitude={coords.driver.lat}
                 longitude={coords.driver.lng}
@@ -341,7 +340,7 @@ export default function DriverShipmentDetail() {
                 <DriverMarker />
               </Marker>
 
-              {/* Marker Lấy hàng (Geocoded) */}
+              {}
               <Marker
                 latitude={coords.pickup.lat}
                 longitude={coords.pickup.lng}
@@ -350,7 +349,7 @@ export default function DriverShipmentDetail() {
                 <LocationMarker type="pickup" />
               </Marker>
 
-              {/* Marker Giao hàng (Geocoded) */}
+              {}
               <Marker
                 latitude={coords.delivery.lat}
                 longitude={coords.delivery.lng}
@@ -362,7 +361,7 @@ export default function DriverShipmentDetail() {
           </div>
         </div>
 
-        {/* 3. STATUS & ACTION CARD */}
+        {}
         <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-5">
           <div className="flex flex-col sm:flex-row gap-4 items-center">
             <div className="w-full sm:w-1/2">
@@ -402,10 +401,10 @@ export default function DriverShipmentDetail() {
           </div>
         </div>
 
-        {/* 4. INFO CARDS */}
+        {}
         <div className="grid md:grid-cols-2 gap-6">
           <div className="space-y-4">
-            {/* Sender Info */}
+            {}
             <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-5 relative overflow-hidden">
               <div className="absolute top-0 left-0 w-1 h-full bg-orange-400"></div>
               <h3 className="text-sm font-bold text-gray-800 flex items-center gap-2 mb-4">
@@ -435,7 +434,7 @@ export default function DriverShipmentDetail() {
               </div>
             </div>
 
-            {/* Receiver Info */}
+            {}
             <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-5 relative overflow-hidden">
               <div className="absolute top-0 left-0 w-1 h-full bg-blue-500"></div>
               <h3 className="text-sm font-bold text-gray-800 flex items-center gap-2 mb-4">
@@ -466,7 +465,7 @@ export default function DriverShipmentDetail() {
             </div>
           </div>
 
-          {/* Shipment Details */}
+          {}
           <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-5 h-fit">
             <h3 className="text-sm font-bold text-gray-800 mb-4 flex items-center gap-2">
               <ClipboardList className="text-gray-500" size={18} /> THÔNG TIN

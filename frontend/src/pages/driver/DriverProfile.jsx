@@ -20,6 +20,7 @@ import {
   PackageCheck,
 } from "lucide-react";
 
+// Hồ sơ cá nhân tài xế
 export default function DriverProfile() {
   const { id: paramId } = useParams();
   const [profile, setProfile] = useState(null);
@@ -27,14 +28,15 @@ export default function DriverProfile() {
   const [loading, setLoading] = useState(true);
   const [isRefeshing, setIsRefreshing] = useState(false);
 
-  // Lấy ID: Ưu tiên từ URL, nếu không có thì lấy từ LocalStorage
+
   const driverId = paramId || localStorage.getItem("userId");
 
+// Tải dữ liệu từ server
   const fetchData = async () => {
     if (!driverId) return;
     setIsRefreshing(true);
     try {
-      // Gọi song song 2 API để tiết kiệm thời gian
+
       const [profileRes, statsRes] = await Promise.all([
         API.get(`/drivers/profile/${driverId}`),
         API.get(`/drivers/dashboard/${driverId}`).catch(() => ({
@@ -45,7 +47,6 @@ export default function DriverProfile() {
       setProfile(profileRes.data);
       setStats(statsRes.data);
     } catch (err) {
-      console.error("❌ Lỗi tải dữ liệu:", err);
       toast.error("Không thể tải thông tin tài xế");
     } finally {
       setLoading(false);
@@ -57,17 +58,17 @@ export default function DriverProfile() {
     fetchData();
   }, [driverId]);
 
-  // Xử lý đổi trạng thái hoạt động
+
+// Bật/tắt trạng thái tài xế
   const toggleStatus = async () => {
     if (!profile) return;
     const newStatus = profile.status === "available" ? "inactive" : "available";
     const toastId = toast.loading("Đang cập nhật trạng thái...");
 
     try {
-      // Giả lập gọi API update status (Bạn cần thay bằng endpoint thật)
-      // await API.patch(`/drivers/${driverId}/status`, { status: newStatus });
 
-      // Update UI Optimistically
+
+
       setProfile((prev) => ({ ...prev, status: newStatus }));
       toast.success(
         newStatus === "available"
@@ -93,7 +94,7 @@ export default function DriverProfile() {
       <div className="p-8 text-center">Không tìm thấy thông tin tài xế.</div>
     );
 
-  // Config màu sắc trạng thái
+
   const isAvailable = profile.status === "available";
   const isDelivering = profile.status === "delivering";
 
@@ -101,13 +102,13 @@ export default function DriverProfile() {
     <div className="min-h-screen bg-[#F8FAFC] p-4 lg:p-8 space-y-6 pb-24">
       <Toaster position="top-right" />
 
-      {/* --- HEADER SECTION --- */}
+      {}
       <div className="relative bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden">
-        {/* Cover Background */}
+        {}
         <div className="h-32 bg-gradient-to-r from-[#113e48] to-[#2a6f7d]"></div>
 
         <div className="px-6 pb-6 relative flex flex-col md:flex-row items-center md:items-end -mt-12 gap-4 md:gap-6">
-          {/* Avatar */}
+          {}
           <div className="relative">
             <img
               src={`https://api.dicebear.com/9.x/initials/svg?seed=${encodeURIComponent(
@@ -116,7 +117,7 @@ export default function DriverProfile() {
               alt={profile.name}
               className="w-28 h-28 rounded-full border-4 border-white shadow-md bg-white"
             />
-            {/* Online Indicator */}
+            {}
             <span
               className={`absolute bottom-2 right-2 w-5 h-5 border-2 border-white rounded-full ${
                 isAvailable
@@ -128,7 +129,7 @@ export default function DriverProfile() {
             ></span>
           </div>
 
-          {/* Name & Role */}
+          {}
           <div className="flex-1 text-center md:text-left mb-2 md:mb-0">
             <h1 className="text-2xl font-bold text-gray-900 flex items-center justify-center md:justify-start gap-2">
               {profile.name}
@@ -144,7 +145,7 @@ export default function DriverProfile() {
             </p>
           </div>
 
-          {/* Action Buttons */}
+          {}
           <div className="flex items-center gap-3 mt-2 md:mt-0">
             <button
               onClick={toggleStatus}
@@ -181,7 +182,7 @@ export default function DriverProfile() {
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* --- LEFT COLUMN: PERSONAL INFO --- */}
+        {}
         <div className="lg:col-span-1 space-y-6">
           <motion.div
             initial={{ opacity: 0, y: 10 }}
@@ -218,7 +219,7 @@ export default function DriverProfile() {
             </div>
           </motion.div>
 
-          {/* Account Security (Demo) */}
+          {}
           <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
             <h3 className="font-bold text-gray-800 mb-4 flex items-center gap-2">
               <Shield size={18} className="text-[#113e48]" /> Bảo mật
@@ -229,9 +230,9 @@ export default function DriverProfile() {
           </div>
         </div>
 
-        {/* --- RIGHT COLUMN: STATISTICS --- */}
+        {}
         <div className="lg:col-span-2 space-y-6">
-          {/* Stats Grid */}
+          {}
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
             <StatBox
               label="Tổng đơn"
@@ -262,7 +263,7 @@ export default function DriverProfile() {
             />
           </div>
 
-          {/* Rating Section (Demo Visuals) */}
+          {}
           <motion.div
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
@@ -292,7 +293,7 @@ export default function DriverProfile() {
               </div>
             </div>
 
-            {/* Progress Bars Demo */}
+            {}
             <div className="space-y-3">
               <RatingBar star={5} percent={80} />
               <RatingBar star={4} percent={15} />
@@ -305,7 +306,7 @@ export default function DriverProfile() {
   );
 }
 
-// --- SUB COMPONENTS ---
+
 
 const InfoRow = ({ icon: Icon, label, value }) => (
   <div className="flex items-center gap-4 py-2 border-b border-gray-50 last:border-0">

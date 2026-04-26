@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useChat } from "../hooks/useChat";
 
+// Sidebar tiện ích
 export default function UtilitySidebar() {
   const navigate = useNavigate();
   const { openSupportChat, openAIChat } = useChat();
@@ -38,7 +39,7 @@ export default function UtilitySidebar() {
 
   return (
     <div className="fixed top-1/3 right-0 z-[9999]">
-      {/* NÚT MỞ */}
+      {}
       {!expanded && (
         <button
           onClick={() => setExpanded(true)}
@@ -49,13 +50,13 @@ export default function UtilitySidebar() {
         </button>
       )}
 
-      {/* SIDEBAR */}
+      {}
       {expanded && (
         <div
           className="bg-blue-600 text-white rounded-l-2xl shadow-2xl w-[220px]
                       flex flex-col overflow-hidden animate-slide-left"
         >
-          {/* Header */}
+          {}
           <div className="flex justify-between items-center px-4 py-3 bg-blue-700">
             <span className="font-semibold">Tiện ích</span>
             <button

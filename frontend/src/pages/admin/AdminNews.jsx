@@ -15,10 +15,10 @@ import {
 } from "lucide-react";
 import Pagination from "../../components/Pagination";
 
-// Import React Quill (react-quill-new supports React 19)
 import ReactQuill from "react-quill-new";
 import "react-quill-new/dist/quill.snow.css";
 
+// Quản lý tin tức bài viết
 export default function AdminNews() {
   const [newsList, setNewsList] = useState([]);
   const [filtered, setFiltered] = useState([]);
@@ -28,29 +28,27 @@ export default function AdminNews() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editItem, setEditItem] = useState(null);
   
-  // States cho Form
+
   const [title, setTitle] = useState("");
   const [desc, setDesc] = useState("");
   const [content, setContent] = useState("");
   const [author, setAuthor] = useState("Admin");
 
-  // File ảnh
   const [imageFile, setImageFile] = useState(null);
-  // Lưu URL ảnh cũ hoặc Preview để hiển thị
+
   const [imagePreview, setImagePreview] = useState("");
 
-  // Pagination State
   const [page, setPage] = useState(1);
   const itemsPerPage = 8;
   
-  // Hàm tạo link ảnh đầy đủ (cho ảnh lưu thư mục /uploads)
+
   const getImageUrl = (url) => {
     if (!url) return "";
     if (url.startsWith("http")) return url;
     return `http://localhost:5000${url}`;
   };
 
-  // 1. Fetch Data
+// Tải danh sách tin tức
   const fetchNews = async () => {
     setLoading(true);
     try {
@@ -68,7 +66,6 @@ export default function AdminNews() {
     fetchNews();
   }, []);
 
-  // 2. Filter Logic
   useEffect(() => {
     const keyword = search.toLowerCase();
     const result = newsList.filter(
@@ -78,7 +75,7 @@ export default function AdminNews() {
     setPage(1);
   }, [search, newsList]);
 
-  // 3. Delete Handler
+// Xử lý xóa dữ liệu
   const handleDelete = async (id) => {
     if (confirm("Bạn có chắc muốn xóa bản tin này không?")) {
       try {
@@ -91,7 +88,7 @@ export default function AdminNews() {
     }
   };
 
-  // 4. Mở modal Sửa
+// Xử lý chỉnh sửa
   const handleEdit = (item) => {
     setEditItem(item);
     setTitle(item.title);
@@ -99,14 +96,13 @@ export default function AdminNews() {
     setContent(item.content);
     setAuthor(item.author);
     
-    // Xóa file cũ trong state
+
     setImageFile(null);
     setImagePreview(getImageUrl(item.image));
     
     setIsModalOpen(true);
   };
 
-  // 5. Mở modal Thêm
   const handleAdd = () => {
     setEditItem(null);
     setTitle("");
@@ -119,7 +115,6 @@ export default function AdminNews() {
     setIsModalOpen(true);
   };
 
-  // 6. Xử lý Image Selection
   const handleImageChange = (e) => {
     const file = e.target.files[0];
     if (file) {
@@ -134,24 +129,22 @@ export default function AdminNews() {
     }
   };
 
-  // 7. Submit lưu
+// Xử lý submit form
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!title.trim()) return toast.error("Vui lòng nhập tiêu đề");
 
-    // Dùng FormData vì có upload file
     const formData = new FormData();
     formData.append("title", title);
     formData.append("desc", desc);
     formData.append("content", content);
     formData.append("author", author);
     
-    // Nếu có file do user mới chọn
+
     if (imageFile) {
       formData.append("imageFile", imageFile);
     } else if (editItem && editItem.image) {
-      // Nếu user giữ nguyên ảnh cũ không sửa, ta đưa lại chuỗi URL
-      // để Backend set lại "image": req.body.image
+
       formData.append("image", editItem.image);
     }
 
@@ -170,12 +163,10 @@ export default function AdminNews() {
       setIsModalOpen(false);
       fetchNews();
     } catch (error) {
-      console.error("Lỗi submit tin tức:", error);
       toast.error(error.response?.data?.message || "Thao tác thất bại");
     }
   };
 
-  // Pagination Logic
   const totalPages = Math.ceil(filtered.length / itemsPerPage);
   const startIndex = (page - 1) * itemsPerPage;
   const currentNews = filtered.slice(startIndex, startIndex + itemsPerPage);
@@ -212,7 +203,6 @@ export default function AdminNews() {
     };
   }, []);
 
-  // Cấu hình thanh công cụ của React-Quill
   const quillModules = useMemo(() => ({
     toolbar: {
       container: [
@@ -238,7 +228,7 @@ export default function AdminNews() {
     <div className="space-y-6 animate-in fade-in duration-500 font-sans relative">
       {!isModalOpen ? (
         <>
-          {/* HEADER & SEARCH */}
+          {}
           <div className="bg-white p-5 rounded-xl shadow-sm border border-gray-100 flex flex-col sm:flex-row justify-between items-center gap-4">
         <div>
           <h1 className="text-xl font-bold text-[#113e48] flex items-center gap-2">
@@ -270,7 +260,7 @@ export default function AdminNews() {
         </div>
       </div>
 
-      {/* TABLE */}
+      {}
       <div className="bg-white border border-gray-100 rounded-xl shadow-sm overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full text-sm text-left">
@@ -360,8 +350,8 @@ export default function AdminNews() {
         </>
       ) : (
         <div className="bg-white rounded-2xl shadow-sm border border-gray-100 flex flex-col relative animate-in slide-in-from-right-8 fade-in-0 duration-500 min-h-[80vh]">
-          {/* FULL PAGE FORM */}
-            {/* Modal Header */}
+          {}
+            {}
             <div className="flex justify-between items-center p-5 border-b border-gray-100 bg-white/95 backdrop-blur z-10 rounded-t-2xl shrink-0">
               <h2 className="text-xl font-bold text-[#113e48] flex items-center gap-2">
                 <Newspaper className="text-orange-500" />
@@ -375,7 +365,7 @@ export default function AdminNews() {
               </button>
             </div>
 
-            {/* Form Body */}
+            {}
             <form onSubmit={handleSubmit} className="p-6 flex flex-col gap-6">
               
               <div className="space-y-1">
@@ -418,7 +408,7 @@ export default function AdminNews() {
                 </div>
               </div>
 
-              {/* Preview Ảnh */}
+              {}
               {imagePreview && (
                 <div className="w-full bg-gray-100 rounded-xl overflow-hidden border border-gray-200 shadow-sm relative group flex justify-center py-4">
                   <img src={imagePreview} alt="Preview" className="max-w-full h-auto max-h-[400px] object-contain" />
@@ -441,7 +431,7 @@ export default function AdminNews() {
 
               <div className="space-y-1 flex-1 flex flex-col min-h-[300px]">
                 <label className="text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">Nội dung chi tiết (Rich Text)</label>
-                {/* Bọc ReactQuill bằng một div h-full để nó giãn nở */}
+                {}
                 <div className="flex-1 border border-gray-200 rounded-xl overflow-hidden bg-white hover:border-orange-300 transition-colors focus-within:ring-2 focus-within:ring-orange-500/20 focus-within:border-orange-500 flex flex-col">
                   <ReactQuill
                     ref={quillRef}
@@ -456,7 +446,7 @@ export default function AdminNews() {
                 </div>
               </div>
 
-              {/* Tùy chỉnh CSS cho Quill */}
+              {}
               <style dangerouslySetInnerHTML={{__html: `
                 .quill-editor .ql-container {
                    font-family: inherit;

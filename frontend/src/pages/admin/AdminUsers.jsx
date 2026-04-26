@@ -14,6 +14,7 @@ import {
 } from "lucide-react";
 import Pagination from "../../components/Pagination";
 
+// Quản lý người dùng hệ thống
 export default function AdminUsers() {
   const [users, setUsers] = useState([]);
   const [roles, setRoles] = useState([]);
@@ -21,11 +22,12 @@ export default function AdminUsers() {
   const [search, setSearch] = useState("");
   const [loading, setLoading] = useState(true);
 
-  // Pagination State
+
   const [page, setPage] = useState(1);
   const itemsPerPage = 8;
 
-  // 🔹 1. Fetch Data
+
+// Tải dữ liệu từ server
   const fetchData = async () => {
     setLoading(true);
     try {
@@ -38,7 +40,6 @@ export default function AdminUsers() {
       setRoles(rolesRes.data);
     } catch (err) {
       toast.error("❌ Lỗi khi tải dữ liệu!");
-      console.error(err);
     } finally {
       setLoading(false);
     }
@@ -48,7 +49,7 @@ export default function AdminUsers() {
     fetchData();
   }, []);
 
-  // 🔹 2. Filter Logic
+
   useEffect(() => {
     const keyword = search.toLowerCase();
     const result = users.filter(
@@ -60,7 +61,7 @@ export default function AdminUsers() {
     setPage(1);
   }, [search, users]);
 
-  // 🔹 3. Update User
+
   const handleUpdate = async (id, field, value) => {
     try {
       const payload =
@@ -73,7 +74,8 @@ export default function AdminUsers() {
     }
   };
 
-  // 🔹 4. Delete User
+
+// Xử lý xóa dữ liệu
   const handleDelete = async (id) => {
     if (confirm("Bạn có chắc muốn xóa người dùng này không?")) {
       try {
@@ -86,7 +88,7 @@ export default function AdminUsers() {
     }
   };
 
-  // 🎨 5. Helper: Lấy màu sắc và icon cho từng Role
+
   const getRoleStyle = (roleId) => {
     const roleName =
       roles.find((r) => r.id == roleId)?.name?.toLowerCase() || "";
@@ -111,21 +113,21 @@ export default function AdminUsers() {
         icon: <ShoppingBag size={14} className="mr-1" />,
       };
     }
-    // Mặc định (User thường hoặc Staff khác)
+
     return {
       style: "bg-gray-100 text-gray-700 border-gray-200 hover:bg-gray-200",
       icon: <User size={14} className="mr-1" />,
     };
   };
 
-  // Pagination Logic
+
   const totalPages = Math.ceil(filtered.length / itemsPerPage);
   const startIndex = (page - 1) * itemsPerPage;
   const currentUsers = filtered.slice(startIndex, startIndex + itemsPerPage);
 
   return (
     <div className="space-y-6 animate-in fade-in duration-500 font-sans">
-      {/* HEADER & SEARCH */}
+      {}
       <div className="bg-white p-5 rounded-xl shadow-sm border border-gray-100 flex flex-col sm:flex-row justify-between items-center gap-4">
         <div>
           <h1 className="text-xl font-bold text-[#113e48] flex items-center gap-2">
@@ -153,7 +155,7 @@ export default function AdminUsers() {
         </div>
       </div>
 
-      {/* TABLE */}
+      {}
       <div className="bg-white border border-gray-100 rounded-xl shadow-sm overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full text-sm text-left">
@@ -187,7 +189,7 @@ export default function AdminUsers() {
                 </tr>
               ) : (
                 currentUsers.map((u) => {
-                  // Lấy style cho role hiện tại
+
                   const roleStyle = getRoleStyle(u.role_id);
 
                   return (
@@ -211,10 +213,10 @@ export default function AdminUsers() {
                         </div>
                       </td>
 
-                      {/* --- CỘT VAI TRÒ (ĐÃ SỬA LẠI ĐẸP HƠN) --- */}
+                      {}
                       <td className="px-6 py-4 text-center">
                         <div className="relative inline-flex items-center justify-center">
-                          {/* Icon minh họa bên trái select */}
+                          {}
                           <div className="absolute left-2 pointer-events-none text-gray-500">
                             {roleStyle.icon}
                           </div>
@@ -240,7 +242,7 @@ export default function AdminUsers() {
                             ))}
                           </select>
 
-                          {/* Mũi tên custom */}
+                          {}
                           <div className="absolute right-2 pointer-events-none text-gray-500 opacity-60">
                             ▼
                           </div>
@@ -286,7 +288,7 @@ export default function AdminUsers() {
           </table>
         </div>
 
-        {/* PAGINATION */}
+        {}
         <Pagination
           currentPage={page}
           totalPages={totalPages}

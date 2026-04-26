@@ -23,7 +23,7 @@ export default function AdminLayout() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const username = localStorage.getItem("username") || "Administrator";
 
-  // Danh sách Menu Admin
+
   const MENU_ITEMS = [
     {
       path: "/admin",
@@ -73,7 +73,8 @@ export default function AdminLayout() {
     },
   ];
 
-  // 🚪 Xử lý đăng xuất
+
+// Xử lý đăng xuất
   const handleLogout = () => {
     if (window.confirm("Bạn có chắc chắn muốn đăng xuất khỏi quyền Admin?")) {
       localStorage.clear();
@@ -81,7 +82,7 @@ export default function AdminLayout() {
     }
   };
 
-  // 🎨 Style cho Link (Active màu cam)
+
   const navLinkClasses = ({ isActive }) => `
     relative flex items-center gap-3 px-4 py-3 text-sm font-medium rounded-xl transition-all duration-300 group
     ${
@@ -91,7 +92,7 @@ export default function AdminLayout() {
     }
   `;
 
-  // 🏷️ Lấy tiêu đề trang hiện tại
+
   const getPageTitle = () => {
     const currentItem = MENU_ITEMS.find(
       (item) => item.path === location.pathname
@@ -101,7 +102,7 @@ export default function AdminLayout() {
 
   return (
     <div className="flex h-screen bg-[#F8FAFC] overflow-hidden font-sans">
-      {/* 📱 MOBILE OVERLAY */}
+      {}
       {isSidebarOpen && (
         <div
           className="fixed inset-0 bg-black/50 z-30 lg:hidden"
@@ -109,7 +110,7 @@ export default function AdminLayout() {
         />
       )}
 
-      {/* =============== SIDEBAR =============== */}
+      {}
       <aside
         className={`
         fixed lg:static inset-y-0 left-0 z-40 w-72 bg-[#113e48] text-white flex flex-col shadow-2xl transition-transform duration-300
@@ -118,7 +119,7 @@ export default function AdminLayout() {
         }
       `}
       >
-        {/* 1. Brand Logo */}
+        {}
         <div className="h-20 flex items-center px-6 border-b border-white/10 bg-[#0d2f36]">
           <div
             className="flex items-center gap-3 cursor-pointer"
@@ -142,7 +143,7 @@ export default function AdminLayout() {
           </div>
         </div>
 
-        {/* 2. Menu List */}
+        {}
         <div className="flex-1 overflow-y-auto py-6 px-4 space-y-1 custom-scrollbar">
           <p className="px-4 mb-3 text-xs font-bold text-blue-200/50 uppercase tracking-widest">
             Hệ thống
@@ -163,7 +164,7 @@ export default function AdminLayout() {
           </nav>
         </div>
 
-        {/* 3. Admin Profile (Bottom) */}
+        {}
         <div className="p-4 bg-[#0d2f36] border-t border-white/5">
           <div className="flex items-center justify-between p-3 rounded-xl bg-white/5 border border-white/5 hover:bg-white/10 transition-colors">
             <div className="flex items-center gap-3 overflow-hidden">
@@ -192,9 +193,9 @@ export default function AdminLayout() {
         </div>
       </aside>
 
-      {/* =============== MAIN CONTENT AREA =============== */}
+      {}
       <div className="flex-1 flex flex-col min-w-0">
-        {/* HEADER BAR */}
+        {}
         <header className="h-20 bg-white shadow-sm border-b border-gray-100 flex items-center justify-between px-6 lg:px-8 z-10">
           <div className="flex items-center gap-4">
             <button
@@ -214,7 +215,7 @@ export default function AdminLayout() {
           </div>
 
           <div className="flex items-center gap-3 sm:gap-6">
-            {/* Notification Bell (Demo UI) */}
+            {}
             <button className="relative p-2 text-gray-400 hover:text-orange-500 hover:bg-orange-50 rounded-full transition-all">
               <Bell size={20} />
               <span className="absolute top-2 right-2 w-2 h-2 bg-red-500 rounded-full border border-white"></span>
@@ -232,7 +233,7 @@ export default function AdminLayout() {
           </div>
         </header>
 
-        {/* CONTENT SCROLL AREA */}
+        {}
         <main className="flex-1 overflow-x-hidden overflow-y-auto bg-[#F8FAFC] p-6 lg:p-8 scroll-smooth">
           <div className="max-w-7xl mx-auto min-h-full">
             <Outlet />

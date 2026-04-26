@@ -2,7 +2,7 @@ import React from "react";
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
 
-// --- ICONS ---
+
 const Icons = {
   Box: () => (
     <svg
@@ -109,7 +109,7 @@ export default function AboutSection() {
 
   return (
     <section className="py-16 md:py-24 bg-white overflow-hidden relative">
-      {/* Background Map */}
+      {}
       <div className="absolute top-0 left-0 w-full h-full opacity-5 pointer-events-none">
         <img
           src="https://img.freepik.com/free-vector/world-map-background-template_1017-31327.jpg"
@@ -118,7 +118,7 @@ export default function AboutSection() {
         />
       </div>
 
-      {/* Background decoration */}
+      {}
       <motion.div
         animate={{ rotate: 360 }}
         transition={{ duration: 50, repeat: Infinity, ease: "linear" }}
@@ -127,9 +127,9 @@ export default function AboutSection() {
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-20 items-center">
-          {/* ===== LEFT COLUMN: IMAGES ===== */}
+          {}
           <div className="relative">
-            {/* Main Image */}
+            {}
             <motion.div
               initial={{ opacity: 0, x: -100 }}
               whileInView={{ opacity: 1, x: 0 }}
@@ -144,7 +144,7 @@ export default function AboutSection() {
               />
             </motion.div>
 
-            {/* Secondary Image */}
+            {}
             <motion.div
               initial={{ opacity: 0, y: 50 }}
               whileInView={{ opacity: 1, y: 0 }}
@@ -165,7 +165,7 @@ export default function AboutSection() {
               />
             </motion.div>
 
-            {/* BADGE */}
+            {}
             <motion.div
               initial={{ scale: 0 }}
               whileInView={{ scale: 1 }}
@@ -181,13 +181,13 @@ export default function AboutSection() {
               <span className="text-3xl md:text-4xl font-extrabold leading-none">
                 10+
               </span>
-              {/* Sửa 'writing-mode-vertical' thành 'vertical-rl' chuẩn Tailwind */}
+              {}
               <span className="text-[10px] md:text-xs font-bold uppercase tracking-widest mt-1 opacity-90 vertical-rl">
                 Năm kinh nghiệm
               </span>
             </motion.div>
 
-            {/* Shape decoration */}
+            {}
             <motion.div
               initial={{ opacity: 0 }}
               whileInView={{ opacity: 0.1 }}
@@ -209,7 +209,7 @@ export default function AboutSection() {
             </motion.div>
           </div>
 
-          {/* ===== RIGHT COLUMN: CONTENT ===== */}
+          {}
           <motion.div
             variants={containerVariants}
             initial="hidden"
@@ -217,7 +217,7 @@ export default function AboutSection() {
             viewport={{ once: true, margin: "-100px" }}
             className="pl-0 lg:pl-6"
           >
-            {/* Tag */}
+            {}
             <motion.div
               variants={itemVariants}
               className="inline-flex font-bold text-xl uppercase tracking-wider items-center gap-2 px-4 py-1.5 rounded-full bg-orange-100 text-orange-500 mb-4 border border-orange-200"
@@ -225,7 +225,7 @@ export default function AboutSection() {
               <Icons.Box /> Giới thiệu
             </motion.div>
 
-            {/* Heading */}
+            {}
             <motion.h2
               variants={itemVariants}
               className="text-2xl md:text-3xl font-extrabold text-slate-800 mb-6 leading-tight"
@@ -233,7 +233,7 @@ export default function AboutSection() {
               VỀ CHÚNG TÔI
             </motion.h2>
 
-            {/* Description */}
+            {}
             <motion.p
               variants={itemVariants}
               className="text-slate-600 mb-8 leading-relaxed"
@@ -245,9 +245,9 @@ export default function AboutSection() {
               cầu vận chuyển của bạn.
             </motion.p>
 
-            {/* Feature Boxes */}
+            {}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 mb-8">
-              {/* Box 1 */}
+              {}
               <motion.div
                 variants={itemVariants}
                 whileHover={{ y: -5 }}
@@ -265,7 +265,7 @@ export default function AboutSection() {
                 </p>
               </motion.div>
 
-              {/* Box 2 */}
+              {}
               <motion.div
                 variants={itemVariants}
                 whileHover={{ y: -5 }}
@@ -284,7 +284,7 @@ export default function AboutSection() {
               </motion.div>
             </div>
 
-            {/* Check list */}
+            {}
             <ul className="space-y-3 mb-8">
               <motion.li
                 variants={itemVariants}
@@ -306,14 +306,14 @@ export default function AboutSection() {
               </motion.li>
             </ul>
 
-            {/* Button */}
+            {}
             <motion.div variants={itemVariants}>
               <Link to="/about">
                 <button className="relative overflow-hidden group bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 text-white font-bold py-3 px-8 rounded-lg shadow-lg hover:shadow-orange-500/30 transition-all flex items-center">
                   <span className="relative z-10 flex items-center">
                     XEM THÊM <Icons.ArrowRight />
                   </span>
-                  {/* Hiệu ứng lướt sáng */}
+                  {}
                   <div className="absolute top-0 -left-[100%] w-full h-full bg-white/20 skew-x-[45deg] group-hover:left-[100%] transition-all duration-700 ease-in-out"></div>
                 </button>
               </Link>

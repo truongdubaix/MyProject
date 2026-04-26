@@ -11,13 +11,14 @@ import {
   FaPaperPlane,
 } from "react-icons/fa";
 
+// Phần chân trang
 export default function Footer() {
   return (
     <footer className="bg-[#0a1f26] text-white pt-20 pb-10 border-t border-gray-800 font-sans">
       <div className="max-w-7xl mx-auto px-6">
-        {/* --- PHẦN TRÊN: 4 CỘT --- */}
+        {}
         <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-12 mb-16">
-          {/* Cột 1: Thông tin công ty */}
+          {}
           <div data-aos="fade-up">
             <div className="flex items-center gap-2 mb-6">
               <img
@@ -34,7 +35,7 @@ export default function Footer() {
               hàng triệu đơn hàng mỗi ngày với cam kết Nhanh chóng - An toàn -
               Minh bạch.
             </p>
-            {/* Social Icons */}
+            {}
             <div className="flex gap-3">
               {[FaFacebookF, FaTwitter, FaLinkedinIn, FaYoutube].map(
                 (Icon, idx) => (
@@ -50,7 +51,7 @@ export default function Footer() {
             </div>
           </div>
 
-          {/* Cột 2: Liên kết nhanh */}
+          {}
           <div data-aos="fade-up" data-aos-delay="100">
             <h4 className="text-lg font-bold text-white mb-5 uppercase tracking-wider">
               Liên kết nhanh
@@ -117,7 +118,7 @@ export default function Footer() {
             </ul>
           </div>
 
-          {/* Cột 3: Thông tin liên hệ (Có icon) */}
+          {}
           <div data-aos="fade-up" data-aos-delay="200">
             <h4 className="text-lg font-bold text-white mb-6 uppercase tracking-wider">
               Liên hệ
@@ -141,7 +142,7 @@ export default function Footer() {
             </ul>
           </div>
 
-          {/* Cột 4: Đăng ký nhận tin (Newsletter) */}
+          {}
           <div data-aos="fade-up" data-aos-delay="300">
             <h4 className="text-lg font-bold text-white mb-6 uppercase tracking-wider">
               Đăng ký nhận tin
@@ -165,10 +166,10 @@ export default function Footer() {
           </div>
         </div>
 
-        {/* --- DÒNG KẺ NGANG --- */}
+        {}
         <div className="border-t border-gray-800 my-8"></div>
 
-        {/* --- PHẦN DƯỚI: COPYRIGHT & CHÍNH SÁCH --- */}
+        {}
         <div className="flex flex-col md:flex-row justify-between items-center text-xs text-gray-500 gap-4">
           <p>
             © {new Date().getFullYear()}{" "}

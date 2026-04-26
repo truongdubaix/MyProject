@@ -1,9 +1,10 @@
 import db from "../config/db.js";
 
-//  Tổng quan hệ thống
+
+// Lấy thống kê hệ thống
 export const getAdminStats = async (req, res) => {
   try {
-    // Tổng số liệu
+
     const [[shipments]] = await db.query(
       "SELECT COUNT(*) AS total FROM shipments"
     );
@@ -15,14 +16,14 @@ export const getAdminStats = async (req, res) => {
       "SELECT SUM(amount) AS total FROM payments WHERE status = 'completed'"
     );
 
-    // Thống kê đơn hàng theo trạng thái
+
     const [statusStats] = await db.query(`
       SELECT status, COUNT(*) AS count
       FROM shipments
       GROUP BY status
     `);
 
-    // Biểu đồ doanh thu theo tháng (12 tháng gần nhất)
+
     const [monthlyRevenue] = await db.query(`
   SELECT 
     DATE_FORMAT(MIN(created_at), '%b') AS month, 
@@ -33,7 +34,7 @@ export const getAdminStats = async (req, res) => {
   ORDER BY YEAR(created_at), MONTH(created_at)
 `);
 
-    // Top 5 tài xế hoạt động nhiều nhất
+
     const [topDrivers] = await db.query(`
       SELECT name, COUNT(a.id) AS deliveries
       FROM drivers d
@@ -53,7 +54,6 @@ export const getAdminStats = async (req, res) => {
       topDrivers,
     });
   } catch (err) {
-    console.error("❌ Lỗi truy vấn admin dashboard:", err);
     res.status(500).json({ error: "Lỗi server khi lấy thống kê" });
   }
 };

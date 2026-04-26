@@ -1,7 +1,7 @@
 import React from "react";
 import { motion } from "framer-motion";
 
-// Danh sách logo đối tác
+
 const partners = [
   {
     name: "Shopee",
@@ -37,7 +37,7 @@ const partners = [
   },
 ];
 
-// Nhận props: className (chỉnh khung), logoSize (chỉnh kích thước logo)
+
 export default function PartnerCarousel({
   className = "",
   logoSize = "w-14 h-8",
@@ -50,9 +50,9 @@ export default function PartnerCarousel({
         Đối tác tin cậy
       </p>
 
-      {/* Slide Container */}
+      {}
       <div className="relative w-full overflow-hidden">
-        {/* Lớp phủ mờ 2 bên (Fade Effect) */}
+        {}
         <div className="absolute top-0 left-0 w-8 h-full bg-gradient-to-r from-white to-transparent z-10 pointer-events-none"></div>
         <div className="absolute top-0 right-0 w-8 h-full bg-gradient-to-l from-white to-transparent z-10 pointer-events-none"></div>
 
@@ -61,12 +61,12 @@ export default function PartnerCarousel({
             className="flex items-center gap-6 pr-6 w-max"
             animate={{ x: "-50%" }}
             transition={{
-              duration: 25, // Tốc độ chạy (càng lớn càng chậm)
+              duration: 25,
               ease: "linear",
               repeat: Infinity,
             }}
           >
-            {/* Render danh sách logo 3 lần để chạy mượt vô tận */}
+            {}
             {[...partners, ...partners, ...partners].map((logo, index) => (
               <div
                 key={index}

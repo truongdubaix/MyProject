@@ -13,7 +13,7 @@ import {
   ChevronLeft,
   ChevronRight,
 } from "lucide-react";
-// Import Component Pagination (nếu đã tạo ở bước trước)
+
 import Pagination from "../../components/Pagination";
 
 export default function AdminCustomer() {
@@ -22,11 +22,11 @@ export default function AdminCustomer() {
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
 
-  // Pagination State
+
   const [page, setPage] = useState(1);
   const itemsPerPage = 8;
 
-  // 📦 Lấy danh sách khách hàng
+
   const fetchCustomers = async () => {
     setLoading(true);
     try {
@@ -34,7 +34,6 @@ export default function AdminCustomer() {
       setCustomers(res.data);
       setFiltered(res.data);
     } catch (err) {
-      console.error(err);
       toast.error("❌ Lỗi tải danh sách khách hàng");
     } finally {
       setLoading(false);
@@ -45,7 +44,7 @@ export default function AdminCustomer() {
     fetchCustomers();
   }, []);
 
-  // 🔍 Tìm kiếm
+
   useEffect(() => {
     const keyword = search.toLowerCase();
     const result = customers.filter(
@@ -55,13 +54,13 @@ export default function AdminCustomer() {
         c.phone?.includes(keyword)
     );
     setFiltered(result);
-    setPage(1); // Reset về trang 1 khi tìm kiếm
+    setPage(1);
   }, [search, customers]);
 
-  // 🔄 Khóa / Mở tài khoản
+
+// Bật/tắt trạng thái
   const handleToggle = async (id, status) => {
-    // Logic xác định trạng thái mới (Dựa vào backend trả về tiếng Việt hay Anh)
-    // Giả sử backend dùng "active" / "blocked". Nếu dùng tiếng Việt thì sửa lại.
+
     const isActive = status === "active" || status === "Hoạt động";
     const newStatus = isActive ? "blocked" : "active";
     const confirmMsg = isActive
@@ -81,7 +80,8 @@ export default function AdminCustomer() {
     }
   };
 
-  // 🗑️ Xóa khách hàng
+
+// Xử lý xóa dữ liệu
   const handleDelete = async (id) => {
     if (
       !confirm(
@@ -98,7 +98,7 @@ export default function AdminCustomer() {
     }
   };
 
-  // 📦 Logic phân trang
+
   const totalPages = Math.ceil(filtered.length / itemsPerPage);
   const startIndex = (page - 1) * itemsPerPage;
   const currentCustomers = filtered.slice(
@@ -108,7 +108,7 @@ export default function AdminCustomer() {
 
   return (
     <div className="space-y-6 animate-in fade-in duration-500 font-sans">
-      {/* HEADER & SEARCH */}
+      {}
       <div className="bg-white p-5 rounded-xl shadow-sm border border-gray-100 flex flex-col sm:flex-row justify-between items-center gap-4">
         <div>
           <h1 className="text-xl font-bold text-[#113e48] flex items-center gap-2">
@@ -136,7 +136,7 @@ export default function AdminCustomer() {
         </div>
       </div>
 
-      {/* TABLE */}
+      {}
       <div className="bg-white border border-gray-100 rounded-xl shadow-sm overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full text-sm text-left">
@@ -246,7 +246,7 @@ export default function AdminCustomer() {
           </table>
         </div>
 
-        {/* PHÂN TRANG */}
+        {}
         <Pagination
           currentPage={page}
           totalPages={totalPages}

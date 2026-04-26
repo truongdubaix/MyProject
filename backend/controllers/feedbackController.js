@@ -1,6 +1,7 @@
 import db from "../config/db.js";
 
-// Gửi feedback
+
+// Gửi đánh giá/phản hồi
 export const createFeedback = async (req, res) => {
   try {
     const { customer_id, shipment_id, content, rating } = req.body;
@@ -17,11 +18,10 @@ export const createFeedback = async (req, res) => {
 
     res.json({ message: "✅ Feedback submitted successfully" });
   } catch (err) {
-    console.error("❌ Lỗi khi lưu feedback:", err);
     res.status(500).json({ message: "Lỗi server khi gửi feedback" });
   }
 };
-// Lấy danh sách feedbacks
+
 export const getAllFeedbacks = async (req, res) => {
   try {
     const [rows] = await db.query(`
@@ -33,19 +33,18 @@ export const getAllFeedbacks = async (req, res) => {
     `);
     res.json(rows);
   } catch (err) {
-    console.error("❌ Lỗi lấy feedbacks:", err);
     res.status(500).json({ message: "Lỗi server khi tải danh sách feedbacks" });
   }
 };
 
-// Xóa feedback
+
+// Xóa đánh giá
 export const deleteFeedback = async (req, res) => {
   try {
     const { id } = req.params;
     await db.query("DELETE FROM feedbacks WHERE id = ?", [id]);
     res.json({ message: "🗑️ Đã xóa feedback" });
   } catch (err) {
-    console.error("❌ Lỗi xóa feedback:", err);
     res.status(500).json({ message: "Lỗi server khi xóa feedback" });
   }
 };

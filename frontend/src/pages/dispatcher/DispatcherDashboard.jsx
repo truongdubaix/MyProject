@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import API from "../../services/api";
 import {
   BarChart,
@@ -25,17 +26,23 @@ import {
 
 const COLORS = ["#0088FE", "#00C49F", "#FFBB28", "#FF8042"];
 
+// Trang tổng quan của điều phối viên
 export default function DispatcherDashboard() {
+  const navigate = useNavigate();
   const [stats, setStats] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [failedShipments, setFailedShipments] = useState([]);
 
   useEffect(() => {
     const fetchStats = async () => {
       try {
-        const res = await API.get("/dispatcher/dashboard");
-        setStats(res.data);
+        const [resStats, resFailed] = await Promise.all([
+          API.get("/dispatcher/dashboard"),
+          API.get("/dispatcher/shipments/failed"),
+        ]);
+        setStats(resStats.data);
+        setFailedShipments(resFailed.data || []);
       } catch (err) {
-        console.error("❌ Lỗi tải dữ liệu:", err);
       } finally {
         setLoading(false);
       }
@@ -52,7 +59,7 @@ export default function DispatcherDashboard() {
 
   if (!stats) return <p className="p-6 text-gray-500">Không có dữ liệu.</p>;
 
-  // --- TÍNH TOÁN SỐ LIỆU ---
+
   const totalShipments = stats.shipments.reduce((a, b) => a + b.count, 0);
   const activeDrivers =
     stats.drivers.find((d) => d.status === "available")?.count || 0;
@@ -65,7 +72,7 @@ export default function DispatcherDashboard() {
   const pending =
     stats.shipments.find((s) => s.status === "pending")?.count || 0;
 
-  // Dữ liệu cho Pie Chart
+
   const pieData = [
     { name: "Đang giao", value: delivering },
     { name: "Hoàn tất", value: completed },
@@ -93,7 +100,7 @@ export default function DispatcherDashboard() {
         </div>
       </div>
 
-      {/* 1. CARDS TỔNG QUAN (ĐẸP HƠN) */}
+      {}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
         <StatCard
           title="Tổng đơn hàng"
@@ -125,9 +132,9 @@ export default function DispatcherDashboard() {
         />
       </div>
 
-      {/* 2. BIỂU ĐỒ & TOP DRIVER */}
+      {}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
-        {/* Cột 1: Biểu đồ Tròn (Tỷ lệ đơn hàng) */}
+        {}
         <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 lg:col-span-1">
           <h3 className="font-bold text-gray-700 mb-4 flex items-center gap-2">
             <CheckCircle size={18} className="text-blue-500" /> Tỷ lệ giao hàng
@@ -155,7 +162,7 @@ export default function DispatcherDashboard() {
                 <Legend verticalAlign="bottom" height={36} />
               </PieChart>
             </ResponsiveContainer>
-            {/* Số tổng ở giữa */}
+            {}
             <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-center -mt-4">
               <span className="text-2xl font-bold text-gray-700">
                 {totalShipments}
@@ -165,7 +172,7 @@ export default function DispatcherDashboard() {
           </div>
         </div>
 
-        {/* Cột 2: Biểu đồ Cột (Doanh thu) */}
+        {}
         <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 lg:col-span-2">
           <h3 className="font-bold text-gray-700 mb-4 flex items-center gap-2">
             <DollarSign size={18} className="text-green-500" /> Doanh thu theo
@@ -216,9 +223,9 @@ export default function DispatcherDashboard() {
         </div>
       </div>
 
-      {/* 3. BẢNG CHI TIẾT & TOP DRIVER */}
+      {}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* Top Drivers */}
+        {}
         <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
           <div className="flex justify-between items-center mb-6">
             <h3 className="font-bold text-gray-700">🏆 Top Tài Xế Xuất Sắc</h3>
@@ -273,36 +280,58 @@ export default function DispatcherDashboard() {
           </div>
         </div>
 
-        {/* Các đơn cần chú ý (Ví dụ: Đơn thất bại gần đây) */}
+        {}
         <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
           <div className="flex justify-between items-center mb-6">
             <h3 className="font-bold text-red-600 flex items-center gap-2">
-              <AlertTriangle size={18} /> Đơn Cần Chú Ý
+              <AlertTriangle size={18} /> Đơn Cần Xử Lý Gấp
             </h3>
+            <button
+              onClick={() => navigate("/dispatcher/failed-orders")}
+              className="text-xs text-blue-600 font-bold hover:underline"
+            >
+              Xem tất cả →
+            </button>
           </div>
-          {/* Đây là data giả lập, bạn có thể gọi API lấy 'failed' shipments */}
           <div className="space-y-3">
-            {[1, 2, 3].map((_, idx) => (
-              <div
-                key={idx}
-                className="p-4 border border-red-50 bg-red-50/30 rounded-xl flex justify-between items-center"
-              >
-                <div>
-                  <p className="text-xs font-bold text-red-500 uppercase mb-1">
-                    Giao thất bại
-                  </p>
-                  <p className="text-sm font-bold text-gray-700">
-                    Đơn #SP{99283 + idx}
-                  </p>
-                  <p className="text-xs text-gray-500 mt-0.5 flex items-center gap-1">
-                    <Clock size={10} /> 2 giờ trước
-                  </p>
-                </div>
-                <button className="px-3 py-1.5 bg-white border border-red-200 text-red-600 text-xs font-bold rounded-lg hover:bg-red-50 transition">
-                  Xử lý
-                </button>
+            {failedShipments.length === 0 ? (
+              <div className="py-8 text-center text-gray-400">
+                <p className="text-2xl mb-2">✅</p>
+                <p className="text-sm font-medium">Không có đơn thất bại!</p>
               </div>
-            ))}
+            ) : (
+              failedShipments.slice(0, 4).map((s) => (
+                <div
+                  key={s.id}
+                  className="p-4 border border-red-50 bg-red-50/30 rounded-xl flex justify-between items-start gap-3"
+                >
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-2 mb-1">
+                      <p className="text-xs font-black text-red-500 uppercase">Thất bại</p>
+                      {(s.total_fails || 0) >= 3 && (
+                        <span className="text-[9px] bg-red-600 text-white px-1.5 py-0.5 rounded-full font-black">Được hủy</span>
+                      )}
+                    </div>
+                    <p className="text-sm font-bold text-gray-700">#{s.tracking_code}</p>
+                    <p className="text-xs text-gray-500 truncate">{s.receiver_name}</p>
+                    {s.failure_note && (
+                      <p className="text-xs text-red-500 italic truncate mt-0.5">{s.failure_note}</p>
+                    )}
+                    <p className="text-xs text-gray-400 mt-1 flex items-center gap-1">
+                      <Clock size={10} />
+                      {s.failed_at ? new Date(s.failed_at).toLocaleDateString("vi-VN") : "--"}
+                      {' · '}{s.total_fails || 0}/3 lần
+                    </p>
+                  </div>
+                  <button
+                    onClick={() => navigate("/dispatcher/failed-orders")}
+                    className="shrink-0 px-3 py-1.5 bg-white border border-red-200 text-red-600 text-xs font-bold rounded-lg hover:bg-red-50 transition"
+                  >
+                    Xử lý
+                  </button>
+                </div>
+              ))
+            )}
           </div>
         </div>
       </div>
@@ -310,11 +339,11 @@ export default function DispatcherDashboard() {
   );
 }
 
-// Component Card nhỏ
+
 function StatCard({ title, value, icon, color, sub }) {
   return (
     <div className="bg-white p-5 rounded-2xl shadow-sm border border-gray-100 hover:shadow-md transition-shadow relative overflow-hidden group">
-      {/* Dải màu bên trái */}
+      {}
       <div className={`absolute left-0 top-0 bottom-0 w-1 ${color}`}></div>
 
       <div className="flex justify-between items-start">

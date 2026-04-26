@@ -4,32 +4,29 @@ import { motion, AnimatePresence } from "framer-motion";
 import API from "../services/api";
 import { io } from "socket.io-client";
 
-// Lấy socket url từ env hoặc default
 const SOCKET_URL = import.meta.env.VITE_SOCKET_URL || "http://localhost:5000";
 const socket = io(SOCKET_URL, { transports: ["websocket"] });
 
+// Thông báo cho khách hàng
 export default function CustomerNotifications({ customerId }) {
   const [show, setShow] = useState(false);
   const [notifications, setNotifications] = useState([]);
   const [hasNew, setHasNew] = useState(false);
   const dropdownRef = useRef(null);
 
-  // 🧾 Lấy danh sách thông báo customer
+// Tải danh sách thông báo
   const fetchNotifications = async () => {
     try {
       const res = await API.get(`/notifications/customer/${customerId}`);
       setNotifications(res.data);
     } catch (err) {
-      console.error("❌ Lỗi khi tải thông báo:", err);
     }
   };
 
-  // ⚡ Lần đầu load thông báo luôn + khi mở dropdown
   useEffect(() => {
     if (customerId) fetchNotifications();
   }, [customerId]);
 
-  // Click ra ngoài để đóng
   useEffect(() => {
     function handleClickOutside(event) {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
@@ -40,14 +37,11 @@ export default function CustomerNotifications({ customerId }) {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  // 🔔 Đăng ký socket realtime
   useEffect(() => {
     if (!customerId) return;
 
-    // Join room dành riêng cho customer
     socket.emit("joinCustomer", customerId);
 
-    // Lắng nghe sự kiện thông báo mới
     socket.on("newCustomerNotification", (notif) => {
       setHasNew(true);
       setNotifications((prev) => [
@@ -64,27 +58,25 @@ export default function CustomerNotifications({ customerId }) {
     return () => socket.off("newCustomerNotification");
   }, [customerId]);
 
-  // 🔘 Đánh dấu 1 thông báo đã đọc
+// Đánh dấu thông báo đã đọc
   const markAsRead = async (id, isRead) => {
-    if (isRead) return; // Nếu đọc rồi thì bỏ qua
+    if (isRead) return;
     try {
       await API.put(`/notifications/${id}/read`);
       setNotifications((prev) =>
         prev.map((n) => (n.id === id ? { ...n, is_read: 1 } : n))
       );
     } catch (err) {
-      console.error("❌ Lỗi khi đánh dấu đã đọc:", err);
     }
   };
 
-  // Đánh dấu tất cả đã đọc
+// Đánh dấu tất cả thông báo đã đọc
   const markAllAsRead = async () => {
     try {
       await API.put(`/notifications/customer/${customerId}/read-all`);
       setNotifications((prev) => prev.map((n) => ({ ...n, is_read: 1 })));
       setHasNew(false);
     } catch (err) {
-      console.error("❌ Lỗi đánh dấu tất cả:", err);
     }
   };
 
@@ -92,7 +84,7 @@ export default function CustomerNotifications({ customerId }) {
 
   return (
     <div className="relative select-none" ref={dropdownRef}>
-      {/* 🔔 Nút chuông */}
+      {}
       <motion.button
         whileTap={{ scale: 0.9 }}
         animate={hasNew ? { rotate: [0, -15, 15, -15, 15, 0] } : {}}
@@ -100,7 +92,7 @@ export default function CustomerNotifications({ customerId }) {
         onClick={() => {
           setShow(!show);
           setHasNew(false);
-          if (!show) fetchNotifications(); // Refresh khi mở
+          if (!show) fetchNotifications();
         }}
         className="relative p-2 text-gray-400 hover:text-orange-500 hover:bg-orange-50 rounded-full transition-all"
         title="Thông báo"
@@ -117,7 +109,7 @@ export default function CustomerNotifications({ customerId }) {
         )}
       </motion.button>
 
-      {/* 📜 Panel thông báo */}
+      {}
       <AnimatePresence>
         {show && (
           <motion.div

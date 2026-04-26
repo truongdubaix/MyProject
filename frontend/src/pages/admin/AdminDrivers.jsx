@@ -15,13 +15,14 @@ import {
   Mail,
   Car,
 } from "lucide-react";
-// 👇 Import Component Pagination
+
 import Pagination from "../../components/Pagination";
 
+// Quản lý tài xế
 export default function AdminDrivers() {
-  const [tab, setTab] = useState("drivers"); // drivers | vehicles | applications
+  const [tab, setTab] = useState("drivers");
 
-  // --- DATA STATE ---
+
   const [drivers, setDrivers] = useState([]);
   const [filteredDrivers, setFilteredDrivers] = useState([]);
 
@@ -33,12 +34,12 @@ export default function AdminDrivers() {
   const [search, setSearch] = useState("");
   const [loading, setLoading] = useState(true);
 
-  // --- PAGINATION STATE ---
+
   const itemsPerPage = 8;
   const [driverPage, setDriverPage] = useState(1);
   const [vehiclePage, setVehiclePage] = useState(1);
 
-  // --- FORM STATE ---
+
   const [showDriverForm, setShowDriverForm] = useState(false);
   const [editingDriver, setEditingDriver] = useState(null);
   const [driverForm, setDriverForm] = useState({
@@ -61,9 +62,8 @@ export default function AdminDrivers() {
   const [selectedDriverId, setSelectedDriverId] = useState(null);
   const [selectedVehicleId, setSelectedVehicleId] = useState("");
 
-  // ==========================
-  // 1. FETCH DATA
-  // ==========================
+
+// Tải danh sách tài xế
   const fetchDrivers = async () => {
     try {
       const res = await API.get("/drivers");
@@ -102,7 +102,7 @@ export default function AdminDrivers() {
     loadData();
   }, []);
 
-  // Filter Logic
+
   useEffect(() => {
     const keyword = search.toLowerCase();
 
@@ -125,11 +125,9 @@ export default function AdminDrivers() {
     }
   }, [search, drivers, vehicles, tab]);
 
-  // ==========================
-  // 2. HANDLERS
-  // ==========================
 
-  // --- DRIVER ---
+
+
   const handleSaveDriver = async (e) => {
     e.preventDefault();
     try {
@@ -159,6 +157,7 @@ export default function AdminDrivers() {
     }
   };
 
+// Xử lý thay đổi trạng thái
   const handleStatusChange = async (id, status) => {
     try {
       await API.patch(`/drivers/${id}/status`, { status });
@@ -169,7 +168,7 @@ export default function AdminDrivers() {
     }
   };
 
-  // --- VEHICLE ---
+
   const handleSaveVehicle = async (e) => {
     e.preventDefault();
     try {
@@ -199,7 +198,7 @@ export default function AdminDrivers() {
     }
   };
 
-  // --- ASSIGN & APPROVE ---
+
   const handleAssignVehicle = async () => {
     if (!selectedVehicleId) return toast.error("Vui lòng chọn xe!");
     try {
@@ -216,6 +215,7 @@ export default function AdminDrivers() {
     }
   };
 
+// Duyệt đơn đăng ký tài xế
   const approveApplication = async (id) => {
     if (!confirm("Duyệt hồ sơ này?")) return;
     try {
@@ -228,9 +228,18 @@ export default function AdminDrivers() {
     }
   };
 
-  // ==========================
-  // 3. HELPERS
-  // ==========================
+  const rejectApplication = async (id) => {
+    if (!confirm("Từ chối hồ sơ này?")) return;
+    try {
+      await API.post(`/drivers/applications/${id}/reject`);
+      toast.success("Đã từ chối hồ sơ");
+      fetchApplications();
+    } catch {
+      toast.error("Lỗi từ chối hồ sơ");
+    }
+  };
+
+
   const getVehicleBadge = (status) => {
     const map = {
       available: { label: "Sẵn sàng", color: "bg-green-100 text-green-700" },
@@ -247,7 +256,7 @@ export default function AdminDrivers() {
     );
   };
 
-  // Pagination Data Calculation
+
   const currentDrivers = filteredDrivers.slice(
     (driverPage - 1) * itemsPerPage,
     driverPage * itemsPerPage
@@ -262,7 +271,7 @@ export default function AdminDrivers() {
 
   return (
     <div className="space-y-6 animate-in fade-in duration-500 font-sans">
-      {/* HEADER TABS */}
+      {}
       <div className="bg-white p-2 rounded-xl shadow-sm border border-gray-100 flex flex-wrap gap-2 w-fit">
         <button
           onClick={() => {
@@ -306,9 +315,9 @@ export default function AdminDrivers() {
         </button>
       </div>
 
-      {/* MAIN CONTENT */}
+      {}
       <div className="bg-white border border-gray-100 rounded-xl shadow-sm overflow-hidden">
-        {/* === TAB 1: DRIVERS === */}
+        {}
         {tab === "drivers" && (
           <>
             <div className="p-5 border-b border-gray-100 flex flex-col sm:flex-row justify-between items-center gap-4 bg-gray-50/50">
@@ -435,7 +444,7 @@ export default function AdminDrivers() {
               </table>
             </div>
 
-            {/* 👇 SỬ DỤNG COMPONENT PHÂN TRANG 👇 */}
+            {}
             <Pagination
               currentPage={driverPage}
               totalPages={totalDriverPages}
@@ -444,7 +453,7 @@ export default function AdminDrivers() {
           </>
         )}
 
-        {/* === TAB 2: VEHICLES === */}
+        {}
         {tab === "vehicles" && (
           <>
             <div className="p-5 border-b border-gray-100 flex flex-col sm:flex-row justify-between items-center gap-4 bg-gray-50/50">
@@ -548,7 +557,7 @@ export default function AdminDrivers() {
               </table>
             </div>
 
-            {/* 👇 SỬ DỤNG COMPONENT PHÂN TRANG 👇 */}
+            {}
             <Pagination
               currentPage={vehiclePage}
               totalPages={totalVehiclePages}
@@ -557,7 +566,7 @@ export default function AdminDrivers() {
           </>
         )}
 
-        {/* === TAB 3: APPLICATIONS === */}
+        {}
         {tab === "applications" && (
           <div className="overflow-x-auto">
             <table className="w-full text-sm text-left">
@@ -616,7 +625,7 @@ export default function AdminDrivers() {
                             <CheckCircle size={14} /> Duyệt
                           </button>
                           <button
-                            onClick={() => alert("Từ chối")}
+                            onClick={() => rejectApplication(app.id)}
                             className="flex items-center gap-1 bg-red-100 hover:bg-red-200 text-red-600 px-3 py-1.5 rounded-lg text-xs font-bold"
                           >
                             <XCircle size={14} /> Hủy
@@ -632,8 +641,8 @@ export default function AdminDrivers() {
         )}
       </div>
 
-      {/* === MODALS (Giữ nguyên phần Modal) === */}
-      {/* ... Phần Modal Driver, Vehicle, AssignModal giữ nguyên như code cũ ... */}
+      {}
+      {}
       {showDriverForm && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40 backdrop-blur-sm">
           <div className="bg-white rounded-xl shadow-2xl w-full max-w-md p-6">

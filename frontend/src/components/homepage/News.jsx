@@ -16,10 +16,9 @@ export default function NewsSection() {
     const fetchNews = async () => {
       try {
         const res = await API.get("/news");
-        // Lấy tối đa 3 tin tức mới nhất hiển thị trang chủ
+
         setNewsData(res.data.slice(0, 3));
       } catch (err) {
-        console.error("Lỗi tải tin tức trang chủ:", err);
       }
     };
     fetchNews();
@@ -28,10 +27,10 @@ export default function NewsSection() {
   return (
     <section className="py-24 bg-white font-sans">
       <div className="max-w-7xl mx-auto px-6">
-        {/* --- HEADER SECTION (Giống mẫu HTML cũ nhưng style SpeedyShip) --- */}
+        {}
         <div className="text-center mb-16" data-aos="fade-up">
           <div className="inline-flex items-center gap-2 mb-3">
-            {/* Giả lập icon cái hộp trong HTML cũ bằng FaBox màu cam */}
+            {}
             <FaBox className="text-orange-500 text-xl animate-bounce" />
             <span className="text-orange-500 font-bold uppercase tracking-widest text-sm">
               Tin tức & Blogs
@@ -43,7 +42,7 @@ export default function NewsSection() {
           <div className="w-20 h-1.5 bg-orange-500 mx-auto mt-4 rounded-full"></div>
         </div>
 
-        {/* --- GRID CARDS --- */}
+        {}
         <div className="grid md:grid-cols-2 xl:grid-cols-3 gap-8">
           {newsData.map((item, i) => (
             <div
@@ -52,7 +51,7 @@ export default function NewsSection() {
               data-aos="fade-up"
               data-aos-delay={i * 100}
             >
-              {/* 1. ẢNH & NGÀY THÁNG */}
+              {}
               <div className="relative h-64 overflow-hidden">
                 <img
                   src={getImageUrl(item.image)}
@@ -60,10 +59,10 @@ export default function NewsSection() {
                   className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
                 />
 
-                {/* Lớp phủ màu đen mờ khi hover */}
+                {}
                 <div className="absolute inset-0 bg-[#113e48]/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
 
-                {/* Badge Ngày tháng */}
+                {}
                 <div className="absolute top-4 left-4 bg-white/95 backdrop-blur rounded-lg shadow-md p-2 min-w-[60px] text-center border-t-4 border-orange-500">
                   <span className="block text-2xl font-extrabold text-[#113e48] leading-none">
                     {new Date(item.created_at).getDate()}
@@ -74,9 +73,9 @@ export default function NewsSection() {
                 </div>
               </div>
 
-              {/* 2. NỘI DUNG CARD */}
+              {}
               <div className="p-8 relative">
-                {/* Thanh Meta (Tác giả & Comment) - Đè lên ảnh một chút hoặc nằm ngay dưới */}
+                {}
                 <div className="flex items-center gap-4 text-xs font-semibold text-gray-500 mb-4 uppercase tracking-wide">
                   <div className="flex items-center gap-2 hover:text-orange-500 transition-colors cursor-pointer">
                     <FaUser className="text-orange-500" /> {item.author}
@@ -88,7 +87,7 @@ export default function NewsSection() {
                   </div>
                 </div>
 
-                {/* Tiêu đề \& Mô tả */}
+                {}
                 <h3 className="text-xl font-bold text-[#113e48] mb-3 line-clamp-2 leading-snug group-hover:text-orange-500 transition-colors">
                   <Link to={`/news/${item.id}`}>{item.title}</Link>
                 </h3>
@@ -96,7 +95,7 @@ export default function NewsSection() {
                   {item.desc}
                 </p>
 
-                {/* Nút Xem thêm */}
+                {}
                 <Link
                   to={`/news/${item.id}`}
                   className="inline-flex items-center gap-2 text-sm font-bold text-gray-400 group-hover:text-[#113e48] transition-all group/btn"
@@ -108,7 +107,7 @@ export default function NewsSection() {
                 </Link>
               </div>
 
-              {/* Đường kẻ trang trí dưới cùng */}
+              {}
               <div className="absolute bottom-0 left-0 w-0 h-1 bg-[#113e48] transition-all duration-500 group-hover:w-full"></div>
             </div>
           ))}

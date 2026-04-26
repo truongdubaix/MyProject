@@ -22,10 +22,10 @@ import {
   User,
 } from "lucide-react";
 
-// Token Mapbox
+
 const MAPBOX_TOKEN = import.meta.env.VITE_MAPBOX_TOKEN;
 
-// --- CUSTOM MARKER ---
+
 const CustomMarker = ({ icon, bgColor, ringColor, onClick }) => {
   return (
     <div
@@ -47,7 +47,7 @@ const CustomMarker = ({ icon, bgColor, ringColor, onClick }) => {
   );
 };
 
-// --- TRẠNG THÁI TIẾNG VIỆT ---
+
 const translateStatus = (status) => {
   const map = {
     pending: "Chờ xử lý",
@@ -62,7 +62,8 @@ const translateStatus = (status) => {
   return map[status] || status;
 };
 
-// --- MAIN COMPONENT ---
+
+// Chi tiết vận đơn đang theo dõi
 export default function DispatcherTrackingDetail() {
   const { id } = useParams();
   const navigate = useNavigate();
@@ -75,13 +76,13 @@ export default function DispatcherTrackingDetail() {
   const [driverPos, setDriverPos] = useState(null);
   const [popupInfo, setPopupInfo] = useState(null);
 
-  // --- API OSRM (LOGIC ÉP ĐƯỜNG VN) ---
+
   const fetchRouteOSRM = async (start, end) => {
     if (!start || !end) return null;
     const startStr = `${start[1]},${start[0]}`;
     const endStr = `${end[1]},${end[0]}`;
 
-    // Điểm neo để ép đường bám biển (tránh đi qua Campuchia/Lào)
+
     const daNang = "108.2022,16.0544";
     const nhaTrang = "109.1967,12.2388";
 
@@ -101,7 +102,6 @@ export default function DispatcherTrackingDetail() {
         return { type: "Feature", geometry: data.routes[0].geometry };
       }
     } catch (error) {
-      console.error("Lỗi OSRM:", error);
     }
     return null;
   };
@@ -113,7 +113,7 @@ export default function DispatcherTrackingDetail() {
         const data = res.data;
         setShipment(data);
 
-        // Tọa độ [Lat, Lng]
+
         let pk =
           data.pickup_lat && data.pickup_lng
             ? [Number(data.pickup_lat), Number(data.pickup_lng)]
@@ -126,7 +126,7 @@ export default function DispatcherTrackingDetail() {
         setPickup(pk);
         setDelivery(dl);
 
-        // --- LOGIC HIỂN THỊ XE & ĐƯỜNG ---
+
         if (data.status === "picking" || data.status === "delivering") {
           const geoJson = await fetchRouteOSRM(pk, dl);
           setRouteGeoJSON(geoJson);
@@ -134,33 +134,32 @@ export default function DispatcherTrackingDetail() {
           if (data.driver_lat) {
             setDriverPos([Number(data.driver_lat), Number(data.driver_lng)]);
           } else {
-            setDriverPos(pk); // Chưa có tọa độ thì lấy điểm đầu
+            setDriverPos(pk);
           }
         } else if (
           data.status === "completed" ||
           data.status === "delivered" ||
           data.status === "success"
         ) {
-          setDriverPos(dl); // Xe tại đích
-          setRouteGeoJSON(null); // Không vẽ đường nữa
+          setDriverPos(dl);
+          setRouteGeoJSON(null);
         } else {
           setDriverPos(null);
           setRouteGeoJSON(null);
         }
       } catch (err) {
-        console.error(err);
       }
     };
     fetchDetail();
   }, [id]);
 
-  // --- AUTO ZOOM (Sửa lại logic chắc chắn chạy) ---
+
   useEffect(() => {
-    // Chờ mapRef và các điểm có dữ liệu
+
     if (!mapRef.current || !pickup || !delivery) return;
 
     const features = [];
-    // Thêm điểm đi & đến vào danh sách cần zoom
+
     features.push({
       type: "Feature",
       geometry: { type: "Point", coordinates: [pickup[1], pickup[0]] },
@@ -170,7 +169,7 @@ export default function DispatcherTrackingDetail() {
       geometry: { type: "Point", coordinates: [delivery[1], delivery[0]] },
     });
 
-    // Nếu có đường đi, thêm cả đường đi vào để zoom bao trọn
+
     if (routeGeoJSON) features.push(routeGeoJSON);
 
     const featureCollection = { type: "FeatureCollection", features: features };
@@ -178,7 +177,7 @@ export default function DispatcherTrackingDetail() {
     try {
       const [minLng, minLat, maxLng, maxLat] = bbox(featureCollection);
 
-      // Kiểm tra xem có phải 1 điểm duy nhất không (để tránh lỗi zoom vô cực)
+
       const isSamePoint = minLng === maxLng && minLat === maxLat;
 
       if (isSamePoint) {
@@ -189,13 +188,12 @@ export default function DispatcherTrackingDetail() {
             [minLng, minLat],
             [maxLng, maxLat],
           ],
-          { padding: 80, duration: 1500, maxZoom: 14 } // maxZoom để không bị dí sát quá
+          { padding: 80, duration: 1500, maxZoom: 14 }
         );
       }
     } catch (error) {
-      console.error("Zoom error:", error);
     }
-  }, [routeGeoJSON, pickup, delivery]); // Chạy lại khi có đường hoặc điểm mới
+  }, [routeGeoJSON, pickup, delivery]);
 
   if (!shipment)
     return (
@@ -206,7 +204,7 @@ export default function DispatcherTrackingDetail() {
 
   return (
     <div className="min-h-screen bg-gray-50 pb-10 font-sans">
-      {/* HEADER */}
+      {}
       <div className="bg-white border-b border-gray-200 px-6 py-4 sticky top-0 z-50 flex items-center justify-between shadow-sm">
         <div className="flex items-center gap-4">
           <button
@@ -240,9 +238,9 @@ export default function DispatcherTrackingDetail() {
       </div>
 
       <div className="max-w-7xl mx-auto p-6 grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* INFO COLUMN */}
+        {}
         <div className="lg:col-span-1 space-y-6">
-          {/* Sender & Receiver */}
+          {}
           <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-200 space-y-6">
             <div className="flex gap-4 relative">
               <div className="flex flex-col items-center">
@@ -283,7 +281,7 @@ export default function DispatcherTrackingDetail() {
             </div>
           </div>
 
-          {/* Driver Info */}
+          {}
           <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-200">
             <h3 className="font-bold text-gray-800 mb-4 flex items-center gap-2">
               <User size={18} className="text-gray-400" /> Thông tin tài xế
@@ -317,7 +315,7 @@ export default function DispatcherTrackingDetail() {
           </div>
         </div>
 
-        {/* MAP COLUMN */}
+        {}
         <div className="lg:col-span-2 h-[600px] bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden relative">
           <Map
             ref={mapRef}
@@ -332,7 +330,7 @@ export default function DispatcherTrackingDetail() {
           >
             <NavigationControl position="bottom-right" />
 
-            {/* ROUTE LINE (Chỉ hiện khi đang đi) */}
+            {}
             {routeGeoJSON && (
               <Source id="route" type="geojson" data={routeGeoJSON}>
                 <Layer
@@ -348,7 +346,7 @@ export default function DispatcherTrackingDetail() {
               </Source>
             )}
 
-            {/* PICKUP MARKER */}
+            {}
             {pickup && (
               <Marker
                 longitude={pickup[1]}
@@ -373,7 +371,7 @@ export default function DispatcherTrackingDetail() {
               </Marker>
             )}
 
-            {/* DELIVERY MARKER */}
+            {}
             {delivery && (
               <Marker
                 longitude={delivery[1]}
@@ -398,7 +396,7 @@ export default function DispatcherTrackingDetail() {
               </Marker>
             )}
 
-            {/* DRIVER MARKER */}
+            {}
             {driverPos && (
               <Marker
                 longitude={driverPos[1]}
@@ -423,7 +421,7 @@ export default function DispatcherTrackingDetail() {
               </Marker>
             )}
 
-            {/* POPUP */}
+            {}
             {popupInfo && (
               <Popup
                 anchor="top"

@@ -16,7 +16,6 @@ router.post("/", upload.single("imageFile"), createNews);
 router.put("/:id", upload.single("imageFile"), updateNews);
 router.delete("/:id", deleteNews);
 
-// Mới thêm: route để upload ảnh trực tiếp (cho Quill editor)
 router.post("/upload-image", upload.single("image"), handleUploadResponse);
 
 export default router;

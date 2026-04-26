@@ -1,6 +1,6 @@
 import pool from "../config/db.js";
 
-// Tạo hoặc lấy chat đang hoạt động
+
 export const startChat = async (req, res) => {
   const { customer_id } = req.body;
   try {
@@ -22,12 +22,11 @@ export const startChat = async (req, res) => {
 
     res.json({ chatId });
   } catch (err) {
-    console.error("❌ Lỗi startChat:", err.message);
     res.status(500).json({ error: "Server error" });
   }
 };
 
-// Lấy danh sách tin nhắn
+
 export const getMessages = async (req, res) => {
   const { chatId } = req.params;
   try {
@@ -37,12 +36,11 @@ export const getMessages = async (req, res) => {
     );
     res.json(rows);
   } catch (err) {
-    console.error("❌ Lỗi getMessages:", err.message);
     res.status(500).json({ error: "Server error" });
   }
 };
 
-// Gửi tin nhắn
+
 export const saveMessage = async (chatId, senderId, role, content) => {
   try {
     await pool.query(
@@ -50,11 +48,10 @@ export const saveMessage = async (chatId, senderId, role, content) => {
       [chatId, senderId, role, content]
     );
   } catch (err) {
-    console.error("❌ Lỗi lưu tin nhắn:", err.message);
   }
 };
 
-// Kết thúc chat
+
 export const endChat = async (req, res) => {
   const { chatId } = req.params;
   try {
@@ -64,7 +61,6 @@ export const endChat = async (req, res) => {
     );
     res.json({ message: "✅ Chat đã kết thúc" });
   } catch (err) {
-    console.error("❌ Lỗi endChat:", err.message);
     res.status(500).json({ error: "Server error" });
   }
 };

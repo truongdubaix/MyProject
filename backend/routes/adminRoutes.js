@@ -8,10 +8,10 @@ import {
 
 const router = express.Router();
 
-//  Dashboard thống kê
+
 router.get("/stats", getAdminStats);
 
-//  Quản lý khách hàng
+
 router.get("/customers", getAllCustomers);
 router.put("/customers/:id", updateCustomerStatus);
 router.delete("/customers/:id", deleteCustomer);

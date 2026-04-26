@@ -39,6 +39,7 @@ const CustomCloseIcon = () => (
   </svg>
 );
 
+// Thanh điều hướng chính
 export default function Navbar() {
   const navigate = useNavigate();
   const location = useLocation();
@@ -80,6 +81,7 @@ export default function Navbar() {
     setUserDropdownOpen(false);
   }, [location]);
 
+// Xử lý đăng xuất
   const handleLogout = () => {
     localStorage.clear();
     setRole(null);
@@ -98,16 +100,16 @@ export default function Navbar() {
     navigate(paths[role] || "/");
   };
 
-  // THÊM HÀM XỬ LÝ NÚT GỬI HÀNG NGAY TẠI ĐÂY
+
   const handleCreateOrder = () => {
     if (!role) {
-      // Yêu cầu đăng nhập nếu chưa có role
+
       navigate("/login");
     } else if (role !== "customer") {
-      // Ngăn các role khác (admin, driver, dispatcher) tạo đơn hàng
+
       alert("Chức năng tạo đơn hàng chỉ dành cho tài khoản Khách hàng.");
     } else {
-      // Nếu đúng là khách hàng thì cho phép chuyển hướng
+
       navigate("/customer/create-order");
     }
   };
@@ -139,7 +141,7 @@ export default function Navbar() {
         scrolled ? "shadow-lg" : ""
       }`}
     >
-      {/* ===== TOP BAR ===== */}
+      {}
       <div
         className={`bg-slate-900 text-white text-xs md:text-sm transition-all duration-300 overflow-hidden ${
           scrolled ? "h-0 opacity-0" : "h-10 opacity-100"
@@ -157,14 +159,14 @@ export default function Navbar() {
         </div>
       </div>
 
-      {/* ===== MAIN NAV ===== */}
+      {}
       <nav
         className={`transition-all duration-300 border-b border-gray-100 ${
           scrolled ? "bg-white/95 backdrop-blur-md py-2" : "bg-white py-3"
         }`}
       >
         <div className="max-w-screen-2xl mx-auto px-4 sm:px-8 flex items-center justify-between gap-4">
-          {/* LOGO */}
+          {}
           <div
             onClick={() => navigate("/")}
             className="flex items-center gap-2 cursor-pointer select-none group shrink-0"
@@ -179,12 +181,12 @@ export default function Navbar() {
             </span>
           </div>
 
-          {/* DESKTOP MENU */}
+          {}
           <div className="hidden lg:flex items-center gap-8 xl:gap-10 shrink-0">
             <NavLink to="/">Trang chủ</NavLink>
             <NavLink to="/about">Giới thiệu</NavLink>
 
-            {/* DỊCH VỤ DROPDOWN */}
+            {}
             <div className="relative group py-2">
               <span className="cursor-pointer font-bold text-slate-700 uppercase hover:text-orange-600 transition-colors text-sm tracking-wide flex items-center whitespace-nowrap">
                 Dịch vụ{" "}
@@ -251,7 +253,7 @@ export default function Navbar() {
 
             <NavLink to="/apply-driver">Tuyển dụng</NavLink>
 
-            {/* CHÍNH SÁCH DROPDOWN */}
+            {}
             <div className="relative group py-2">
               <span className="cursor-pointer font-bold text-slate-700 uppercase hover:text-orange-600 transition-colors text-sm tracking-wide flex items-center whitespace-nowrap">
                 Chính sách{" "}
@@ -291,9 +293,9 @@ export default function Navbar() {
             <NavLink to="/contact">Liên hệ</NavLink>
           </div>
 
-          {/* RIGHT ACTIONS */}
+          {}
           <div className="flex items-center gap-3 shrink-0">
-            {/* UPDATE: GẮN SỰ KIỆN onClick VÀO NÚT BỎ THẺ Link */}
+            {}
             <button
               onClick={handleCreateOrder}
               className="hidden md:flex relative overflow-hidden group bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 text-white font-bold px-6 py-2 rounded-full shadow-md hover:shadow-orange-500/30 transition-all items-center gap-2 transform active:scale-95 whitespace-nowrap"
@@ -413,7 +415,7 @@ export default function Navbar() {
         </div>
       </nav>
 
-      {/* ===== MOBILE MENU ===== */}
+      {}
       <div
         className={`lg:hidden overflow-hidden transition-all duration-300 ${
           mobileMenuOpen
@@ -435,7 +437,7 @@ export default function Navbar() {
             Giới thiệu
           </Link>
 
-          {/* Mobile Dịch vụ */}
+          {}
           <div className="py-2 px-4">
             <p className="text-xs font-bold text-gray-400 uppercase mb-2">
               Dịch vụ
@@ -474,7 +476,7 @@ export default function Navbar() {
             </div>
           </div>
 
-          {/* Mobile Chính sách */}
+          {}
           <div className="py-2 px-4">
             <p className="text-xs font-bold text-gray-400 uppercase mb-2">
               Chính sách

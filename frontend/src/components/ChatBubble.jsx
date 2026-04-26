@@ -11,17 +11,18 @@ import {
   faInfoCircle,
 } from "@fortawesome/free-solid-svg-icons";
 
+// Bong bóng chat nổi
 export default function ChatBubble({ onClose }) {
   const [collapsed, setCollapsed] = useState(false);
   const [chatId, setChatId] = useState(null);
 
-  // Thêm state để quản lý Toast thông báo
+
   const [showToast, setShowToast] = useState(false);
 
-  // State quản lý mobile
+
   const [isMobile, setIsMobile] = useState(false);
 
-  // Tin nhắn ban đầu
+
   const [messages, setMessages] = useState([
     {
       role: "system",
@@ -31,21 +32,21 @@ export default function ChatBubble({ onClose }) {
   ]);
 
   const [input, setInput] = useState("");
-  const [ready, setReady] = useState(false); // Trạng thái kết nối
+  const [ready, setReady] = useState(false);
   const messagesEndRef = useRef(null);
 
-  // Ref để giữ instance của socket
+
   const socketRef = useRef(null);
 
   const userId = localStorage.getItem("userId");
   const role = localStorage.getItem("role");
 
-  // Auto scroll
+
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages, collapsed]);
 
-  // Hook kiểm tra kích thước màn hình
+
   useEffect(() => {
     const handleResize = () => setIsMobile(window.innerWidth < 768);
     handleResize();
@@ -53,7 +54,7 @@ export default function ChatBubble({ onClose }) {
     return () => window.removeEventListener("resize", handleResize);
   }, []);
 
-  // 🟢 LOGIC KẾT NỐI SOCKET
+
   useEffect(() => {
     if (!userId || role !== "customer") {
       alert("⚠ Vui lòng đăng nhập để chat!");
@@ -62,7 +63,6 @@ export default function ChatBubble({ onClose }) {
     }
 
     if (!socketRef.current) {
-      console.log("🔌 Client: Đang khởi tạo Socket...");
       socketRef.current = io("http://localhost:5000", {
         transports: ["websocket"],
         reconnectionAttempts: 5,
@@ -72,7 +72,6 @@ export default function ChatBubble({ onClose }) {
     const socket = socketRef.current;
 
     const onChatStarted = (id) => {
-      console.log("✅ Client: Chat Started! ID:", id);
       setChatId(id);
       setReady(true);
       socket.emit("joinChat", id);
@@ -92,7 +91,6 @@ export default function ChatBubble({ onClose }) {
     };
 
     const onNewMessage = (msg) => {
-      console.log("📩 New Message:", msg);
       setMessages((prev) => {
         const exists = prev.some(
           (m) =>
@@ -108,25 +106,23 @@ export default function ChatBubble({ onClose }) {
     };
 
     const onChatEnded = () => {
-      // 1. Hiển thị Toast
+
       setShowToast(true);
-      // 2. Khóa chat
+
       setReady(false);
-      // 3. Đảm bảo cửa sổ đang mở để người dùng thấy thông báo
+
       setCollapsed(false);
 
-      // 4. Đợi 4 giây rồi mới đóng hẳn
+
       setTimeout(() => {
         onClose();
       }, 4000);
     };
 
     const onConnectError = (err) => {
-      console.error("❌ Socket Error:", err);
     };
 
     socket.on("connect", () => {
-      console.log("🌐 Socket Connected:", socket.id);
       socket.emit("startChat", userId);
     });
 
@@ -140,7 +136,6 @@ export default function ChatBubble({ onClose }) {
     }
 
     return () => {
-      console.log("🛑 Client: Cleanup Socket...");
       socket.off("connect");
       socket.off("chatStarted", onChatStarted);
       socket.off("newMessage", onNewMessage);
@@ -151,7 +146,7 @@ export default function ChatBubble({ onClose }) {
     };
   }, [userId, role, onClose]);
 
-  // 🟢 HÀM GỬI TIN NHẮN
+
   const sendMessage = () => {
     if (!input.trim()) return;
 
@@ -199,7 +194,7 @@ export default function ChatBubble({ onClose }) {
         height: collapsed ? "auto" : isMobile ? "100dvh" : "600px",
       }}
     >
-      {/* --- 🔥 TOAST THÔNG BÁO KẾT THÚC --- */}
+      {}
       <AnimatePresence>
         {showToast && (
           <motion.div
@@ -214,7 +209,7 @@ export default function ChatBubble({ onClose }) {
         )}
       </AnimatePresence>
 
-      {/* HEADER */}
+      {}
       <motion.div
         layout="position"
         className={`bg-gradient-to-r from-orange-600 to-blue-500 text-white px-4 py-3 flex justify-between items-center cursor-pointer select-none shrink-0 z-10 ${
@@ -271,7 +266,7 @@ export default function ChatBubble({ onClose }) {
         </div>
       </motion.div>
 
-      {/* BODY */}
+      {}
       <AnimatePresence>
         {!collapsed && (
           <motion.div
@@ -331,7 +326,7 @@ export default function ChatBubble({ onClose }) {
               <div ref={messagesEndRef} />
             </div>
 
-            {/* INPUT */}
+            {}
             <div className="p-2 md:p-3 bg-white border-t border-gray-100 relative z-20 shrink-0 pb-safe">
               <div
                 className={`relative flex items-center bg-gray-100 rounded-full px-3 md:px-4 py-1.5 md:py-2 border border-transparent transition-all duration-300 ${

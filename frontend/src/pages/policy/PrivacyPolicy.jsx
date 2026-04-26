@@ -14,11 +14,11 @@ import "aos/dist/aos.css";
 export default function PrivacyPolicy() {
   useEffect(() => {
     AOS.init({ duration: 800, once: true });
-    // Cuộn lên đầu trang khi vào
+
     window.scrollTo(0, 0);
   }, []);
 
-  // Danh sách các mục chính sách (Sidebar)
+
   const sidebarLinks = [
     {
       name: "Bảo mật thông tin",
@@ -48,9 +48,9 @@ export default function PrivacyPolicy() {
 
   return (
     <div className="font-sans bg-gray-50 text-slate-700">
-      {/* 1. HERO HEADER: Nền xanh đậm */}
+      {}
       <section className="relative py-24 bg-[#113e48] text-white overflow-hidden">
-        {/* Họa tiết nền */}
+        {}
         <div className="absolute inset-0 opacity-10 pointer-events-none">
           <svg className="w-full h-full" xmlns="http://www.w3.org/2000/svg">
             <pattern
@@ -84,10 +84,10 @@ export default function PrivacyPolicy() {
         </div>
       </section>
 
-      {/* 2. MAIN CONTENT & SIDEBAR */}
+      {}
       <section className="max-w-7xl mx-auto px-6 py-16">
         <div className="flex flex-col lg:flex-row gap-12">
-          {/* --- SIDEBAR (Menu trái) --- */}
+          {}
           <div className="lg:w-1/4 shrink-0">
             <div className="bg-white rounded-2xl shadow-lg border border-gray-100 p-6 sticky top-24">
               <h3 className="text-lg font-bold text-[#113e48] mb-6 border-b border-gray-100 pb-4">
@@ -115,7 +115,7 @@ export default function PrivacyPolicy() {
                 ))}
               </ul>
 
-              {/* Box hỗ trợ nhỏ */}
+              {}
               <div className="mt-8 bg-[#113e48] rounded-xl p-5 text-white text-center">
                 <p className="text-sm font-medium mb-3">
                   Bạn cần giải đáp thêm?
@@ -130,7 +130,7 @@ export default function PrivacyPolicy() {
             </div>
           </div>
 
-          {/* --- RIGHT CONTENT (Nội dung chính) --- */}
+          {}
           <div className="lg:w-3/4">
             <div className="bg-white rounded-2xl shadow-xl shadow-[#113e48]/5 border border-gray-100 p-8 md:p-12">
               <div className="prose prose-lg max-w-none text-gray-600">
@@ -142,7 +142,7 @@ export default function PrivacyPolicy() {
                   của chúng tôi.
                 </p>
 
-                {/* Mục 1 */}
+                {}
                 <div className="mb-10" data-aos="fade-up">
                   <h3 className="flex items-center gap-3 text-2xl font-bold text-[#113e48] mb-4">
                     <span className="w-8 h-8 rounded-lg bg-blue-100 text-blue-600 flex items-center justify-center text-sm">
@@ -179,7 +179,7 @@ export default function PrivacyPolicy() {
                   </ul>
                 </div>
 
-                {/* Mục 2 */}
+                {}
                 <div className="mb-10" data-aos="fade-up">
                   <h3 className="flex items-center gap-3 text-2xl font-bold text-[#113e48] mb-4">
                     <span className="w-8 h-8 rounded-lg bg-blue-100 text-blue-600 flex items-center justify-center text-sm">
@@ -231,7 +231,7 @@ export default function PrivacyPolicy() {
                   </div>
                 </div>
 
-                {/* Mục 3 */}
+                {}
                 <div className="mb-10" data-aos="fade-up">
                   <h3 className="flex items-center gap-3 text-2xl font-bold text-[#113e48] mb-4">
                     <span className="w-8 h-8 rounded-lg bg-blue-100 text-blue-600 flex items-center justify-center text-sm">
@@ -257,7 +257,7 @@ export default function PrivacyPolicy() {
                   </ul>
                 </div>
 
-                {/* Mục 4 */}
+                {}
                 <div className="mb-8" data-aos="fade-up">
                   <h3 className="flex items-center gap-3 text-2xl font-bold text-[#113e48] mb-4">
                     <span className="w-8 h-8 rounded-lg bg-blue-100 text-blue-600 flex items-center justify-center text-sm">

@@ -1,16 +1,17 @@
 import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 
+// Xử lý đăng xuất
 export default function Logout() {
   const navigate = useNavigate();
 
   useEffect(() => {
-    // Xoá dữ liệu đăng nhập
+
     localStorage.removeItem("token");
     localStorage.removeItem("role");
     localStorage.removeItem("username");
 
-    // Chuyển về trang đăng nhập
+
     navigate("/login");
   }, [navigate]);
 

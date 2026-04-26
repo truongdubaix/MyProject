@@ -13,7 +13,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCircleNotch, faLightbulb } from "@fortawesome/free-solid-svg-icons";
 
-// --- DANH SÁCH CÂU HỎI GỢI Ý ---
+
 const SUGGESTED_QUESTIONS = [
   "Tra cứu đơn hàng SPxxxx",
   "Bảng giá vận chuyển nội thành?",
@@ -21,6 +21,7 @@ const SUGGESTED_QUESTIONS = [
   "Làm sao để tạo đơn hàng mới?",
 ];
 
+// Popup chat nhanh phía trên
 export default function ChatPopupTop({ onClose }) {
   const [collapsed, setCollapsed] = useState(false);
   const [messages, setMessages] = useState([
@@ -42,23 +43,22 @@ export default function ChatPopupTop({ onClose }) {
   const handleSend = async (text) => {
     if (!text.trim()) return;
 
-    // 1. Ẩn gợi ý
+
     setShowSuggestions(false);
 
-    // 2. Hiện tin nhắn user
+
     const userMsg = { from: "user", text: text };
     setMessages((prev) => [...prev, userMsg]);
     setInput("");
     setIsTyping(true);
 
     try {
-      // 3. Gọi API thật
+
       const res = await API.post("/ai/ask", { message: text });
 
       const botMsg = { from: "bot", text: res.data.reply };
       setMessages((prev) => [...prev, botMsg]);
     } catch (error) {
-      console.error("AI Error:", error);
       setMessages((prev) => [
         ...prev,
         {
@@ -73,7 +73,7 @@ export default function ChatPopupTop({ onClose }) {
 
   return (
     <motion.div
-      // 1. Animation Layout
+
       initial={{ opacity: 0, scale: 0.9 }}
       animate={{
         opacity: 1,
@@ -85,7 +85,7 @@ export default function ChatPopupTop({ onClose }) {
       transition={{ type: "spring", stiffness: 300, damping: 30 }}
       className="bg-white rounded-t-xl shadow-2xl flex flex-col overflow-hidden border border-gray-200 font-sans"
     >
-      {/* HEADER */}
+      {}
       <div
         className="bg-gradient-to-r from-[#113e48] to-blue-500 text-white px-4 py-3 flex justify-between items-center cursor-pointer select-none"
         onClick={() => setCollapsed(!collapsed)}
@@ -121,7 +121,7 @@ export default function ChatPopupTop({ onClose }) {
         </div>
       </div>
 
-      {/* BODY */}
+      {}
       {!collapsed && (
         <>
           <div className="flex-1 p-4 overflow-y-auto bg-slate-50 scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-transparent">
@@ -248,7 +248,7 @@ export default function ChatPopupTop({ onClose }) {
             <div ref={messagesEndRef} />
           </div>
 
-          {/* INPUT */}
+          {}
           <div className="p-3 bg-white border-t border-gray-100">
             <div className="relative flex items-center bg-gray-100 rounded-full px-4 py-2 border border-transparent focus-within:bg-white focus-within:ring-1 focus-within:ring-orange-500 transition-all">
               <input

@@ -25,14 +25,15 @@ export default function CustomerLayout() {
   const username = localStorage.getItem("username") || "Khách hàng";
   const customerId = localStorage.getItem("customer_id") || localStorage.getItem("userId");
 
-  // State quản lý việc mở/đóng sidebar trên mobile
+
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
-  // Tự động đóng sidebar khi chuyển trang trên mobile
+
   useEffect(() => {
     setIsSidebarOpen(false);
   }, [location.pathname]);
 
+// Xử lý đăng xuất
   const handleLogout = () => {
     if (window.confirm("Bạn có chắc chắn muốn đăng xuất?")) {
       localStorage.clear();
@@ -49,7 +50,7 @@ export default function CustomerLayout() {
     }
   `;
 
-  // Title Header Mapping
+
   const getPageTitle = () => {
     switch (location.pathname) {
       case "/customer":
@@ -78,7 +79,7 @@ export default function CustomerLayout() {
 
   return (
     <div className="flex h-screen bg-[#F8FAFC] overflow-hidden font-sans">
-      {/* --- OVERLAY MOBILE --- */}
+      {}
       {isSidebarOpen && (
         <div
           className="fixed inset-0 bg-black/50 z-40 md:hidden transition-opacity"
@@ -86,7 +87,7 @@ export default function CustomerLayout() {
         />
       )}
 
-      {/* --- SIDEBAR --- */}
+      {}
       <aside
         className={`
           fixed inset-y-0 left-0 z-50 w-72 bg-[#113e48] text-white flex flex-col shadow-2xl 
@@ -95,7 +96,7 @@ export default function CustomerLayout() {
           ${isSidebarOpen ? "translate-x-0" : "-translate-x-full"}
         `}
       >
-        {/* Brand Logo & Nút Đóng (Mobile) */}
+        {}
         <div className="h-16 md:h-20 flex items-center justify-between px-6 md:px-8 border-b border-white/10 shrink-0">
           <div
             className="flex items-center gap-2 cursor-pointer"
@@ -113,7 +114,7 @@ export default function CustomerLayout() {
             </span>
           </div>
 
-          {/* Nút đóng sidebar chỉ hiện trên mobile */}
+          {}
           <button
             onClick={() => setIsSidebarOpen(false)}
             className="md:hidden p-2 bg-white/10 rounded-lg hover:bg-white/20 transition-colors text-white"
@@ -122,9 +123,9 @@ export default function CustomerLayout() {
           </button>
         </div>
 
-        {/* Navigation Menu */}
+        {}
         <div className="flex-1 overflow-y-auto py-6 px-4 space-y-6 custom-scrollbar">
-          {/* GROUP 1: CHỨC NĂNG CHÍNH */}
+          {}
           <div>
             <p className="px-4 mb-2 text-[10px] font-bold text-blue-200/50 uppercase tracking-widest">
               Quản lý vận đơn
@@ -145,7 +146,7 @@ export default function CustomerLayout() {
             </nav>
           </div>
 
-          {/* GROUP 2: TIỆN ÍCH */}
+          {}
           <div>
             <p className="px-4 mb-2 text-[10px] font-bold text-blue-200/50 uppercase tracking-widest">
               Tiện ích
@@ -166,7 +167,7 @@ export default function CustomerLayout() {
             </nav>
           </div>
 
-          {/* GROUP 3: CÀI ĐẶT */}
+          {}
           <div>
             <p className="px-4 mb-2 text-[10px] font-bold text-blue-200/50 uppercase tracking-widest">
               Cài đặt
@@ -179,7 +180,7 @@ export default function CustomerLayout() {
           </div>
         </div>
 
-        {/* User Profile Footer */}
+        {}
         <div className="p-4 bg-[#0d2f36] border-t border-white/5 shrink-0">
           <div className="flex items-center justify-between p-3 rounded-xl bg-white/5 border border-white/5 hover:bg-white/10 transition-colors cursor-pointer group">
             <div className="flex items-center gap-3 overflow-hidden">
@@ -204,11 +205,11 @@ export default function CustomerLayout() {
         </div>
       </aside>
 
-      {/* --- MAIN CONTENT --- */}
+      {}
       <div className="flex-1 flex flex-col min-w-0 h-screen overflow-hidden relative">
         <header className="h-16 bg-white shadow-sm border-b border-gray-100 flex items-center justify-between px-4 md:px-8 z-10 shrink-0">
           <div className="flex items-center gap-3">
-            {/* Nút Hamburger (Chỉ hiện trên mobile) */}
+            {}
             <button
               onClick={() => setIsSidebarOpen(true)}
               className="md:hidden p-2 -ml-2 text-slate-600 hover:bg-slate-100 rounded-lg transition-colors focus:outline-none"

@@ -3,7 +3,7 @@ import API from "../services/api";
 import toast from "react-hot-toast";
 import AOS from "aos";
 import "aos/dist/aos.css";
-// Import các icon cần thiết từ react-icons
+
 import {
   FaTruck,
   FaMoneyBillWave,
@@ -17,8 +17,9 @@ import {
   FaHandshake,
 } from "react-icons/fa";
 
+// Đăng ký làm tài xế
 export default function ApplyDriver() {
-  // --- STATE & LOGIC GIỮ NGUYÊN ---
+
   const [form, setForm] = useState({
     name: "",
     phone: "",
@@ -41,6 +42,7 @@ export default function ApplyDriver() {
     });
   };
 
+// Xử lý submit form
   const handleSubmit = async (e) => {
     e.preventDefault();
 
@@ -50,11 +52,11 @@ export default function ApplyDriver() {
 
     try {
       setLoading(true);
-      // Gọi API nộp đơn (Đường dẫn API giữ nguyên theo logic cũ của bạn)
+
       const res = await API.post("/drivers/apply", form);
       toast.success("✅ " + res.data.message);
 
-      // Reset form sau khi gửi thành công
+
       setForm({
         name: "",
         phone: "",
@@ -64,7 +66,6 @@ export default function ApplyDriver() {
         experience: "",
       });
     } catch (err) {
-      console.error(err);
       toast.error("❌ Gửi thất bại, vui lòng thử lại!");
     } finally {
       setLoading(false);
@@ -73,12 +74,12 @@ export default function ApplyDriver() {
 
   return (
     <div className="font-sans bg-gray-50 text-slate-800">
-      {/* 1. HERO BANNER */}
+      {}
       <section
         className="relative py-28 bg-[#113e48] text-white overflow-hidden"
         data-aos="fade-down"
       >
-        {/* Background Pattern */}
+        {}
         <div className="absolute inset-0 opacity-10 pointer-events-none">
           <svg className="w-full h-full" xmlns="http://www.w3.org/2000/svg">
             <pattern
@@ -113,7 +114,7 @@ export default function ApplyDriver() {
         </div>
       </section>
 
-      {/* 2. LỢI ÍCH */}
+      {}
       <section className="py-20 -mt-16 relative z-20 px-6">
         <div
           className="max-w-6xl mx-auto grid md:grid-cols-3 gap-8"
@@ -157,10 +158,10 @@ export default function ApplyDriver() {
         </div>
       </section>
 
-      {/* 3. YÊU CẦU CÔNG VIỆC */}
+      {}
       <section className="py-16 bg-white" data-aos="fade-right">
         <div className="max-w-6xl mx-auto px-6 grid md:grid-cols-2 gap-12 items-center">
-          {/* Cột Ảnh minh họa */}
+          {}
           <div className="relative h-96 rounded-2xl overflow-hidden shadow-lg hidden md:block">
             <img
               src="https://images.unsplash.com/photo-1616432043562-3671ea2e5242?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80"
@@ -170,7 +171,7 @@ export default function ApplyDriver() {
             <div className="absolute inset-0 bg-[#113e48]/20 mix-blend-multiply"></div>
           </div>
 
-          {/* Cột Nội dung */}
+          {}
           <div>
             <div className="inline-flex items-center gap-2 mb-2 text-orange-600 font-bold uppercase tracking-wider text-sm">
               <FaCheckCircle /> Tiêu chí
@@ -202,7 +203,7 @@ export default function ApplyDriver() {
         </div>
       </section>
 
-      {/* 4. FORM ỨNG TUYỂN */}
+      {}
       <section className="py-24 bg-gray-50 relative">
         <div className="max-w-4xl mx-auto px-6" data-aos="fade-up">
           <div className="bg-white p-8 md:p-12 rounded-3xl shadow-2xl shadow-[#113e48]/10 border border-gray-100">
@@ -327,10 +328,10 @@ export default function ApplyDriver() {
         </div>
       </section>
 
-      {/* 🔥 5. QUY TRÌNH TUYỂN DỤNG (STYLE MỚI) 🔥 */}
+      {}
       <section className="py-24 bg-white border-t border-gray-100 overflow-hidden">
         <div className="max-w-7xl mx-auto px-6 text-center">
-          {/* Header Section */}
+          {}
           <div className="mb-16" data-aos="fade-up">
             <div className="inline-flex items-center gap-2 bg-orange-100 text-orange-600 px-4 py-2 rounded-full font-bold text-sm uppercase tracking-wide mb-4 border border-orange-200">
               <FaUserCheck /> <span>Quy trình</span>
@@ -340,9 +341,9 @@ export default function ApplyDriver() {
             </h2>
           </div>
 
-          {/* Process Steps */}
+          {}
           <div className="grid grid-cols-1 md:grid-cols-4 gap-8 relative">
-            {/* Đường nối nét đứt (Chỉ hiện trên desktop) */}
+            {}
             <div className="hidden md:block absolute top-[70px] left-0 w-full h-0.5 border-t-2 border-dashed border-orange-200 -z-0"></div>
 
             {[
@@ -377,20 +378,20 @@ export default function ApplyDriver() {
                 data-aos="fade-up"
                 data-aos-delay={i * 150}
               >
-                {/* Vòng tròn lớn nét đứt */}
+                {}
                 <div className="w-36 h-36 rounded-full border-2 border-dashed border-orange-300 bg-white flex items-center justify-center mb-6 relative transition-all duration-500 group-hover:border-orange-500 group-hover:bg-orange-50">
-                  {/* Icon bên trong */}
+                  {}
                   <div className="text-4xl text-orange-500 transition-transform duration-500 group-hover:scale-110">
                     {step.icon}
                   </div>
 
-                  {/* Badge số thứ tự (Góc phải trên) */}
+                  {}
                   <div className="absolute top-0 right-0 bg-orange-500 text-white w-8 h-8 rounded-full flex items-center justify-center font-bold text-sm shadow-md border-2 border-white transform translate-x-1 -translate-y-1">
                     {step.id}
                   </div>
                 </div>
 
-                {/* Nội dung */}
+                {}
                 <h3 className="text-xl font-bold text-[#113e48] mb-2 group-hover:text-orange-600 transition-colors">
                   {step.title}
                 </h3>

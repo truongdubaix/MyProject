@@ -14,11 +14,11 @@ import {
 } from "@fortawesome/free-solid-svg-icons";
 
 export default function AIRealtimeSection() {
-  // [lat, lng]
+
   const [driverPos, setDriverPos] = useState([16.0678, 108.2208]);
   const { openAIChat, openSupportChat } = useChat();
 
-  // 📌 Update mock position (GIỮ LOGIC CŨ)
+
   useEffect(() => {
     const timer = setInterval(() => {
       setDriverPos((prev) => [
@@ -34,7 +34,7 @@ export default function AIRealtimeSection() {
       <div className="absolute top-0 right-0 w-1/2 h-full bg-gradient-to-l from-orange-50 to-transparent pointer-events-none"></div>
 
       <div className="max-w-7xl mx-auto px-6 grid lg:grid-cols-2 gap-16 items-start relative z-10">
-        {/* LEFT */}
+        {}
         <div data-aos="fade-right">
           <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-orange-100 text-orange-600 mb-6 border border-orange-200">
             <FontAwesomeIcon icon={faRobot} className="text-xl" />
@@ -54,7 +54,7 @@ export default function AIRealtimeSection() {
           </p>
 
           <div className="grid sm:grid-cols-2 gap-6">
-            {/* AI */}
+            {}
             <div className="relative bg-white p-6 rounded-2xl shadow-md border border-[#113e48] hover:shadow-xl hover:-translate-y-1 transition-all duration-300 group overflow-hidden">
               <div className="absolute inset-0 bg-orange-500 translate-y-full group-hover:translate-y-0 transition-transform duration-500 z-0"></div>
               <div className="absolute top-0 -left-[100%] w-full h-full bg-white/20 skew-x-[45deg] group-hover:left-[100%] transition-all duration-700 z-1"></div>
@@ -78,7 +78,7 @@ export default function AIRealtimeSection() {
               </div>
             </div>
 
-            {/* HUMAN */}
+            {}
             <div className="relative bg-white p-6 rounded-2xl shadow-md border border-orange-500 hover:shadow-xl hover:-translate-y-1 transition-all duration-300 group overflow-hidden">
               <div className="absolute inset-0 bg-[#113e48] translate-y-full group-hover:translate-y-0 transition-transform duration-500 z-0"></div>
               <div className="absolute top-0 -left-[100%] w-full h-full bg-white/20 skew-x-[45deg] group-hover:left-[100%] transition-all duration-700 z-1"></div>
@@ -103,7 +103,7 @@ export default function AIRealtimeSection() {
           </div>
         </div>
 
-        {/* RIGHT MAP – MAPBOX */}
+        {}
         <div data-aos="fade-left" className="relative mt-8 lg:mt-0">
           <div className="bg-white rounded-[30px] shadow-[0_20px_50px_rgba(0,0,0,0.1)] p-2 border relative z-10 overflow-hidden">
             <div className="px-6 py-5 flex justify-between items-center border-b bg-white z-20">

@@ -19,7 +19,6 @@ import {
   Legend,
 } from "recharts";
 
-// Hàm lấy User ID
 function getCurrentUserId() {
   const keys = ["user", "userId", "userid", "user_id", "customer_id"];
   for (const key of keys) {
@@ -29,14 +28,13 @@ function getCurrentUserId() {
       try {
         const parsed = JSON.parse(value);
         if (parsed?.id) return parsed.id;
-      } catch (err) {
-        console.error(err);
-      }
+      } catch (err) {}
     } else return value;
   }
   return null;
 }
 
+// Trang tổng quan của khách hàng
 export default function CustomerDashboard() {
   const [shipments, setShipments] = useState([]);
   const [stats, setStats] = useState({
@@ -54,10 +52,11 @@ export default function CustomerDashboard() {
     AOS.init({ duration: 600, easing: "ease-out-cubic", once: true });
 
     if (!userId) {
-      toast.error("❌ Không tìm thấy thông tin người dùng!");
+      toast.error("Không tìm thấy thông tin người dùng!");
       return;
     }
 
+    // Tải dữ liệu từ server
     const fetchData = async () => {
       try {
         setLoading(true);
@@ -65,7 +64,6 @@ export default function CustomerDashboard() {
         const data = res.data || [];
         setShipments(data);
 
-        // Tính toán thống kê
         const total = data.length;
         const delivering = data.filter((s) =>
           ["delivering", "picking"].includes(s.status),
@@ -74,7 +72,10 @@ export default function CustomerDashboard() {
           ["delivered", "completed"].includes(s.status),
         ).length;
         const pending = data.filter((s) => s.status === "pending").length;
-        const failed = total - (pending + delivering + completed); // Các trạng thái còn lại
+        const assigned = data.filter((s) => s.status === "assigned").length;
+        const failed = data.filter((s) =>
+          ["failed", "cancelled"].includes(s.status),
+        ).length;
         const totalCod = data.reduce(
           (sum, s) => sum + (Number(s.cod_amount) || 0),
           0,
@@ -82,17 +83,16 @@ export default function CustomerDashboard() {
 
         setStats({ total, delivering, completed, pending, totalCod });
 
-        // Xử lý dữ liệu cho Pie Chart
         const rawChartData = [
           { name: "Chờ xử lý", value: pending, color: "#F59E0B" },
+          { name: "Đã phân công", value: assigned, color: "#8B5CF6" },
           { name: "Đang giao", value: delivering, color: "#3B82F6" },
-          { name: "Hoàn tất", value: completed, color: "#10B981" },
+          { name: "Hoàn thành", value: completed, color: "#10B981" },
           { name: "Thất bại/Hủy", value: failed, color: "#EF4444" },
         ];
-        // Lọc bỏ các trạng thái = 0
+
         setChartData(rawChartData.filter((item) => item.value > 0));
       } catch (err) {
-        console.error(err);
         toast.error("Không thể tải dữ liệu!");
       } finally {
         setLoading(false);
@@ -117,9 +117,8 @@ export default function CustomerDashboard() {
   }
 
   return (
-    // 🔥 UPDATE: Giảm spacing trên mobile (space-y-6 thay vì space-y-8)
     <div className="space-y-6 md:space-y-8 animate-in fade-in duration-500 pb-10">
-      {/* 1. Header Welcome */}
+      {/* Header */}
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 md:gap-4">
         <div>
           <h1 className="text-xl md:text-2xl font-extrabold text-[#113e48] flex items-center gap-2">
@@ -143,8 +142,7 @@ export default function CustomerDashboard() {
         </button>
       </div>
 
-      {/* 2. Stats Grid */}
-      {/* 🔥 UPDATE: Giảm gap trên mobile */}
+      {/* Stat Cards */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-6">
         <StatCard
           title="Tổng đơn"
@@ -173,17 +171,16 @@ export default function CustomerDashboard() {
             <DollarSign className="text-purple-600 w-5 h-5 md:w-6 md:h-6" />
           }
           bg="bg-purple-50"
-          valueSize="text-lg md:text-2xl" // Cho text nhỏ lại xíu nếu tiền dài
+          valueSize="text-lg md:text-2xl"
         />
       </div>
 
-      {/* 3. Charts & Recent Orders */}
+      {/* Chart + Recent Orders */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 md:gap-8">
-        {/* Left: Pie Chart */}
+        {/* Pie Chart */}
         <div className="bg-white p-4 md:p-6 rounded-2xl md:rounded-3xl shadow-sm border border-gray-100 lg:col-span-1 flex flex-col">
           <h3 className="text-base md:text-lg font-bold text-[#113e48] mb-2 flex items-center gap-2">
-            <PieChartIcon size={18} className="text-gray-400" /> Tỷ lệ trạng
-            thái
+            <PieChartIcon size={18} className="text-gray-400" /> Tỷ lệ trạng thái
           </h3>
 
           <div className="flex-1 min-h-[250px] md:min-h-[300px] relative">
@@ -194,7 +191,7 @@ export default function CustomerDashboard() {
                     data={chartData}
                     cx="50%"
                     cy="50%"
-                    innerRadius={50} // Nhỏ hơn chút cho mobile
+                    innerRadius={50}
                     outerRadius={70}
                     paddingAngle={5}
                     dataKey="value"
@@ -244,7 +241,7 @@ export default function CustomerDashboard() {
           </div>
         </div>
 
-        {/* Right: Recent Orders Table */}
+        {/* Recent Orders */}
         <div className="bg-white p-4 md:p-6 rounded-2xl md:rounded-3xl shadow-sm border border-gray-100 lg:col-span-2">
           <div className="flex justify-between items-center mb-4 md:mb-6">
             <h3 className="text-base md:text-lg font-bold text-[#113e48]">
@@ -262,7 +259,7 @@ export default function CustomerDashboard() {
               </div>
             ) : (
               <>
-                {/* --- Giao diện MOBILE (dạng Card) --- */}
+                {/* Mobile cards */}
                 <div className="md:hidden space-y-3">
                   {shipments.slice(0, 5).map((s) => (
                     <div
@@ -271,33 +268,22 @@ export default function CustomerDashboard() {
                     >
                       <div className="flex justify-between items-start mb-2 border-b border-gray-100 pb-2">
                         <div>
-                          <p className="text-xs text-gray-400 font-medium">
-                            Mã VĐ
-                          </p>
+                          <p className="text-xs text-gray-400 font-medium">Mã VĐ</p>
                           <p className="font-bold text-[#113e48] text-sm">
                             {s.tracking_code}
                           </p>
                         </div>
                         <StatusBadge status={s.status} />
                       </div>
-
                       <div className="grid grid-cols-2 gap-2 text-sm">
                         <div>
-                          <p className="text-[10px] text-gray-400 uppercase">
-                            Người nhận
-                          </p>
-                          <p className="font-medium text-gray-800 truncate">
-                            {s.receiver_name}
-                          </p>
-                          <p className="text-xs text-gray-500">
-                            {s.receiver_phone}
-                          </p>
+                          <p className="text-[10px] text-gray-400 uppercase">Người nhận</p>
+                          <p className="font-medium text-gray-800 truncate">{s.receiver_name}</p>
+                          <p className="text-xs text-gray-500">{s.receiver_phone}</p>
                         </div>
                         <div className="text-right flex flex-col justify-between">
                           <div>
-                            <p className="text-[10px] text-gray-400 uppercase">
-                              Tiền COD
-                            </p>
+                            <p className="text-[10px] text-gray-400 uppercase">Tiền COD</p>
                             <p className="font-bold text-gray-700">
                               {Number(s.cod_amount).toLocaleString("vi-VN")}₫
                             </p>
@@ -311,7 +297,7 @@ export default function CustomerDashboard() {
                   ))}
                 </div>
 
-                {/* --- Giao diện DESKTOP (dạng Table) --- */}
+                {/* Desktop table */}
                 <div className="hidden md:block overflow-x-auto">
                   <table className="w-full text-sm text-left">
                     <thead className="text-xs text-gray-400 uppercase bg-gray-50/50 border-b border-gray-100">
@@ -320,9 +306,7 @@ export default function CustomerDashboard() {
                         <th className="px-4 py-3">Người nhận</th>
                         <th className="px-4 py-3 text-center">Trạng thái</th>
                         <th className="px-4 py-3 text-right">COD</th>
-                        <th className="px-4 py-3 rounded-tr-lg text-right">
-                          Ngày tạo
-                        </th>
+                        <th className="px-4 py-3 rounded-tr-lg text-right">Ngày tạo</th>
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-gray-50">
@@ -335,12 +319,8 @@ export default function CustomerDashboard() {
                             {s.tracking_code}
                           </td>
                           <td className="px-4 py-4">
-                            <div className="font-medium text-gray-900">
-                              {s.receiver_name}
-                            </div>
-                            <div className="text-xs text-gray-400">
-                              {s.receiver_phone}
-                            </div>
+                            <div className="font-medium text-gray-900">{s.receiver_name}</div>
+                            <div className="text-xs text-gray-400">{s.receiver_phone}</div>
                           </td>
                           <td className="px-4 py-4 text-center">
                             <StatusBadge status={s.status} />
@@ -365,16 +345,7 @@ export default function CustomerDashboard() {
   );
 }
 
-// --- SUB COMPONENTS ---
-
-// Cập nhật StatCard để hỗ trợ prop custom font size (valueSize)
-function StatCard({
-  title,
-  value,
-  icon,
-  bg,
-  valueSize = "text-xl md:text-2xl",
-}) {
+function StatCard({ title, value, icon, bg, valueSize = "text-xl md:text-2xl" }) {
   return (
     <div className="bg-white p-3 md:p-5 rounded-xl md:rounded-2xl shadow-sm border border-gray-100 flex items-center justify-between hover:shadow-md transition-shadow group h-full">
       <div className="w-[60%]">
@@ -394,52 +365,63 @@ function StatCard({
   );
 }
 
+// Tạo badge hiển thị trạng thái
 function StatusBadge({ status }) {
   const config = {
     pending: {
       label: "Chờ xử lý",
-      color: "bg-yellow-100 text-yellow-700",
-      icon: "⏳",
+      color: "bg-yellow-50 text-yellow-700 border-yellow-200",
+      dot: "bg-yellow-400",
+    },
+    assigned: {
+      label: "Đã phân công",
+      color: "bg-gray-100 text-gray-600 border-gray-200",
+      dot: "bg-gray-400",
     },
     picking: {
-      label: "Đang lấy",
-      color: "bg-blue-100 text-blue-700",
-      icon: "📦",
+      label: "Đang lấy hàng",
+      color: "bg-orange-50 text-orange-700 border-orange-200",
+      dot: "bg-orange-400",
     },
     delivering: {
       label: "Đang giao",
-      color: "bg-blue-100 text-blue-700",
-      icon: "🚚",
+      color: "bg-blue-50 text-blue-700 border-blue-200",
+      dot: "bg-blue-400",
     },
     delivered: {
-      label: "Đã giao", // Sửa text cho ngắn gọn hơn
-      color: "bg-green-100 text-green-700",
-      icon: "✅",
+      label: "Đã giao",
+      color: "bg-green-50 text-green-700 border-green-200",
+      dot: "bg-green-400",
     },
     completed: {
-      label: "Hoàn tất",
-      color: "bg-green-100 text-green-700",
-      icon: "✅",
+      label: "Hoàn thành",
+      color: "bg-green-50 text-green-700 border-green-200",
+      dot: "bg-green-500",
     },
-    failed: { label: "Thất bại", color: "bg-red-100 text-red-700", icon: "❌" },
+    failed: {
+      label: "Giao thất bại",
+      color: "bg-red-50 text-red-700 border-red-200",
+      dot: "bg-red-500",
+    },
     cancelled: {
       label: "Đã hủy",
-      color: "bg-gray-100 text-gray-600",
-      icon: "🚫",
+      color: "bg-gray-100 text-gray-500 border-gray-200",
+      dot: "bg-gray-400",
     },
   };
 
   const s = config[status] || {
     label: status,
-    color: "bg-gray-100 text-gray-600",
-    icon: "•",
+    color: "bg-gray-100 text-gray-500 border-gray-200",
+    dot: "bg-gray-300",
   };
 
   return (
     <span
-      className={`px-2 md:px-2.5 py-0.5 md:py-1 rounded-full text-[10px] md:text-xs font-bold ${s.color} border border-transparent flex items-center gap-1 w-fit`}
+      className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-bold border whitespace-nowrap ${s.color}`}
     >
-      <span>{s.icon}</span> <span>{s.label}</span>
+      <span className={`w-1.5 h-1.5 rounded-full ${s.dot} flex-shrink-0`} />
+      {s.label}
     </span>
   );
 }

@@ -64,9 +64,9 @@ export default function ExpressDelivery() {
 
   return (
     <div className="font-sans bg-slate-50 text-slate-700">
-      {/* 1. HERO SECTION: Dynamic & Fast */}
+      {}
       <section className="relative h-[500px] flex items-center overflow-hidden">
-        {/* Background Image: Traffic light trails / Fast motion */}
+        {}
         <div className="absolute inset-0 z-0">
           <img
             src="https://images.unsplash.com/photo-1557166983-5939644443a0?auto=format&fit=crop&w=1920&q=80"
@@ -103,7 +103,7 @@ export default function ExpressDelivery() {
         </div>
       </section>
 
-      {/* 2. KEY SELLING POINTS (Lợi ích cốt lõi) */}
+      {}
       <section className="py-12 -mt-16 relative z-20 px-6">
         <div className="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-6">
           {[
@@ -146,7 +146,7 @@ export default function ExpressDelivery() {
         </div>
       </section>
 
-      {/* 3. SERVICE PACKAGES (Gói dịch vụ) */}
+      {}
       <section className="py-20 px-6 max-w-7xl mx-auto">
         <div className="text-center mb-16">
           <h2 className="text-3xl font-extrabold text-[#113e48] mb-4">
@@ -221,7 +221,7 @@ export default function ExpressDelivery() {
         </div>
       </section>
 
-      {/* 4. CAM KẾT */}
+      {}
       <section className="py-20 bg-white">
         <div className="max-w-6xl mx-auto px-6 grid md:grid-cols-2 gap-12 items-center">
           <div data-aos="fade-right">
@@ -290,7 +290,7 @@ export default function ExpressDelivery() {
         </div>
       </section>
 
-      {/* 5. CTA BOTTOM */}
+      {}
       <section className="py-20 bg-gradient-to-r from-red-600 to-orange-600 text-white text-center">
         <div className="max-w-3xl mx-auto px-6">
           <h2 className="text-3xl md:text-5xl font-extrabold mb-6">
