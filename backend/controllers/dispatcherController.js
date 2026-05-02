@@ -339,16 +339,23 @@ export const getDispatcherDashboard = async (req, res) => {
       [region_id],
     );
 
-    const [topDrivers] = await db.query(
-      `
-      SELECT d.name, COUNT(a.id) AS deliveries
-      FROM drivers d
-      LEFT JOIN assignments a ON d.id = a.driver_id
-      ${regionConditionTopDriver}
-      GROUP BY d.id, d.name
-      ORDER BY deliveries DESC
-      LIMIT 5
-    `,
+      const [topDrivers] = await db.query(
+        `
+        SELECT 
+          d.id,
+          d.name, 
+          COUNT(a.id) AS total_assignments,
+          COUNT(CASE WHEN s.status IN ('delivered', 'completed') THEN 1 END) AS completed_deliveries,
+          ROUND(COUNT(CASE WHEN s.status IN ('delivered', 'completed') THEN 1 END) * 100.0 / COUNT(a.id), 1) AS completion_rate
+        FROM drivers d
+        LEFT JOIN assignments a ON d.id = a.driver_id
+        LEFT JOIN shipments s ON a.shipment_id = s.id
+        ${regionConditionTopDriver}
+        GROUP BY d.id, d.name
+        HAVING total_assignments > 0
+        ORDER BY completion_rate DESC, completed_deliveries DESC
+        LIMIT 5
+      `,
       [region_id],
     );
 

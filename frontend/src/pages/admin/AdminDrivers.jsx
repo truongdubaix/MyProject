@@ -14,6 +14,7 @@ import {
   Phone,
   Mail,
   Car,
+  Package,
 } from "lucide-react";
 
 import Pagination from "../../components/Pagination";
@@ -375,6 +376,7 @@ export default function AdminDrivers() {
                     <th className="px-6 py-4">Tài xế</th>
                     <th className="px-6 py-4">Liên hệ</th>
                     <th className="px-6 py-4">Xe đang chạy</th>
+                    <th className="px-6 py-4 text-center">Đơn hàng</th>
                     <th className="px-6 py-4 text-center">Trạng thái</th>
                     <th className="px-6 py-4 text-center">Thao tác</th>
                   </tr>
@@ -421,6 +423,13 @@ export default function AdminDrivers() {
                             <Plus size={12} /> Gán xe
                           </button>
                         )}
+                      </td>
+                      <td className="px-6 py-4">
+                        <div className="flex justify-center">
+                          <div className="px-3 py-1 bg-blue-50 text-blue-700 border border-blue-200 rounded-lg font-bold flex items-center gap-1.5 w-fit">
+                            <Package size={14} /> {d.total_orders || 0}
+                          </div>
+                        </div>
                       </td>
                       <td className="px-6 py-4 text-center">
                         <select

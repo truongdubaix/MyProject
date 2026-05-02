@@ -38,7 +38,7 @@ export default function HeroBanner() {
         return { text: "Đang giao hàng", color: "text-blue-600 font-semibold" };
       case "completed":
         return { text: "Hoàn tất", color: "text-green-600 font-semibold" };
-      case "cancelled":
+      case "canceled":
         return { text: "Đã hủy", color: "text-red-600 font-semibold" };
       default:
         return { text: "Không xác định", color: "text-gray-500 font-medium" };

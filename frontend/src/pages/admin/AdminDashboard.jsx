@@ -58,29 +58,24 @@ export default function AdminDashboard() {
   };
 
 
-  const shipmentData = stats.shipmentStats.map((s) => ({
-    name:
-      s.status === "pending"
-        ? "Chờ xử lý"
-        : s.status === "processing"
-        ? "Đang xử lý"
-        : s.status === "delivering"
-        ? "Đang giao"
-        : s.status === "delivered"
-        ? "Đã giao"
-        : s.status === "failed"
-        ? "Thất bại"
-        : "Khác",
-    value: s.count,
-    fill:
-      s.status === "delivered"
-        ? "#10B981"
-        : s.status === "failed"
-        ? "#EF4444"
-        : s.status === "delivering"
-        ? "#3B82F6"
-        : "#F59E0B",
-  }));
+  const STATUS_MAP = {
+    pending: { label: "Chờ lấy hàng", color: "#F59E0B", order: 1 },
+    assigned: { label: "Đã phân công", color: "#8B5CF6", order: 2 },
+    picking: { label: "Đang lấy hàng", color: "#EC4899", order: 3 },
+    delivering: { label: "Đang giao", color: "#3B82F6", order: 4 },
+    delivered: { label: "Đã giao", color: "#10B981", order: 5 },
+    completed: { label: "Hoàn thành", color: "#059669", order: 6 },
+    failed: { label: "Thất bại", color: "#EF4444", order: 7 },
+    canceled: { label: "Đã hủy", color: "#6B7280", order: 8 }
+  };
+
+  const shipmentData = [...stats.shipmentStats]
+    .sort((a, b) => (STATUS_MAP[a.status]?.order || 99) - (STATUS_MAP[b.status]?.order || 99))
+    .map((s) => ({
+      name: STATUS_MAP[s.status]?.label || s.status,
+      value: s.count,
+      fill: STATUS_MAP[s.status]?.color || "#cbd5e1"
+    }));
 
   return (
     <div className="space-y-8 animate-in fade-in duration-500">
@@ -286,22 +281,25 @@ export default function AdminDashboard() {
                             {d.name}
                           </p>
                           <p className="text-[10px] text-gray-400">
-                            ID: #{1000 + i}
+                            ID: #{d.id}
                           </p>
                         </div>
                       </div>
                     </td>
                     <td className="p-4 text-center font-bold text-gray-700">
-                      {d.deliveries}
+                      {d.completed_deliveries || 0}
                     </td>
                     <td className="p-4 text-center">
-                      <div className="w-24 h-1.5 bg-gray-100 rounded-full mx-auto overflow-hidden">
-                        <div
-                          className="h-full bg-green-500 rounded-full"
-                          style={{
-                            width: `${Math.min(d.deliveries * 2, 100)}%`,
-                          }}
-                        ></div>
+                      <div className="flex flex-col items-center gap-1">
+                        <span className="text-xs font-bold text-[#113e48]">{d.completion_rate || 0}%</span>
+                        <div className="w-24 h-1.5 bg-gray-100 rounded-full mx-auto overflow-hidden">
+                          <div
+                            className="h-full bg-green-500 rounded-full"
+                            style={{
+                              width: `${d.completion_rate || 0}%`,
+                            }}
+                          ></div>
+                        </div>
                       </div>
                     </td>
                     <td className="p-4 text-right">

@@ -154,9 +154,17 @@ export const createShipment = async (req, res) => {
 // Lấy đơn hàng của khách hàng
 export const getShipmentsByCustomer = async (req, res) => {
   try {
-    const [rows] = await pool.query(
-      "SELECT * FROM shipments WHERE customer_id = ? ORDER BY created_at DESC",
-      [req.params.customer_id]
+      const [rows] = await pool.query(
+        `SELECT s.*, 
+                d.name AS driver_name, 
+                d.phone AS driver_phone,
+                d.license_no AS plate_number
+         FROM shipments s 
+         LEFT JOIN assignments a ON s.id = a.shipment_id 
+         LEFT JOIN drivers d ON a.driver_id = d.id 
+         WHERE s.customer_id = ? 
+         ORDER BY s.created_at DESC`,
+        [req.params.customer_id]
     );
     res.json(rows);
   } catch (err) {
@@ -243,6 +251,8 @@ export const getShipmentDetail = async (req, res) => {
       `SELECT 
           s.*, 
           d.name AS driver_name,
+          d.phone AS driver_phone,
+          d.license_no AS plate_number,
           d.latitude AS driver_lat,
           d.longitude AS driver_lng
         FROM shipments s

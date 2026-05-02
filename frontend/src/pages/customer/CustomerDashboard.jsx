@@ -74,7 +74,7 @@ export default function CustomerDashboard() {
         const pending = data.filter((s) => s.status === "pending").length;
         const assigned = data.filter((s) => s.status === "assigned").length;
         const failed = data.filter((s) =>
-          ["failed", "cancelled"].includes(s.status),
+          ["failed", "canceled"].includes(s.status),
         ).length;
         const totalCod = data.reduce(
           (sum, s) => sum + (Number(s.cod_amount) || 0),
@@ -403,7 +403,7 @@ function StatusBadge({ status }) {
       color: "bg-red-50 text-red-700 border-red-200",
       dot: "bg-red-500",
     },
-    cancelled: {
+    canceled: {
       label: "Đã hủy",
       color: "bg-gray-100 text-gray-500 border-gray-200",
       dot: "bg-gray-400",
@@ -418,7 +418,7 @@ function StatusBadge({ status }) {
 
   return (
     <span
-      className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-bold border whitespace-nowrap ${s.color}`}
+      className={`inline-flex items-center justify-center gap-1.5 min-w-[130px] px-2.5 py-1.5 rounded-full text-[11px] font-bold border whitespace-nowrap ${s.color}`}
     >
       <span className={`w-1.5 h-1.5 rounded-full ${s.dot} flex-shrink-0`} />
       {s.label}

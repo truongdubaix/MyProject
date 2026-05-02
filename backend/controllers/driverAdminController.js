@@ -11,7 +11,8 @@ export const getAllDrivers = async (req, res) => {
         d.vehicle_id,
         v.plate_no, 
         v.type AS vehicle_type, 
-        v.capacity_kg AS capacity
+        v.capacity_kg AS capacity,
+        (SELECT COUNT(*) FROM assignments a WHERE a.driver_id = d.id) AS total_orders
       FROM drivers d
       LEFT JOIN vehicles v ON d.vehicle_id = v.id
       ORDER BY d.id DESC

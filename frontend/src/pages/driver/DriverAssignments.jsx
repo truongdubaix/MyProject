@@ -464,7 +464,7 @@ export default function DriverAssignments() {
                   {}
                   {a.service_type === 'fast' && (
                     <div className="absolute -top-2.5 right-4 z-10">
-                      <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full text-[10px] font-black bg-red-500 text-white shadow-lg shadow-red-500/30 animate-pulse uppercase tracking-wider">
+                      <span className="inline-flex items-center justify-center gap-1 min-w-[130px] px-3 py-1.5 rounded-full text-[10px] font-black bg-red-500 text-white shadow-lg shadow-red-500/30 animate-pulse uppercase tracking-wider">
                         <Rocket size={12} />
                         Hỏa tốc — Ưu tiên
                       </span>
@@ -472,7 +472,7 @@ export default function DriverAssignments() {
                   )}
                   {a.service_type === 'express' && (
                     <div className="absolute -top-2.5 right-4 z-10">
-                      <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[10px] font-bold bg-orange-100 text-orange-700 ring-1 ring-orange-200 uppercase tracking-wider">
+                      <span className="inline-flex items-center justify-center gap-1 min-w-[130px] px-2.5 py-1.5 rounded-full text-[10px] font-bold bg-orange-100 text-orange-700 ring-1 ring-orange-200 uppercase tracking-wider">
                         <Zap size={11} />
                         Nhanh
                       </span>

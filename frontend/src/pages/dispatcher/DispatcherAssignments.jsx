@@ -259,7 +259,7 @@ export default function DispatcherAssignmentsUIPro() {
       delivering: "bg-orange-50 text-orange-700 ring-orange-600/20",
       completed:  "bg-green-50 text-green-700 ring-green-600/20",
       failed:     "bg-red-50 text-red-700 ring-red-600/20",
-      cancelled:  "bg-gray-50 text-gray-600 ring-gray-500/10",
+      canceled:  "bg-gray-50 text-gray-600 ring-gray-500/10",
       pending:    "bg-yellow-50 text-yellow-700 ring-yellow-600/20",
     };
     const statusText = {
@@ -269,11 +269,11 @@ export default function DispatcherAssignmentsUIPro() {
       delivering: "Đang giao",
       completed:  "Hoàn tất",
       failed:     "Thất bại",
-      cancelled:  "Đã hủy",
+      canceled:  "Đã hủy",
     };
     return (
       <span
-        className={`inline-flex items-center whitespace-nowrap rounded-full px-2.5 py-0.5 text-xs font-medium ring-1 ring-inset ${
+        className={`inline-flex items-center justify-center min-w-[130px] whitespace-nowrap rounded-full px-2.5 py-1.5 text-xs font-bold ring-1 ring-inset ${
           styles[status] || "bg-gray-50 text-gray-600 ring-gray-500/10"
         }`}
       >

@@ -57,7 +57,7 @@ const translateStatus = (status) => {
     delivered: "Đã giao hàng",
     completed: "Hoàn tất",
     failed: "Giao thất bại",
-    cancelled: "Đã hủy",
+    canceled: "Đã hủy",
   };
   return map[status] || status;
 };

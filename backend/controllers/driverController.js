@@ -528,3 +528,23 @@ export const getDriverProfileByUser = async (req, res) => {
     res.status(500).json({ message: "Lỗi khi lấy thông tin tài xế" });
   }
 };
+
+export const updateDriverLocation = async (req, res) => {
+  try {
+    const { id } = req.params; // user_id
+    const { latitude, longitude } = req.body;
+
+    if (!latitude || !longitude) {
+      return res.status(400).json({ message: "Vui lòng cung cấp tọa độ." });
+    }
+
+    await db.query(
+      "UPDATE drivers SET latitude = ?, longitude = ? WHERE user_id = ?",
+      [latitude, longitude, id]
+    );
+
+    res.json({ message: "Đã cập nhật vị trí." });
+  } catch (err) {
+    res.status(500).json({ message: "Lỗi server khi cập nhật vị trí." });
+  }
+};

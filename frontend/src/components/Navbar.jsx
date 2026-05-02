@@ -81,7 +81,7 @@ export default function Navbar() {
     setUserDropdownOpen(false);
   }, [location]);
 
-// Xử lý đăng xuất
+  // Xử lý đăng xuất
   const handleLogout = () => {
     localStorage.clear();
     setRole(null);
@@ -100,16 +100,12 @@ export default function Navbar() {
     navigate(paths[role] || "/");
   };
 
-
   const handleCreateOrder = () => {
     if (!role) {
-
       navigate("/login");
     } else if (role !== "customer") {
-
       alert("Chức năng tạo đơn hàng chỉ dành cho tài khoản Khách hàng.");
     } else {
-
       navigate("/customer/create-order");
     }
   };
@@ -150,7 +146,7 @@ export default function Navbar() {
         <div className="max-w-screen-2xl mx-auto px-4 sm:px-8 h-full flex justify-between items-center font-medium">
           <span className="flex items-center gap-2 whitespace-nowrap">
             <span className="bg-green-500 rounded-full w-2 h-2 inline-block animate-pulse"></span>
-            Top 10 Đơn vị vận chuyển uy tín 2024
+            Top 10 Đơn vị vận chuyển uy tín 2026
           </span>
           <div className="flex gap-4 opacity-90 text-gray-200 whitespace-nowrap">
             <span className="hidden sm:inline">✉ support@speedyship.com</span>

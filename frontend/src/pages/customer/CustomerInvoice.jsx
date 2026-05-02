@@ -14,6 +14,7 @@ import {
   Filter,
   Eye,
   Loader2,
+  Phone,
   Package,
   PackageOpen,
   Clock,
@@ -36,7 +37,7 @@ const STATUS_OPTIONS = [
   { value: "delivered", label: "Đã giao", icon: Package, color: "text-green-600", bg: "bg-green-100" },
   { value: "completed", label: "Hoàn thành", icon: CheckCircle, color: "text-green-600", bg: "bg-green-100" },
   { value: "failed", label: "Giao thất bại", icon: AlertTriangle, color: "text-red-600", bg: "bg-red-100" },
-  { value: "cancelled", label: "Đã hủy", icon: Ban, color: "text-gray-500", bg: "bg-gray-100" },
+  { value: "canceled", label: "Đã hủy", icon: Ban, color: "text-gray-500", bg: "bg-gray-100" },
 ];
 
 function StatusFilterDropdown({ value, onChange }) {
@@ -156,7 +157,7 @@ export default function CustomerInvoice() {
       delivered: "Đã giao",
       completed: "Hoàn thành",
       failed: "Giao thất bại",
-      cancelled: "Đã hủy",
+      canceled: "Đã hủy",
       express: "Hỏa tốc",
       standard: "Thường",
       fast: "Hỏa tốc",
@@ -207,11 +208,11 @@ export default function CustomerInvoice() {
       delivered: { color: "bg-green-100 text-green-700 border-green-200", icon: <CheckCircle size={12} /> },
       completed: { color: "bg-green-100 text-green-700 border-green-200", icon: <CheckCircle size={12} /> },
       failed: { color: "bg-red-100 text-red-700 border-red-200", icon: <XCircle size={12} /> },
-      cancelled: { color: "bg-gray-100 text-gray-600 border-gray-200", icon: <XCircle size={12} /> },
+      canceled: { color: "bg-gray-100 text-gray-600 border-gray-200", icon: <XCircle size={12} /> },
     };
     const s = config[status] || { color: "bg-gray-100 text-gray-600", icon: null };
     return (
-      <span className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-bold border whitespace-nowrap ${s.color}`}>
+      <span className={`inline-flex items-center justify-center min-w-[130px] gap-1 px-2.5 py-1.5 rounded-full text-xs font-bold border whitespace-nowrap ${s.color}`}>
         {s.icon} {getStatusLabel(status)}
       </span>
     );
@@ -795,7 +796,7 @@ export default function CustomerInvoice() {
                       {new Date(s.created_at).toLocaleDateString("vi-VN")}
                     </td>
                     <td className="px-6 py-4 text-center">
-                      <div className="flex justify-center gap-2">
+                      <div className="flex justify-start gap-2 w-[72px] mx-auto">
                         {}
                         <button
                           onClick={() =>
@@ -886,6 +887,41 @@ export default function CustomerInvoice() {
             </div>
 
             {}
+            {previewData.driver_name ? (
+              <div className="bg-orange-50 p-4 rounded-xl border border-orange-100 flex items-center gap-4">
+                <div className="w-12 h-12 rounded-full bg-orange-200 flex items-center justify-center text-orange-700 font-bold text-xl">
+                  {previewData.driver_name.charAt(0)}
+                </div>
+                <div className="flex-1">
+                  <p className="text-[10px] font-bold text-orange-600 uppercase mb-0.5">Tài xế phụ trách</p>
+                  <p className="font-bold text-[#113e48]">{previewData.driver_name}</p>
+                  <div className="flex flex-col gap-1 mt-1">
+                    <p className="text-[11px] text-gray-600 flex items-center gap-1.5">
+                      <Phone size={12} className="text-orange-500" /> {previewData.driver_phone || "Đang cập nhật SĐT"}
+                    </p>
+                    <p className="text-[11px] text-gray-600 flex items-center gap-1.5">
+                      <Truck size={12} className="text-orange-500" /> Biển số: <span className="font-semibold text-gray-800 tracking-wider">{previewData.plate_number || "Đang cập nhật"}</span>
+                    </p>
+                  </div>
+                </div>
+                {previewData.driver_phone && (
+                  <a href={"tel:" + previewData.driver_phone} className="bg-white p-2 rounded-full shadow-sm text-green-600 hover:bg-green-50 transition-colors">
+                    <Phone size={20} />
+                  </a>
+                )}
+              </div>
+            ) : (
+              <div className="bg-gray-50 p-4 rounded-xl border border-gray-200 flex items-center gap-4">
+                <div className="w-12 h-12 rounded-full bg-gray-200 flex items-center justify-center text-gray-400">
+                  <Truck size={20} />
+                </div>
+                <div className="flex-1">
+                  <p className="text-[10px] font-bold text-gray-500 uppercase mb-0.5">Tài xế phụ trách</p>
+                  <p className="font-bold text-gray-400 italic">Chưa phân công tài xế</p>
+                </div>
+              </div>
+            )}
+
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
               <div className="bg-slate-50 p-4 rounded-xl border border-slate-200">
                 <p className="text-[10px] font-bold text-slate-500 uppercase mb-2">Thanh toán</p>

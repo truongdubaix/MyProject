@@ -11,6 +11,7 @@ import {
   toggleDriverStatus,
   updateDriverProfile,
   getDriverRatingStats,
+  updateDriverLocation,
 } from "../controllers/driverController.js";
 
 const router = express.Router();
@@ -27,5 +28,6 @@ router.patch("/password/:id", changeDriverPassword);
 router.patch("/toggle-status/:id", toggleDriverStatus);
 router.put("/update-profile/:id", updateDriverProfile);
 router.put("/:id/vehicle", updateDriverVehicle);
+router.patch("/location/:id", updateDriverLocation);
 
 export default router;

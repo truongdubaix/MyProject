@@ -81,7 +81,7 @@ function TrackingTimeline({ status }) {
       case "completed":
         return 3;
       case "failed":
-      case "cancelled":
+      case "canceled":
         return -1;
       default:
         return 0;
@@ -89,7 +89,7 @@ function TrackingTimeline({ status }) {
   };
 
   const currentIndex = getStatusIndex(status);
-  const isFailed = status === "failed" || status === "cancelled";
+  const isFailed = status === "failed" || status === "canceled";
 
   return (
     <div className="w-full py-4">
@@ -420,10 +420,9 @@ export default function CustomerShipmentDetail() {
             </div>
           </div>
 
-          {shipment.driver_name && (
+          {shipment.driver_name ? (
             <div
               className="bg-[#113e48] p-5 rounded-2xl text-white shadow-lg relative overflow-hidden group"
-              data-aos="fade-up"
             >
               <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full blur-2xl -translate-y-1/2 translate-x-1/2 group-hover:bg-white/20 transition-all"></div>
               <div className="relative z-10 flex items-center gap-4">
@@ -435,13 +434,37 @@ export default function CustomerShipmentDetail() {
                     Tài xế phụ trách
                   </p>
                   <p className="font-bold text-lg">{shipment.driver_name}</p>
-                </div>
-                <a
-                  href={`tel:${shipment.driver_phone}`}
-                  className="bg-green-500 hover:bg-green-600 p-3 rounded-full shadow-lg transition-transform hover:scale-110"
-                >
-                  <Phone size={20} className="text-white" />
-                </a>
+                    <div className="flex flex-col gap-1.5 mt-2">
+                      <p className="text-sm text-blue-100 flex items-center gap-2">
+                        <Phone size={14} className="text-orange-400" /> {shipment.driver_phone || "Đang cập nhật SĐT"}
+                      </p>
+                      <p className="text-sm text-blue-100 flex items-center gap-2">
+                        <Truck size={14} className="text-orange-400" /> Biển số: <span className="font-bold text-white tracking-wider">{shipment.plate_number || "Đang cập nhật"}</span>
+                      </p>
+                    </div>
+                  </div>
+                  {shipment.driver_phone && (
+                  <a
+                    href={`tel:${shipment.driver_phone}`}
+                    className="bg-green-500 hover:bg-green-600 p-3 rounded-full shadow-lg transition-transform hover:scale-110"
+                  >
+                    <Phone size={20} className="text-white" />
+                  </a>
+                )}
+              </div>
+            </div>
+          ) : (
+            <div
+              className="bg-white p-5 rounded-2xl border border-gray-100 shadow-sm flex items-center gap-4"
+            >
+              <div className="w-12 h-12 rounded-full bg-gray-100 flex items-center justify-center text-gray-400">
+                <Truck size={20} />
+              </div>
+              <div className="flex-1">
+                <p className="text-xs text-gray-400 uppercase font-bold mb-0.5">
+                  Tài xế phụ trách
+                </p>
+                <p className="font-bold text-gray-400 italic text-sm">Chưa phân công tài xế</p>
               </div>
             </div>
           )}

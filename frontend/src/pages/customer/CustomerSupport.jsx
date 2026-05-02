@@ -72,7 +72,6 @@ const formatAnswerToBullets = (answer = "") => {
 
 export default function CustomerSupport() {
   const { openAIChat } = useChat();
-  const [activeMainTab, setActiveMainTab] = useState("faq");
   const [activeFaqTab, setActiveFaqTab] = useState("general");
   const [loadingFaq, setLoadingFaq] = useState(false);
   const [questionsByCategory, setQuestionsByCategory] = useState(DEFAULT_QUESTIONS_BY_CATEGORY);
@@ -81,8 +80,6 @@ export default function CustomerSupport() {
   const [loadingAnswerQuestion, setLoadingAnswerQuestion] = useState("");
 
   useEffect(() => {
-    if (activeMainTab !== "faq") return;
-
     setLoadingFaq(true);
     API.get("/ai/faq-suggestions")
       .then((res) => {
@@ -103,7 +100,7 @@ export default function CustomerSupport() {
         setQuestionsByCategory(next);
       })
       .finally(() => setLoadingFaq(false));
-  }, [activeMainTab]);
+  }, []);
 
   const faqQuestions = useMemo(
     () => questionsByCategory[activeFaqTab] || [],
@@ -152,41 +149,8 @@ export default function CustomerSupport() {
         </div>
       </div>
 
-      <div className="flex gap-4 border-b border-gray-200">
-        <button
-          onClick={() => setActiveMainTab("faq")}
-          className={`pb-3 px-2 text-sm font-bold transition-all border-b-2 ${
-            activeMainTab === "faq"
-              ? "border-orange-500 text-orange-600"
-              : "border-transparent text-gray-500 hover:text-gray-700"
-          }`}
-        >
-          FAQ AI
-        </button>
-        <button
-          onClick={() => setActiveMainTab("history")}
-          className={`pb-3 px-2 text-sm font-bold transition-all border-b-2 ${
-            activeMainTab === "history"
-              ? "border-orange-500 text-orange-600"
-              : "border-transparent text-gray-500 hover:text-gray-700"
-          }`}
-        >
-          Lịch sử hỗ trợ
-        </button>
-      </div>
-
-      <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 min-h-[460px]">
-        {activeMainTab === "history" && (
-          <div className="text-center py-10">
-            <div className="bg-gray-50 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
-              <FileText size={32} className="text-gray-400" />
-            </div>
-            <p className="text-gray-500">Bạn chưa có lịch sử hỗ trợ gần đây.</p>
-          </div>
-        )}
-
-        {activeMainTab === "faq" && (
-          <div className="grid grid-cols-1 lg:grid-cols-[240px_1fr] gap-6">
+      <div className="bg-white p-8 rounded-3xl shadow-sm border border-gray-100 min-h-[600px]">
+          <div className="grid grid-cols-1 lg:grid-cols-[280px_1fr] gap-8">
             <aside className="space-y-2">
               {FAQ_CATEGORY_ORDER.map((tab) => {
                 const isActive = tab === activeFaqTab;
@@ -198,9 +162,9 @@ export default function CustomerSupport() {
                       setActiveFaqTab(tab);
                       setExpandedQuestion(null);
                     }}
-                    className={`w-full text-left px-4 py-2.5 rounded-lg text-sm font-semibold transition-colors ${
+                    className={`w-full text-left px-5 py-3 rounded-xl text-base font-semibold transition-colors ${
                       isActive
-                        ? "bg-orange-50 text-orange-600 border border-orange-200"
+                        ? "bg-orange-50 text-orange-600 border border-orange-200 shadow-sm"
                         : "text-gray-600 border border-transparent hover:bg-gray-50"
                     }`}
                   >
@@ -245,9 +209,9 @@ export default function CustomerSupport() {
                     <div key={q} className="border border-gray-200 rounded-lg overflow-hidden">
                       <button
                         onClick={() => handleToggleQuestion(q)}
-                        className="w-full px-4 py-3.5 flex items-center justify-between text-left hover:bg-gray-50 transition-colors"
+                        className="w-full px-5 py-4 flex items-center justify-between text-left hover:bg-gray-50 transition-colors"
                       >
-                        <span className="text-sm font-medium text-[#113e48]">{q}</span>
+                        <span className="text-base font-medium text-[#113e48]">{q}</span>
                         <ChevronDown
                           size={18}
                           className={`text-gray-400 transition-transform ${isOpen ? "rotate-180" : ""}`}
@@ -264,7 +228,7 @@ export default function CustomerSupport() {
                           {!isLoadingThis && (
                             <ul className="space-y-1.5">
                               {formatAnswerToBullets(answer).map((line, idx) => (
-                                <li key={`${q}-${idx}`} className="text-sm text-gray-700 leading-relaxed flex gap-2">
+                                <li key={`${q}-${idx}`} className="text-base text-gray-700 leading-relaxed flex gap-2">
                                   <span className="text-[#113e48]">•</span>
                                   <span>{line}</span>
                                 </li>
@@ -278,7 +242,6 @@ export default function CustomerSupport() {
                 })}
             </section>
           </div>
-        )}
       </div>
     </div>
   );

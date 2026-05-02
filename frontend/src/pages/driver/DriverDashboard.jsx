@@ -141,18 +141,36 @@ export default function DriverDashboard() {
     return () => socket.disconnect();
   }, [id]);
 
-// Tải dữ liệu thống kê
   const fetchStats = async () => {
     try {
       const res = await API.get(`/drivers/dashboard/${id}`);
       setStats(res.data);
-
 
       if (res.data.latitude && res.data.longitude) {
         setDriverLocation({
           latitude: parseFloat(res.data.latitude),
           longitude: parseFloat(res.data.longitude),
         });
+      }
+
+      // Xin quyền vị trí và cập nhật tọa độ mới
+      if ("geolocation" in navigator) {
+        navigator.geolocation.getCurrentPosition(
+          async (position) => {
+            const { latitude, longitude } = position.coords;
+            setDriverLocation({ latitude, longitude });
+            // Cập nhật backend
+            try {
+              await API.patch(`/drivers/location/${id}`, { latitude, longitude });
+            } catch (err) {
+              console.error("Lỗi cập nhật vị trí:", err);
+            }
+          },
+          (error) => {
+            console.error("Lỗi lấy vị trí:", error);
+          },
+          { enableHighAccuracy: true }
+        );
       }
     } catch (err) {
       toast.error("Không thể tải dữ liệu.");
@@ -336,7 +354,7 @@ export default function DriverDashboard() {
                   </div>
                 </div>
                 <div className="text-right">
-                  <span className={`inline-flex px-2.5 py-0.5 rounded-full text-xs font-bold mb-1 ${
+                  <span className={`inline-flex items-center justify-center min-w-[130px] px-2.5 py-1.5 rounded-full text-xs font-bold mb-1 ${
                     (STATUS_LABELS[s.status]?.color) || 'bg-gray-100 text-gray-600'
                   }`}>
                     {STATUS_LABELS[s.status]?.label || s.status}

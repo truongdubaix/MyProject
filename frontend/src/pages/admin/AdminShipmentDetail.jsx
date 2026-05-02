@@ -9,6 +9,7 @@ import {
   Clock3,
   FileText,
   MapPin,
+  CreditCard,
   Package,
   Phone,
   Truck,
@@ -192,52 +193,118 @@ export default function AdminShipmentDetail() {
         </span>
       </div>
 
-      <div className="grid grid-cols-1 xl:grid-cols-3 gap-5">
-        <div className="xl:col-span-1 space-y-4">
-          <div className="bg-white border border-gray-100 rounded-xl p-4 space-y-3">
-            <h3 className="font-bold text-[#113e48] flex items-center gap-2">
-              <FileText size={16} className="text-blue-600" />
-              Thông tin vận đơn
+      <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
+        <div className="xl:col-span-1 space-y-6">
+          
+          {/* Lấy hàng / Giao hàng */}
+          <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 space-y-6">
+            <h3 className="font-bold text-[#113e48] flex items-center gap-2 text-sm uppercase tracking-wide">
+              <MapPin size={16} /> Lộ trình & Địa chỉ
             </h3>
-            <p className="text-sm text-gray-700">Người gửi: <b>{shipment.sender_name}</b></p>
-            <p className="text-sm text-gray-700">SĐT gửi: <b>{shipment.sender_phone}</b></p>
-            <p className="text-sm text-gray-700">Người nhận: <b>{shipment.receiver_name}</b></p>
-            <p className="text-sm text-gray-700">SĐT nhận: <b>{shipment.receiver_phone}</b></p>
-            <p className="text-sm text-gray-700">Khối lượng: <b>{shipment.weight_kg || 0} kg</b></p>
-            <p className="text-sm text-gray-700">COD: <b>{Number(shipment.cod_amount || 0).toLocaleString("vi-VN")} đ</b></p>
-            <p className="text-sm text-gray-700">Dịch vụ: <b>{shipment.service_type || "normal"}</b></p>
+            <div className="flex gap-4 relative">
+              <div className="flex flex-col items-center">
+                <div className="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center text-blue-600">
+                  <Package size={16} />
+                </div>
+                <div className="w-0.5 h-full bg-gray-100 my-1"></div>
+              </div>
+              <div className="flex-1 pb-4">
+                <p className="text-xs text-gray-400 font-bold uppercase mb-1">Điểm lấy hàng</p>
+                <p className="text-sm text-gray-800 font-medium leading-relaxed">{shipment.pickup_address}</p>
+              </div>
+            </div>
+            
+            <div className="flex gap-4 relative">
+              <div className="flex flex-col items-center">
+                <div className="w-8 h-8 rounded-full bg-orange-100 flex items-center justify-center text-orange-600">
+                  <MapPin size={16} />
+                </div>
+              </div>
+              <div className="flex-1">
+                <p className="text-xs text-gray-400 font-bold uppercase mb-1">Điểm giao hàng</p>
+                <p className="text-sm text-gray-800 font-medium leading-relaxed">{shipment.delivery_address}</p>
+              </div>
+            </div>
           </div>
 
-          <div className="bg-white border border-gray-100 rounded-xl p-4 space-y-3">
-            <h3 className="font-bold text-[#113e48] flex items-center gap-2">
-              <Truck size={16} className="text-slate-600" />
-              Thông tin tài xế
+          {/* Thông tin vận đơn */}
+          <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
+            <h3 className="font-bold text-[#113e48] mb-4 flex items-center gap-2 text-sm uppercase tracking-wide">
+              <FileText size={16} /> Thông tin vận đơn
             </h3>
-            {shipment.driver_name ? (
-              <>
-                <p className="text-sm text-gray-700 flex items-center gap-2"><User size={14} /> <b>{shipment.driver_name}</b></p>
-                <p className="text-sm text-gray-700 flex items-center gap-2"><Phone size={14} /> {shipment.driver_phone || "Chưa có SĐT"}</p>
-                <p className="text-sm text-gray-700 flex items-center gap-2"><Truck size={14} /> {shipment.plate_number || "Chưa có biển số"}</p>
-              </>
-            ) : (
-              <p className="text-sm text-gray-500 italic">Chưa phân công tài xế</p>
-            )}
+            <div className="space-y-3 text-sm">
+              <div className="flex justify-between text-gray-500">
+                <span>Người gửi</span>
+                <span className="font-bold text-[#113e48]">{shipment.sender_name}</span>
+              </div>
+              <div className="flex justify-between text-gray-500">
+                <span>SĐT gửi</span>
+                <span className="font-medium text-gray-900">{shipment.sender_phone}</span>
+              </div>
+              <div className="flex justify-between text-gray-500">
+                <span>Người nhận</span>
+                <span className="font-bold text-[#113e48]">{shipment.receiver_name}</span>
+              </div>
+              <div className="flex justify-between text-gray-500">
+                <span>SĐT nhận</span>
+                <span className="font-medium text-gray-900">{shipment.receiver_phone}</span>
+              </div>
+              <div className="h-px bg-gray-100 my-2"></div>
+              <div className="flex justify-between text-gray-500">
+                <span>Dịch vụ</span>
+                <span className={`font-bold ${shipment.service_type === 'fast' ? "text-red-600" : "text-blue-600"} uppercase`}>
+                  {shipment.service_type === 'fast' ? "Hỏa Tốc" : "Tiêu Chuẩn"}
+                </span>
+              </div>
+              <div className="flex justify-between text-gray-500">
+                <span>Khối lượng</span>
+                <span className="font-medium text-gray-900">{shipment.weight_kg || 0} kg</span>
+              </div>
+              <div className="flex justify-between text-gray-500">
+                <span>Thu hộ (COD)</span>
+                <span className="font-bold text-orange-600 text-base">{Number(shipment.cod_amount || 0).toLocaleString("vi-VN")} ₫</span>
+              </div>
+            </div>
           </div>
 
-          <div className="bg-white border border-gray-100 rounded-xl p-4 space-y-2">
-            <h3 className="font-bold text-[#113e48] flex items-center gap-2">
-              <MapPin size={16} className="text-orange-500" />
-              Địa chỉ
-            </h3>
-            <p className="text-sm text-gray-700 flex items-start gap-2">
-              <Package size={14} className="text-blue-600 mt-0.5" />
-              <span><span className="font-semibold">Lấy hàng:</span> {shipment.pickup_address || "Chưa có"}</span>
-            </p>
-            <p className="text-sm text-gray-700 flex items-start gap-2">
-              <MapPin size={14} className="text-orange-500 mt-0.5" />
-              <span><span className="font-semibold">Giao hàng:</span> {shipment.delivery_address || "Chưa có"}</span>
-            </p>
-          </div>
+          {/* Thông tin tài xế */}
+          {shipment.driver_name ? (
+            <div className="bg-[#113e48] p-5 rounded-2xl text-white shadow-lg relative overflow-hidden group">
+              <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full blur-2xl -translate-y-1/2 translate-x-1/2 group-hover:bg-white/20 transition-all"></div>
+              <div className="relative z-10 flex items-center gap-4">
+                <div className="w-12 h-12 rounded-full bg-orange-500 flex items-center justify-center text-xl font-bold border-2 border-white/20">
+                  {shipment.driver_name.charAt(0)}
+                </div>
+                <div className="flex-1">
+                  <p className="text-xs text-blue-200 uppercase font-bold mb-0.5">Tài xế phụ trách</p>
+                  <p className="font-bold text-lg">{shipment.driver_name}</p>
+                  <div className="flex flex-col gap-1.5 mt-2">
+                    <p className="text-sm text-blue-100 flex items-center gap-2">
+                      <Phone size={14} className="text-orange-400" /> {shipment.driver_phone || "Đang cập nhật SĐT"}
+                    </p>
+                    <p className="text-sm text-blue-100 flex items-center gap-2">
+                      <Truck size={14} className="text-orange-400" /> Biển số: <span className="font-bold text-white tracking-wider">{shipment.plate_number || "Đang cập nhật"}</span>
+                    </p>
+                  </div>
+                </div>
+                {shipment.driver_phone && (
+                  <a href={`tel:${shipment.driver_phone}`} className="bg-green-500 hover:bg-green-600 p-3 rounded-full shadow-lg transition-transform hover:scale-110">
+                    <Phone size={20} className="text-white" />
+                  </a>
+                )}
+              </div>
+            </div>
+          ) : (
+            <div className="bg-white p-5 rounded-2xl border border-gray-100 shadow-sm flex items-center gap-4">
+              <div className="w-12 h-12 rounded-full bg-gray-100 flex items-center justify-center text-gray-400">
+                <Truck size={20} />
+              </div>
+              <div className="flex-1">
+                <p className="text-xs text-gray-400 uppercase font-bold mb-0.5">Tài xế phụ trách</p>
+                <p className="font-bold text-gray-400 italic text-sm">Chưa phân công tài xế</p>
+              </div>
+            </div>
+          )}
         </div>
 
         <div className="xl:col-span-2 bg-white border border-gray-100 rounded-xl overflow-hidden h-[72vh] min-h-[560px]">

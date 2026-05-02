@@ -30,7 +30,7 @@ const STATUS_OPTIONS = [
   { value: "delivering", label: "Đang giao hàng", icon: Truck, color: "text-blue-600", bg: "bg-blue-100" },
   { value: "completed", label: "Hoàn thành", icon: CheckCircle, color: "text-green-600", bg: "bg-green-100" },
   { value: "failed", label: "Giao thất bại", icon: AlertTriangle, color: "text-red-600", bg: "bg-red-100" },
-  { value: "cancelled", label: "Đã hủy", icon: Ban, color: "text-gray-500", bg: "bg-gray-100" },
+  { value: "canceled", label: "Đã hủy", icon: Ban, color: "text-gray-500", bg: "bg-gray-100" },
 ];
 
 
@@ -187,7 +187,7 @@ export default function CustomerHistory() {
         color: "bg-red-100 text-red-700 border-red-200",
         icon: <XCircle size={12} />,
       },
-      cancelled: {
+      canceled: {
         label: "Đã hủy",
         color: "bg-gray-100 text-gray-600 border-gray-200",
         icon: <XCircle size={12} />,
@@ -199,7 +199,7 @@ export default function CustomerHistory() {
     };
     return (
       <span
-        className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-bold border whitespace-nowrap ${s.color}`}
+        className={`inline-flex items-center justify-center gap-1 min-w-[130px] px-2.5 py-1.5 rounded-full text-xs font-bold border whitespace-nowrap ${s.color}`}
       >
         {s.icon} {s.label}
       </span>
@@ -301,7 +301,7 @@ export default function CustomerHistory() {
                       {new Date(s.created_at).toLocaleDateString("vi-VN")}
                     </td>
                     <td className="px-6 py-4 text-center">
-                      <div className="flex justify-center gap-2 opacity-80 group-hover:opacity-100 transition-opacity">
+                      <div className="flex justify-start gap-2 w-[72px] mx-auto opacity-80 group-hover:opacity-100 transition-opacity">
                         <button
                           onClick={() => navigate(`/customer/history/${s.id}`)}
                           className="p-2 text-blue-600 bg-blue-50 hover:bg-blue-100 rounded-lg transition-colors"

@@ -300,15 +300,13 @@ export default function DispatcherDashboard() {
                     <div className="w-full bg-gray-100 rounded-full h-1.5 mt-2 overflow-hidden">
                       <div
                         className="bg-blue-500 h-1.5 rounded-full"
-                        style={{ width: `${Math.min(d.deliveries * 5, 100)}%` }}
+                        style={{ width: `${d.completion_rate || 0}%` }}
                       ></div>
                     </div>
                   </div>
                   <div className="text-right">
-                    <p className="font-bold text-blue-600 text-lg">
-                      {d.deliveries}
-                    </p>
-                    <p className="text-xs text-gray-400">đơn</p>
+                    <p className="font-bold text-blue-600 text-lg">{d.completion_rate || 0}%</p>
+                    <p className="text-xs text-gray-400">{d.completed_deliveries || 0} đơn HT</p>
                   </div>
                 </div>
               ))
