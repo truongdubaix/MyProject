@@ -59,10 +59,10 @@ export const login = async (req, res) => {
     const user = users[0];
 
 
-    if (user.status && user.status.toLowerCase() === "inactive") {
+    if (user.status && (user.status.toLowerCase() === "inactive" || user.status.toLowerCase() === "blocked")) {
       return res.status(403).json({
         message:
-          "Tài khoản của bạn đã bị vô hiệu hóa, vui lòng liên hệ quản trị viên.",
+          "Tài khoản của bạn đã bị khóa, vui lòng liên hệ quản trị viên.",
       });
     }
 

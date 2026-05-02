@@ -52,14 +52,13 @@ export default function DispatcherAssignmentsUIPro() {
   const fetchAll = async () => {
     setLoading(true);
     try {
-      const [resShipments, resDrivers] = await Promise.all([
-        API.get("/shipments"),
+      const [resUnassigned, resAssigned, resDrivers] = await Promise.all([
+        API.get("/dispatcher/shipments/unassigned"),
+        API.get("/dispatcher/assignments"),
         API.get("/dispatcher/drivers"),
       ]);
-
-      const allShipments = resShipments.data;
-      setUnassigned(allShipments.filter((s) => s.status === "pending"));
-      setAssignments(allShipments.filter((s) => s.status !== "pending"));
+      setUnassigned(resUnassigned.data || []);
+      setAssignments(resAssigned.data || []);
       setDrivers(resDrivers.data);
       setSelectedIds([]);
     } catch (err) {
@@ -243,7 +242,7 @@ export default function DispatcherAssignmentsUIPro() {
         shipment_ids: selectedIds,
         driver_id: selectedDriverBulk,
       });
-      toast.success(`✅ Đã phân công thành công!`, { id: toastId });
+      toast.success(`Đã phân công thành công!`, { id: toastId });
       fetchAll();
       setSelectedDriverBulk("");
     } catch (err) {

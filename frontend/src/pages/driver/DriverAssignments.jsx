@@ -219,7 +219,7 @@ export default function DriverAssignments() {
           a.shipment_id === shipmentId ? { ...a, status: status } : a
         )
       );
-      toast.success("✅ Đã cập nhật trạng thái!", { id: toastId });
+      toast.success("Đã cập nhật trạng thái!", { id: toastId });
     } catch {
       toast.error("❌ Lỗi cập nhật trạng thái!", { id: toastId });
       fetchAssignments();
@@ -330,7 +330,7 @@ export default function DriverAssignments() {
                           : "bg-gray-50 border-gray-200 text-gray-700 hover:border-red-300 hover:bg-red-50"
                       }`}
                     >
-                      <span className="mr-2">{selectedReason === reason ? "✅" : "○"}</span>
+                      <span className="mr-2">{selectedReason === reason ? "●" : "○"}</span>
                       {reason}
                     </button>
                   ))}

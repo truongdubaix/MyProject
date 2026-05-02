@@ -215,6 +215,14 @@ export default function AdminDrivers() {
     }
   };
 
+  const normalizeDriverStatus = (status) => {
+    if (status === "available" || status === "free") return "free";
+    if (status === "busy" || status === "active" || status === "delivering")
+      return "busy";
+    if (status === "inactive") return "inactive";
+    return "free";
+  };
+
 // Duyệt đơn đăng ký tài xế
   const approveApplication = async (id) => {
     if (!confirm("Duyệt hồ sơ này?")) return;
@@ -223,8 +231,8 @@ export default function AdminDrivers() {
       toast.success("Đã duyệt hồ sơ");
       fetchApplications();
       fetchDrivers();
-    } catch {
-      toast.error("Lỗi duyệt hồ sơ");
+    } catch (err) {
+      toast.error(err.response?.data?.error || "Lỗi duyệt hồ sơ");
     }
   };
 
@@ -234,17 +242,26 @@ export default function AdminDrivers() {
       await API.post(`/drivers/applications/${id}/reject`);
       toast.success("Đã từ chối hồ sơ");
       fetchApplications();
-    } catch {
-      toast.error("Lỗi từ chối hồ sơ");
+    } catch (err) {
+      toast.error(err.response?.data?.error || "Lỗi từ chối hồ sơ");
     }
   };
 
 
   const getVehicleBadge = (status) => {
     const map = {
-      available: { label: "Sẵn sàng", color: "bg-green-100 text-green-700" },
-      busy: { label: "Đang sử dụng", color: "bg-blue-100 text-blue-700" },
-      maintenance: { label: "Bảo trì", color: "bg-red-100 text-red-700" },
+      available: {
+        label: "Sẵn sàng",
+        color: "bg-green-100 text-green-800 border border-green-200",
+      },
+      busy: {
+        label: "Đang sử dụng",
+        color: "bg-sky-100 text-sky-800 border border-sky-200",
+      },
+      maintenance: {
+        label: "Bảo trì",
+        color: "bg-yellow-100 text-yellow-800 border border-yellow-200",
+      },
     };
     const s = map[status] || map.available;
     return (
@@ -407,15 +424,19 @@ export default function AdminDrivers() {
                       </td>
                       <td className="px-6 py-4 text-center">
                         <select
-                          value={d.status}
-                          onChange={(e) =>
-                            handleStatusChange(d.id, e.target.value)
-                          }
-                          className="bg-transparent text-xs font-bold border-none outline-none cursor-pointer text-gray-700"
+                          value={normalizeDriverStatus(d.status)}
+                          onChange={(e) => handleStatusChange(d.id, e.target.value)}
+                          className={`border outline-none font-bold text-xs cursor-pointer px-2.5 py-0.5 rounded-full ${
+                            normalizeDriverStatus(d.status) === "free"
+                              ? "bg-green-100 text-green-800 border-green-200"
+                              : normalizeDriverStatus(d.status) === "busy"
+                              ? "bg-sky-100 text-sky-800 border-sky-200"
+                              : "bg-gray-100 text-gray-800 border-gray-200"
+                          }`}
                         >
-                          <option value="available">🟢 Sẵn sàng</option>
-                          <option value="delivering">🔵 Đang giao</option>
-                          <option value="inactive">⚪ Tạm nghỉ</option>
+                          <option value="free">Sẵn sàng</option>
+                          <option value="busy">Đang bận</option>
+                          <option value="inactive">Tạm nghỉ</option>
                         </select>
                       </td>
                       <td className="px-6 py-4 text-center">
@@ -600,17 +621,17 @@ export default function AdminDrivers() {
                     </td>
                     <td className="px-6 py-4 text-center">
                       {app.status === "pending" && (
-                        <span className="bg-yellow-100 text-yellow-700 px-2 py-1 rounded text-xs font-bold">
+                        <span className="bg-yellow-100 text-yellow-800 border border-yellow-200 px-2.5 py-0.5 rounded-full text-xs font-bold">
                           Chờ duyệt
                         </span>
                       )}
                       {app.status === "approved" && (
-                        <span className="bg-green-100 text-green-700 px-2 py-1 rounded text-xs font-bold">
+                        <span className="bg-green-100 text-green-800 border border-green-200 px-2.5 py-0.5 rounded-full text-xs font-bold">
                           Đã duyệt
                         </span>
                       )}
                       {app.status === "rejected" && (
-                        <span className="bg-red-100 text-red-700 px-2 py-1 rounded text-xs font-bold">
+                        <span className="bg-red-100 text-red-800 border border-red-200 px-2.5 py-0.5 rounded-full text-xs font-bold">
                           Từ chối
                         </span>
                       )}
@@ -772,9 +793,9 @@ export default function AdminDrivers() {
                   }
                   className="w-full p-3 border rounded-lg text-sm bg-white outline-none"
                 >
-                  <option value="available">🟢 Sẵn sàng</option>
-                  <option value="busy">🔴 Đang sử dụng</option>
-                  <option value="maintenance">🟠 Bảo trì</option>
+                  <option value="available">✓ Sẵn sàng</option>
+                  <option value="busy">➜ Đang sử dụng</option>
+                  <option value="maintenance">◔ Bảo trì</option>
                 </select>
               </div>
 

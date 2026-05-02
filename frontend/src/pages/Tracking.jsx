@@ -210,7 +210,7 @@ export default function Tracking() {
 
       const data = res.data;
       setShipment(data);
-      setSuccess("✅ Tra cứu thành công!");
+      setSuccess("Tra cứu thành công!");
 
 
       let pk =
@@ -433,7 +433,7 @@ export default function Tracking() {
           )}
           {success && (
             <div className="mt-4 p-3 bg-green-50 text-green-600 rounded-lg text-sm font-medium flex items-center gap-2">
-              ✅ {success}
+              {success}
             </div>
           )}
         </div>
@@ -622,7 +622,7 @@ export default function Tracking() {
                           {shipment.status === "completed" ||
                           shipment.status === "delivered" ? (
                             <span className="text-green-600">
-                              ✅ Đã giao hàng
+                              Đã giao hàng
                             </span>
                           ) : (
                             <>

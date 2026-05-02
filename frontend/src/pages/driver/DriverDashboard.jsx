@@ -22,10 +22,7 @@ import {
   MapPin,
   AlertCircle,
   Rocket,
-  Bell,
-  BellRing,
   X,
-  Zap,
 } from "lucide-react";
 
 import Map, { Marker, NavigationControl, GeolocateControl } from "react-map-gl";
@@ -83,15 +80,6 @@ export default function DriverDashboard() {
   const [stats, setStats] = useState(null);
   const [loading, setLoading] = useState(true);
   const [driverLocation, setDriverLocation] = useState(null);
-  const [notifications, setNotifications] = useState([]);
-  const [showNotifPanel, setShowNotifPanel] = useState(false);
-  const [unreadCount, setUnreadCount] = useState(0);
-
-// Thêm thông báo mới vào danh sách
-  const addNotification = (notif) => {
-    setNotifications((prev) => [notif, ...prev].slice(0, 50));
-    setUnreadCount((c) => c + 1);
-  };
 
 
   useEffect(() => {
@@ -124,14 +112,6 @@ export default function DriverDashboard() {
           </div>
         ), { duration: 8000 });
 
-        addNotification({
-          id: Date.now(),
-          type: 'express',
-          title: '🚨 Đơn hỏa tốc mới!',
-          message: tracking ? `Vận đơn ${tracking} — Giao ngay!` : 'Bạn được phân công đơn hỏa tốc mới.',
-          time: new Date(),
-          read: false,
-        });
       } else {
 
         toast.custom((t) => (
@@ -153,14 +133,6 @@ export default function DriverDashboard() {
           </div>
         ), { duration: 5000 });
 
-        addNotification({
-          id: Date.now(),
-          type: 'normal',
-          title: '📦 Đơn hàng mới',
-          message: tracking ? `Vận đơn ${tracking}` : 'Bạn được phân công đơn hàng mới.',
-          time: new Date(),
-          read: false,
-        });
       }
 
       fetchStats();
@@ -193,6 +165,15 @@ export default function DriverDashboard() {
     fetchStats();
   }, [id]);
 
+  useEffect(() => {
+    if (!driverLocation || !mapRef.current) return;
+    mapRef.current.easeTo({
+      center: [driverLocation.longitude, driverLocation.latitude],
+      zoom: 15,
+      duration: 900,
+    });
+  }, [driverLocation]);
+
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-screen bg-gray-50">
@@ -210,92 +191,6 @@ export default function DriverDashboard() {
     <div className="min-h-screen bg-[#F8FAFC] p-4 pb-20 lg:p-8 space-y-6">
       <Toaster position="top-right" containerStyle={{ top: 80 }} />
 
-      {}
-      {showNotifPanel && (
-        <div className="fixed inset-0 z-50 flex justify-end" onClick={() => setShowNotifPanel(false)}>
-          <div
-            className="w-full max-w-sm bg-white shadow-2xl h-full flex flex-col border-l border-gray-100"
-            onClick={(e) => e.stopPropagation()}
-          >
-            {}
-            <div className="flex items-center justify-between px-5 py-4 border-b border-gray-100 bg-gradient-to-r from-[#113e48] to-[#1a5a68]">
-              <div className="flex items-center gap-2 text-white">
-                <BellRing size={20} />
-                <h3 className="font-bold text-base">Thông báo</h3>
-                {unreadCount > 0 && (
-                  <span className="bg-red-500 text-white text-xs font-black px-2 py-0.5 rounded-full">
-                    {unreadCount}
-                  </span>
-                )}
-              </div>
-              <div className="flex items-center gap-3">
-                {unreadCount > 0 && (
-                  <button
-                    onClick={() => setUnreadCount(0)}
-                    className="text-[11px] text-blue-200 hover:text-white transition"
-                  >
-                    Đánh dấu đã đọc
-                  </button>
-                )}
-                <button onClick={() => setShowNotifPanel(false)} className="text-white/70 hover:text-white">
-                  <X size={20} />
-                </button>
-              </div>
-            </div>
-
-            {}
-            <div className="flex-1 overflow-y-auto divide-y divide-gray-50">
-              {notifications.length === 0 ? (
-                <div className="flex flex-col items-center justify-center h-full text-gray-400 py-16 gap-3">
-                  <Bell size={40} className="opacity-30" />
-                  <p className="text-sm">Chưa có thông báo nào</p>
-                </div>
-              ) : (
-                notifications.map((n) => (
-                  <div
-                    key={n.id}
-                    className={`px-5 py-4 flex items-start gap-3 hover:bg-gray-50 transition ${
-                      n.type === 'express'
-                        ? 'border-l-4 border-red-400 bg-red-50/30'
-                        : 'border-l-4 border-blue-300'
-                    }`}
-                  >
-                    <div className={`w-9 h-9 rounded-full flex items-center justify-center shrink-0 ${
-                      n.type === 'express'
-                        ? 'bg-red-100 text-red-600'
-                        : 'bg-blue-100 text-blue-600'
-                    }`}>
-                      {n.type === 'express'
-                        ? <Rocket size={18} className="animate-pulse" />
-                        : <PackageCheck size={18} />}
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <p className={`text-sm font-bold ${
-                        n.type === 'express' ? 'text-red-700' : 'text-gray-800'
-                      }`}>
-                        {n.title}
-                      </p>
-                      <p className="text-xs text-gray-500 mt-0.5 truncate">{n.message}</p>
-                      <p className="text-[10px] text-gray-400 mt-1">
-                        {n.time.toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' })}
-                        {' — '}
-                        {n.time.toLocaleDateString('vi-VN')}
-                      </p>
-                    </div>
-                    {n.type === 'express' && (
-                      <span className="shrink-0 text-[9px] font-black bg-red-500 text-white px-1.5 py-0.5 rounded-full uppercase tracking-wide">
-                        Gấp!
-                      </span>
-                    )}
-                  </div>
-                ))
-              )}
-            </div>
-          </div>
-        </div>
-      )}
-
-      {}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
           <h1 className="text-2xl font-bold text-gray-800 flex items-center gap-2">
@@ -306,21 +201,6 @@ export default function DriverDashboard() {
           </p>
         </div>
         <div className="flex items-center gap-3">
-          {}
-          <button
-            onClick={() => { setShowNotifPanel(true); setUnreadCount(0); }}
-            className="relative p-2.5 rounded-xl bg-white border border-gray-200 shadow-sm hover:shadow-md transition-all hover:bg-gray-50"
-          >
-            {unreadCount > 0
-              ? <BellRing size={22} className="text-[#113e48]" />
-              : <Bell size={22} className="text-gray-500" />}
-            {unreadCount > 0 && (
-              <span className="absolute -top-1.5 -right-1.5 min-w-[20px] h-5 flex items-center justify-center bg-red-500 text-white text-[10px] font-black rounded-full px-1 animate-bounce">
-                {unreadCount > 9 ? '9+' : unreadCount}
-              </span>
-            )}
-          </button>
-          {}
           <span className="flex h-3 w-3 relative">
             <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
             <span className="relative inline-flex rounded-full h-3 w-3 bg-green-500"></span>

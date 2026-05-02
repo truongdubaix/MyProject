@@ -153,8 +153,8 @@ export default function Navbar() {
             Top 10 Đơn vị vận chuyển uy tín 2024
           </span>
           <div className="flex gap-4 opacity-90 text-gray-200 whitespace-nowrap">
-            <span className="hidden sm:inline">✉ contact@speedyship.vn</span>
-            <span>📞 1900 1234 (24/7)</span>
+            <span className="hidden sm:inline">✉ support@speedyship.com</span>
+            <span>📞 1900 888 999 (24/7)</span>
           </div>
         </div>
       </div>

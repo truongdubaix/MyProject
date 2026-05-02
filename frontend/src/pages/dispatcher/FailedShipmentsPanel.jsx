@@ -79,7 +79,7 @@ export default function FailedShipmentsPanel() {
         },
       );
       toast.success(
-        `✅ Đã lên lịch giao lại vào ${new Date(selectedDate).toLocaleDateString("vi-VN")}`,
+        `Đã lên lịch giao lại vào ${new Date(selectedDate).toLocaleDateString("vi-VN")}`,
       );
       setActionModal(null);
       fetchData();
@@ -217,7 +217,7 @@ export default function FailedShipmentsPanel() {
                       </select>
                       {selectedDriver && (
                         <p className="text-xs text-blue-600 mt-1">
-                          ✅ Đơn sẽ được phân công ngay cho tài xế này
+                          Đơn sẽ được phân công ngay cho tài xế này
                         </p>
                       )}
                     </div>

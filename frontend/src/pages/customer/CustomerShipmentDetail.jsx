@@ -591,7 +591,7 @@ export default function CustomerShipmentDetail() {
               {shipment.status === "delivering"
                 ? "🚚 Đang giao hàng"
                 : shipment.status === "completed"
-                ? "✅ Giao thành công"
+                ? "Giao thành công"
                 : "📦 " + shipment.status}
             </p>
           </div>

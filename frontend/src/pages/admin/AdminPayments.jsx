@@ -49,7 +49,7 @@ export default function AdminPayments() {
   const handleUpdate = async (id, status) => {
     try {
       await API.put(`/payments/${id}`, { status });
-      toast.success("✅ Đã cập nhật trạng thái");
+      toast.success("Đã cập nhật trạng thái");
       fetchPayments();
     } catch {
       toast.error("❌ Cập nhật thất bại");
@@ -172,17 +172,17 @@ export default function AdminPayments() {
                       <select
                         value={p.status}
                         onChange={(e) => handleUpdate(p.id, e.target.value)}
-                        className={`border-none bg-transparent outline-none font-bold text-xs cursor-pointer px-2 py-1 rounded-full ${
+                        className={`border outline-none font-bold text-xs cursor-pointer px-2.5 py-0.5 rounded-full ${
                           p.status === "completed"
-                            ? "text-green-700 bg-green-100"
+                            ? "bg-green-100 text-green-800 border-green-200"
                             : p.status === "pending"
-                            ? "text-yellow-700 bg-yellow-100"
-                            : "text-red-700 bg-red-100"
+                            ? "bg-yellow-100 text-yellow-800 border-yellow-200"
+                            : "bg-red-100 text-red-800 border-red-200"
                         }`}
                       >
-                        <option value="pending">⏳ Đang xử lý</option>
-                        <option value="completed">✅ Hoàn tất</option>
-                        <option value="failed">❌ Thất bại</option>
+                        <option value="pending">Đang xử lý</option>
+                        <option value="completed">Hoàn tất</option>
+                        <option value="failed">Thất bại</option>
                       </select>
                     </td>
                     <td className="px-6 py-4 text-center text-gray-500 text-xs">

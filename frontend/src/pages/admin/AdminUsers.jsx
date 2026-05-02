@@ -67,7 +67,7 @@ export default function AdminUsers() {
       const payload =
         field === "role_id" ? { role_id: value } : { status: value };
       await API.put(`/users/${id}`, payload);
-      toast.success("✅ Cập nhật thành công!");
+      toast.success("Cập nhật thành công!");
       fetchData();
     } catch (err) {
       toast.error("❌ Cập nhật thất bại!");
@@ -255,14 +255,14 @@ export default function AdminUsers() {
                           onChange={(e) =>
                             handleUpdate(u.id, "status", e.target.value)
                           }
-                          className={`border-none bg-transparent outline-none font-bold text-xs cursor-pointer px-2 py-1 rounded-full transition-colors ${
+                          className={`border outline-none font-bold text-xs cursor-pointer px-2.5 py-0.5 rounded-full ${
                             u.status === "active" || u.status === "Hoạt động"
-                              ? "text-green-700 bg-green-50 hover:bg-green-100"
-                              : "text-red-600 bg-red-50 hover:bg-red-100"
+                              ? "bg-green-100 text-green-800 border-green-200"
+                              : "bg-red-100 text-red-800 border-red-200"
                           }`}
                         >
-                          <option value="active">🟢 Hoạt động</option>
-                          <option value="blocked">🔴 Đã khóa</option>
+                          <option value="active">Hoạt động</option>
+                          <option value="blocked">Đã khóa</option>
                         </select>
                       </td>
                       <td className="px-6 py-4 text-center text-gray-500 text-xs">

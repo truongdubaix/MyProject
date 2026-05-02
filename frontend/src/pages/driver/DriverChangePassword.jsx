@@ -12,7 +12,7 @@ export default function DriverChangePassword() {
       oldPassword,
       newPassword,
     });
-    alert("✅ Đổi mật khẩu thành công");
+    alert("Đổi mật khẩu thành công");
     setOldPassword("");
     setNewPassword("");
   };

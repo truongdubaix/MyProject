@@ -1,4 +1,5 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
 import API from "../../services/api";
 
@@ -16,14 +17,89 @@ import {
   Truck,
   User,
   Phone,
+  Clock3,
+  Send,
+  PackageCheck,
+  CircleCheck,
+  CircleX,
+  Ban,
 } from "lucide-react";
 import Pagination from "../../components/Pagination";
 
+const SHIPMENT_STATUS_OPTIONS = [
+  {
+    value: "pending",
+    label: "Chờ xử lý",
+    icon: Clock3,
+    itemClass: "text-yellow-700",
+    iconClass: "bg-yellow-50 text-yellow-600",
+  },
+  {
+    value: "assigned",
+    label: "Đã điều phối",
+    icon: Send,
+    itemClass: "text-cyan-700",
+    iconClass: "bg-cyan-50 text-cyan-600",
+  },
+  {
+    value: "picking",
+    label: "Đang lấy hàng",
+    icon: Package,
+    itemClass: "text-orange-700",
+    iconClass: "bg-orange-50 text-orange-600",
+  },
+  {
+    value: "picked",
+    label: "Đã lấy hàng",
+    icon: PackageCheck,
+    itemClass: "text-indigo-700",
+    iconClass: "bg-indigo-50 text-indigo-600",
+  },
+  {
+    value: "delivering",
+    label: "Đang giao hàng",
+    icon: Truck,
+    itemClass: "text-blue-700",
+    iconClass: "bg-blue-50 text-blue-600",
+  },
+  {
+    value: "delivered",
+    label: "Giao thành công",
+    icon: CircleCheck,
+    itemClass: "text-green-700",
+    iconClass: "bg-green-50 text-green-600",
+  },
+  {
+    value: "completed",
+    label: "Hoàn tất",
+    icon: CircleCheck,
+    itemClass: "text-green-700",
+    iconClass: "bg-green-50 text-green-600",
+  },
+  {
+    value: "failed",
+    label: "Giao thất bại",
+    icon: CircleX,
+    itemClass: "text-red-700",
+    iconClass: "bg-red-50 text-red-600",
+  },
+  {
+    value: "canceled",
+    label: "Đã hủy",
+    icon: Ban,
+    itemClass: "text-gray-700",
+    iconClass: "bg-gray-100 text-gray-600",
+  },
+];
+
 // Quản lý tất cả đơn hàng
 export default function AdminShipments() {
+  const navigate = useNavigate();
   const [shipments, setShipments] = useState([]);
   const [filtered, setFiltered] = useState([]);
   const [search, setSearch] = useState("");
+  const [filterRegion, setFilterRegion] = useState("all");
+  const [filterStatus, setFilterStatus] = useState("all");
   const [loading, setLoading] = useState(true);
 
   const [showForm, setShowForm] = useState(false);
@@ -46,6 +122,8 @@ export default function AdminShipments() {
     cod_amount: "",
     status: "pending",
   });
+  const [statusDropdownOpen, setStatusDropdownOpen] = useState(false);
+  const statusDropdownRef = useRef(null);
 
   const [page, setPage] = useState(1);
   const perPage = 8;
@@ -73,16 +151,21 @@ export default function AdminShipments() {
 
   useEffect(() => {
     const keyword = search.toLowerCase();
-    const filteredData = shipments.filter(
-      (s) =>
+    const filteredData = shipments.filter((s) => {
+      const matchSearch =
         s.tracking_code?.toLowerCase().includes(keyword) ||
         s.sender_name?.toLowerCase().includes(keyword) ||
         s.receiver_name?.toLowerCase().includes(keyword) ||
-        s.sender_phone?.includes(keyword)
-    );
+        s.sender_phone?.includes(keyword);
+
+      const matchRegion = filterRegion === "all" || s.region_id === filterRegion;
+      const matchStatus = filterStatus === "all" || s.status === filterStatus;
+
+      return matchSearch && matchRegion && matchStatus;
+    });
     setFiltered(filteredData);
     setPage(1);
-  }, [search, shipments]);
+  }, [search, filterRegion, filterStatus, shipments]);
 
   const handleChange = (e) =>
     setForm({ ...form, [e.target.name]: e.target.value });
@@ -142,6 +225,20 @@ export default function AdminShipments() {
 
   const paginatedData = filtered.slice((page - 1) * perPage, page * perPage);
 
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (
+        statusDropdownRef.current &&
+        !statusDropdownRef.current.contains(event.target)
+      ) {
+        setStatusDropdownOpen(false);
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
 
 // Tạo badge hiển thị trạng thái
   const getStatusBadge = (status) => {
@@ -152,6 +249,7 @@ export default function AdminShipments() {
       picked: "bg-indigo-100 text-indigo-800 border-indigo-200",
       delivering: "bg-blue-100 text-blue-800 border-blue-200",
       delivered: "bg-green-100 text-green-800 border-green-200",
+      completed: "bg-green-100 text-green-800 border-green-200",
       failed: "bg-red-100 text-red-800 border-red-200",
       canceled: "bg-gray-100 text-gray-800 border-gray-200",
     };
@@ -163,6 +261,7 @@ export default function AdminShipments() {
       picked: "Đã lấy hàng",
       delivering: "Đang giao hàng",
       delivered: "Giao thành công",
+      completed: "Hoàn tất",
       failed: "Giao thất bại",
       canceled: "Đã hủy",
     };
@@ -177,6 +276,11 @@ export default function AdminShipments() {
       </span>
     );
   };
+
+  const selectedStatus =
+    SHIPMENT_STATUS_OPTIONS.find((s) => s.value === form.status) ||
+    SHIPMENT_STATUS_OPTIONS[0];
+  const SelectedStatusIcon = selectedStatus.icon;
 
   return (
     <div className="space-y-6 animate-in fade-in duration-500 font-sans">
@@ -193,8 +297,30 @@ export default function AdminShipments() {
           </p>
         </div>
 
-        <div className="flex w-full sm:w-auto gap-3">
-          <div className="relative flex-1 sm:w-72">
+        <div className="flex flex-wrap items-center gap-3 w-full sm:w-auto">
+          <select
+            value={filterRegion}
+            onChange={(e) => setFilterRegion(e.target.value)}
+            className="px-3 py-2.5 bg-gray-50 border border-gray-200 rounded-lg text-sm font-semibold focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 transition-all cursor-pointer"
+          >
+            <option value="all">Tất cả khu vực</option>
+            <option value="HN">Hà Nội (HN)</option>
+            <option value="HCM">TP.HCM (HCM)</option>
+            <option value="DN">Đà Nẵng (DN)</option>
+          </select>
+          <select
+            value={filterStatus}
+            onChange={(e) => setFilterStatus(e.target.value)}
+            className="px-3 py-2.5 bg-gray-50 border border-gray-200 rounded-lg text-sm font-semibold focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 transition-all cursor-pointer"
+          >
+            <option value="all">Tất cả trạng thái</option>
+            {SHIPMENT_STATUS_OPTIONS.map((opt) => (
+              <option key={opt.value} value={opt.value}>
+                {opt.label}
+              </option>
+            ))}
+          </select>
+          <div className="relative flex-1 min-w-[200px]">
             <Search
               className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"
               size={18}
@@ -281,17 +407,27 @@ export default function AdminShipments() {
                 paginatedData.map((s) => (
                   <tr
                     key={s.id}
-                    className="hover:bg-gray-50/50 transition-colors group"
+                    onClick={() => navigate(`/admin/shipments/${s.id}`)}
+                    className="hover:bg-gray-50/50 transition-colors group cursor-pointer"
                   >
                     {}
                     <td className="px-6 py-4">
-                      <span className="font-bold text-[#113e48] text-base">
+                      <button
+                        type="button"
+                        onClick={() => navigate(`/admin/shipments/${s.id}`)}
+                        className="font-bold text-[#113e48] text-base hover:text-orange-600 transition-colors"
+                      >
                         #{s.tracking_code}
-                      </span>
+                      </button>
                       <p className="text-[10px] text-gray-400 mt-1 flex items-center gap-1">
                         <Truck size={10} />{" "}
                         {new Date(s.created_at).toLocaleDateString("vi-VN")}
                       </p>
+                      {s.region_id && (
+                        <span className="inline-block mt-1.5 px-2 py-0.5 bg-indigo-50 border border-indigo-100 text-indigo-600 text-[10px] font-bold rounded">
+                          {s.region_id}
+                        </span>
+                      )}
                     </td>
 
                     {}
@@ -371,7 +507,10 @@ export default function AdminShipments() {
 
                     {}
                     <td className="px-6 py-4 text-center">
-                      <div className="flex items-center justify-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                      <div
+                        className="flex items-center justify-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity"
+                        onClick={(e) => e.stopPropagation()}
+                      >
                         <button
                           onClick={() => {
                             setForm(s);
@@ -422,8 +561,8 @@ export default function AdminShipments() {
 
       {}
       {showForm && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-[#113e48]/50 backdrop-blur-sm animate-in fade-in duration-200">
-          <div className="bg-white rounded-2xl shadow-2xl w-full max-w-3xl overflow-hidden animate-in zoom-in-95 duration-200 flex flex-col max-h-[90vh]">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-3 bg-[#113e48]/50 backdrop-blur-sm animate-in fade-in duration-200">
+          <div className="bg-white rounded-2xl shadow-2xl w-full max-w-5xl overflow-hidden animate-in zoom-in-95 duration-200 flex flex-col max-h-[95vh]">
             {}
             <div className="px-6 py-4 border-b border-gray-100 flex justify-between items-center bg-gray-50 shrink-0">
               <div>
@@ -611,21 +750,63 @@ export default function AdminShipments() {
                     <label className="text-xs font-semibold text-gray-500 mb-1 block">
                       Trạng thái
                     </label>
-                    <select
-                      name="status"
-                      value={form.status}
-                      onChange={handleChange}
-                      className="w-full p-2.5 border rounded-lg text-sm bg-white cursor-pointer hover:border-orange-300 transition-colors"
-                    >
-                      <option value="pending">🟡 Chờ xử lý</option>
-                      <option value="assigned">🔵 Đã điều phối</option>
-                      <option value="picking">🟣 Đang lấy hàng</option>
-                      <option value="picked">🚚 Đã lấy hàng</option>
-                      <option value="delivering">🚀 Đang giao hàng</option>
-                      <option value="delivered">✅ Giao thành công</option>
-                      <option value="failed">❌ Giao thất bại</option>
-                      <option value="canceled">🚫 Đã hủy</option>
-                    </select>
+                    <div className="relative" ref={statusDropdownRef}>
+                      <button
+                        type="button"
+                        onClick={() => setStatusDropdownOpen((prev) => !prev)}
+                        className={`w-full p-2.5 border rounded-lg text-sm bg-white cursor-pointer transition-all flex items-center justify-between ${selectedStatus.itemClass}`}
+                      >
+                        <span className="flex items-center gap-2 font-semibold">
+                          <span
+                            className={`w-6 h-6 rounded-md flex items-center justify-center ${selectedStatus.iconClass}`}
+                          >
+                            <SelectedStatusIcon size={14} />
+                          </span>
+                          {selectedStatus.label}
+                        </span>
+                        <ChevronRight
+                          size={16}
+                          className={`transition-transform ${
+                            statusDropdownOpen ? "rotate-90" : ""
+                          }`}
+                        />
+                      </button>
+
+                      {statusDropdownOpen && (
+                        <div className="absolute z-30 bottom-full mb-2 w-full rounded-xl border border-gray-100 bg-white shadow-xl overflow-hidden">
+                          {SHIPMENT_STATUS_OPTIONS.map((statusOption) => {
+                            const StatusIcon = statusOption.icon;
+                            return (
+                              <button
+                                key={statusOption.value}
+                                type="button"
+                                onClick={() => {
+                                  setForm((prev) => ({
+                                    ...prev,
+                                    status: statusOption.value,
+                                  }));
+                                  setStatusDropdownOpen(false);
+                                }}
+                                className={`w-full px-3 py-2.5 text-left flex items-center gap-2 hover:bg-gray-50 transition-colors ${statusOption.itemClass} ${
+                                  form.status === statusOption.value
+                                    ? "bg-gray-50"
+                                    : ""
+                                }`}
+                              >
+                                <span
+                                  className={`w-6 h-6 rounded-md flex items-center justify-center ${statusOption.iconClass}`}
+                                >
+                                  <StatusIcon size={14} />
+                                </span>
+                                <span className="text-sm font-semibold">
+                                  {statusOption.label}
+                                </span>
+                              </button>
+                            );
+                          })}
+                        </div>
+                      )}
+                    </div>
                   </div>
                 </div>
               </div>

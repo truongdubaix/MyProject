@@ -1,6 +1,5 @@
 import db from "../config/db.js";
 
-
 // Lấy danh sách tất cả khách hàng
 export const getAllCustomers = async (req, res) => {
   try {
@@ -19,18 +18,16 @@ export const getAllCustomers = async (req, res) => {
   }
 };
 
-
 export const updateCustomerStatus = async (req, res) => {
   try {
     const { id } = req.params;
     const { status } = req.body;
     await db.query("UPDATE users SET status = ? WHERE id = ?", [status, id]);
-    res.json({ message: "✅ Cập nhật trạng thái thành công" });
+    res.json({ message: " Cập nhật trạng thái thành công" });
   } catch (err) {
     res.status(500).json({ message: "Lỗi server khi cập nhật trạng thái" });
   }
 };
-
 
 export const deleteCustomer = async (req, res) => {
   try {

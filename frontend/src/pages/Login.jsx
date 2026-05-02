@@ -49,9 +49,15 @@ export default function Login() {
       localStorage.setItem("role", user.role);
       localStorage.setItem("username", user.name);
       localStorage.setItem("userId", user.id.toString());
+      if (user.region_id) {
+        localStorage.setItem("region_id", String(user.region_id));
+      }
 
       if (user.role === "customer") {
         localStorage.setItem("customer_id", user.id.toString());
+      }
+      if (user.role === "dispatcher") {
+        localStorage.setItem("dispatcher_id", user.id.toString());
       }
 
       if (user.role === "admin") navigate("/admin");
@@ -112,7 +118,7 @@ export default function Login() {
                 <input
                   type="email"
                   name="email"
-                  placeholder="admin@speedyship.com"
+                  placeholder="khachhang@speedyship.com"
                   value={form.email}
                   onChange={handleChange}
                   className="w-full pl-11 pr-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 transition-all text-slate-700 font-medium text-sm"

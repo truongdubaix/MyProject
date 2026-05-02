@@ -87,7 +87,7 @@ export default function AdminContacts() {
       await API.patch(`/contact/${selectedContact.id}/assign`, {
         dispatcher_id: selectedDispatcher,
       });
-      toast.success("✅ Đã giao yêu cầu cho điều phối viên!");
+      toast.success("Đã giao yêu cầu cho điều phối viên!");
       setShowAssignModal(false);
       setSelectedDispatcher("");
       fetchContacts();

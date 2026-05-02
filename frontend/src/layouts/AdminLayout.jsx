@@ -15,6 +15,7 @@ import {
   ChevronRight,
   ShieldCheck,
   Newspaper,
+  FileText,
 } from "lucide-react";
 
 export default function AdminLayout() {
@@ -94,10 +95,20 @@ export default function AdminLayout() {
 
 
   const getPageTitle = () => {
+    if (location.pathname.startsWith("/admin/shipments/")) {
+      return "Chi tiết vận đơn";
+    }
     const currentItem = MENU_ITEMS.find(
       (item) => item.path === location.pathname
     );
     return currentItem ? currentItem.label : "Admin Control Panel";
+  };
+
+  const getPageIcon = () => {
+    if (location.pathname.startsWith("/admin/shipments/")) {
+      return <FileText size={22} className="text-orange-500" />;
+    }
+    return null;
   };
 
   return (
@@ -205,7 +216,8 @@ export default function AdminLayout() {
               <Menu size={24} />
             </button>
             <div>
-              <h2 className="text-2xl font-extrabold text-[#113e48]">
+              <h2 className="text-2xl font-extrabold text-[#113e48] flex items-center gap-2">
+                {getPageIcon()}
                 {getPageTitle()}
               </h2>
               <p className="hidden md:block text-xs text-gray-400 mt-0.5">

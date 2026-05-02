@@ -113,7 +113,7 @@ export default function CustomerProfile() {
     e.preventDefault();
     try {
       await API.put(`/customers/profile/${userId}`, profile);
-      toast.success("✅ Cập nhật hồ sơ thành công!");
+      toast.success("Cập nhật hồ sơ thành công!");
       setIsEditing(false);
     } catch (err) {
       toast.error("❌ Lỗi cập nhật!");

@@ -163,7 +163,7 @@ export default function CustomerTrack() {
         setRouteGeoJSON(null);
       }
 
-      toast.success("✅ Đã tìm thấy đơn hàng!");
+      toast.success("Đã tìm thấy đơn hàng!");
     } catch (err) {
       toast.error("❌ Không tìm thấy đơn hàng hoặc bạn không có quyền xem!");
     } finally {

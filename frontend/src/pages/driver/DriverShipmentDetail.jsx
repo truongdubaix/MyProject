@@ -240,7 +240,15 @@ export default function DriverShipmentDetail() {
 
 
       if (pickupCoords && deliveryCoords && mapRef.current) {
-
+        const bounds = new mapboxgl.LngLatBounds();
+        bounds.extend([pickupCoords.lng, pickupCoords.lat]);
+        bounds.extend([deliveryCoords.lng, deliveryCoords.lat]);
+        bounds.extend([driverPos.lng, driverPos.lat]);
+        mapRef.current.fitBounds(bounds, {
+          padding: 80,
+          duration: 900,
+          maxZoom: 15,
+        });
       }
     } catch (err) {
       toast.error("Không thể tải thông tin đơn hàng");
@@ -266,6 +274,19 @@ export default function DriverShipmentDetail() {
   useEffect(() => {
     fetchShipmentAndCoords();
   }, [shipmentId]);
+
+  useEffect(() => {
+    if (!mapRef.current) return;
+    const bounds = new mapboxgl.LngLatBounds();
+    bounds.extend([coords.pickup.lng, coords.pickup.lat]);
+    bounds.extend([coords.delivery.lng, coords.delivery.lat]);
+    bounds.extend([coords.driver.lng, coords.driver.lat]);
+    mapRef.current.fitBounds(bounds, {
+      padding: 80,
+      duration: 700,
+      maxZoom: 15,
+    });
+  }, [coords]);
 
   if (loading)
     return (

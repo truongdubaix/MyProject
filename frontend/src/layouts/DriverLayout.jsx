@@ -12,6 +12,7 @@ import {
   X,
   User,
 } from "lucide-react";
+import DriverNotifications from "../components/DriverNotifications";
 
 export default function DriverLayout() {
   const { id: paramId } = useParams();
@@ -167,11 +168,11 @@ export default function DriverLayout() {
       {}
       <div className="flex-1 flex flex-col min-h-screen overflow-hidden">
         {}
-        <header className="lg:hidden bg-white shadow-sm p-4 flex items-center justify-between sticky top-0 z-30">
+        <header className="bg-white shadow-sm p-4 flex items-center justify-between sticky top-0 z-30">
           <div className="flex items-center gap-3">
             <button
               onClick={() => setIsMobileMenuOpen(true)}
-              className="p-2 text-slate-600 hover:bg-slate-100 rounded-lg"
+              className="p-2 text-slate-600 hover:bg-slate-100 rounded-lg lg:hidden"
             >
               <Menu size={24} />
             </button>
@@ -179,8 +180,11 @@ export default function DriverLayout() {
               SpeedyShip Driver
             </span>
           </div>
-          <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center text-blue-700 font-bold">
-            {username.charAt(0)}
+          <div className="flex items-center gap-3">
+            <DriverNotifications driverId={driverId} />
+            <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center text-blue-700 font-bold">
+              {username.charAt(0)}
+            </div>
           </div>
         </header>
 

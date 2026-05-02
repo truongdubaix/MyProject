@@ -54,7 +54,7 @@ export default function ApplyDriver() {
       setLoading(true);
 
       const res = await API.post("/drivers/apply", form);
-      toast.success("✅ " + res.data.message);
+      toast.success(res.data.message);
 
 
       setForm({

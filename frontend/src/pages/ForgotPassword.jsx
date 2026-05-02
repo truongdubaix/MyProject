@@ -144,7 +144,7 @@ export default function ForgotPassword() {
                     : "bg-green-50 text-green-600 border-green-100"
                 }`}
               >
-                <span>{message.type === "error" ? "⚠️" : "✅"}</span>{" "}
+                <span>{message.type === "error" ? "⚠️" : ""}</span>{" "}
                 {message.text}
               </motion.div>
             )}

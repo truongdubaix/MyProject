@@ -80,10 +80,10 @@ export default function AdminNews() {
     if (confirm("Bạn có chắc muốn xóa bản tin này không?")) {
       try {
         await API.delete(`/news/${id}`);
-        toast.success("🗑️ Đã xóa tin tức");
+        toast.success(" Đã xóa tin tức");
         fetchNews();
       } catch {
-        toast.error("❌ Xóa thất bại");
+        toast.error(" Xóa thất bại");
       }
     }
   };

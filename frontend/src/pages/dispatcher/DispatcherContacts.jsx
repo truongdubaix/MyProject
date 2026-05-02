@@ -87,7 +87,7 @@ export default function DispatcherContactsPro() {
         status: "resolved",
         note,
       });
-      toast.success("✅ Đã xử lý xong!", { id: toastId });
+      toast.success("Đã xử lý xong!", { id: toastId });
       closeNoteModal();
       fetchMyContacts();
     } catch (err) {

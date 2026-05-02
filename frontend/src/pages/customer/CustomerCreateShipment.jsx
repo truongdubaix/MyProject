@@ -27,11 +27,11 @@ import {
 
 
 const WAREHOUSE = {
-  address: "Số 123, Nguyễn Văn Linh, Thanh Khê, TP Đà Nẵng",
+  address: "55 Nguyễn Văn Linh, Quận Hải Châu, TP. Đà Nẵng",
   lat: 16.0600,
   lng: 108.2130,
   name: "Kho SpeedyShip Đà Nẵng",
-  phone: "0236 123 4567",
+  phone: "1900 888 999",
 };
 
 // Form tạo đơn hàng mới

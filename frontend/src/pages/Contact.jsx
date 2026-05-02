@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import AOS from "aos";
 import "aos/dist/aos.css";
 import API from "../services/api";
@@ -50,6 +50,7 @@ const OfficeMarker = ({ onClick }) => {
 
 // Trang liên hệ
 export default function Contact() {
+  const mapRef = useRef(null);
   const [form, setForm] = useState({
     name: "",
     email: "",
@@ -64,6 +65,15 @@ export default function Contact() {
     AOS.init({ duration: 800, once: true });
   }, []);
 
+  useEffect(() => {
+    if (!mapRef.current) return;
+    mapRef.current.easeTo({
+      center: [OFFICE_COORDS.lng, OFFICE_COORDS.lat],
+      zoom: 15,
+      duration: 800,
+    });
+  }, []);
+
   const handleChange = (e) =>
     setForm({ ...form, [e.target.name]: e.target.value });
 
@@ -73,7 +83,7 @@ export default function Contact() {
     setLoading(true);
     try {
       await API.post("/contact", form);
-      toast.success("✅ Gửi yêu cầu thành công! Cảm ơn bạn đã liên hệ.");
+      toast.success("Gửi yêu cầu thành công! Cảm ơn bạn đã liên hệ.");
       setForm({ name: "", email: "", phone: "", message: "" });
     } catch {
       toast.error("❌ Không thể gửi yêu cầu, vui lòng thử lại sau!");
@@ -191,6 +201,7 @@ export default function Contact() {
           {}
           <div className="rounded-xl shadow-inner overflow-hidden h-[300px] border border-gray-200 mt-auto relative">
             <Map
+              ref={mapRef}
               initialViewState={{
                 latitude: OFFICE_COORDS.lat,
                 longitude: OFFICE_COORDS.lng,

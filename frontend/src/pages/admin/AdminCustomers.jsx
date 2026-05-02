@@ -72,7 +72,7 @@ export default function AdminCustomer() {
     try {
       await API.put(`/admin/customers/${id}`, { status: newStatus });
       toast.success(
-        isActive ? "🔒 Đã khóa tài khoản" : "✅ Đã mở khóa tài khoản"
+        isActive ? "🔒 Đã khóa tài khoản" : "Đã mở khóa tài khoản"
       );
       fetchCustomers();
     } catch {

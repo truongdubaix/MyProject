@@ -22,9 +22,29 @@ import {
   Users,
   DollarSign,
   Clock,
+  MapPin,
 } from "lucide-react";
 
 const COLORS = ["#0088FE", "#00C49F", "#FFBB28", "#FF8042"];
+
+const REGION_META = {
+  DN: {
+    city: "Đà Nẵng",
+    nearby: ["Hòa Vang", "Liên Chiểu", "Thanh Khê", "Ngũ Hành Sơn"],
+  },
+  HCM: {
+    city: "TP.HCM",
+    nearby: ["Thủ Đức", "Bình Thạnh", "Gò Vấp", "Tân Bình"],
+  },
+  HN: {
+    city: "Hà Nội",
+    nearby: ["Cầu Giấy", "Đống Đa", "Nam Từ Liêm", "Thanh Xuân"],
+  },
+  OTHER: {
+    city: "Liên vùng",
+    nearby: ["Khu vực tổng hợp"],
+  },
+};
 
 // Trang tổng quan của điều phối viên
 export default function DispatcherDashboard() {
@@ -59,6 +79,9 @@ export default function DispatcherDashboard() {
 
   if (!stats) return <p className="p-6 text-gray-500">Không có dữ liệu.</p>;
 
+  const regionId =
+    stats.region_id || localStorage.getItem("region_id") || "OTHER";
+  const regionInfo = REGION_META[regionId] || REGION_META.OTHER;
 
   const totalShipments = stats.shipments.reduce((a, b) => a + b.count, 0);
   const activeDrivers =
@@ -88,7 +111,7 @@ export default function DispatcherDashboard() {
             <Truck className="text-orange-500" /> Bảng điều khiển Điều phối
           </h1>
           <p className="text-sm text-gray-500 mt-1">
-            Tổng quan hoạt động vận hành hôm nay
+            Tổng quan vận hành khu vực {regionInfo.city}
           </p>
         </div>
         <div className="flex gap-2">
@@ -97,6 +120,23 @@ export default function DispatcherDashboard() {
             <option>Tuần này</option>
             <option>Tháng này</option>
           </select>
+        </div>
+      </div>
+
+      <div className="mb-6 bg-white border border-gray-100 rounded-2xl p-4 md:p-5">
+        <div className="flex items-center gap-2 text-[#113e48] font-bold mb-2">
+          <MapPin size={16} className="text-orange-500" />
+          Khu vực lân cận đang theo dõi
+        </div>
+        <div className="flex flex-wrap gap-2">
+          {regionInfo.nearby.map((area) => (
+            <span
+              key={area}
+              className="px-3 py-1.5 rounded-full text-xs font-semibold bg-orange-50 text-orange-700 border border-orange-200"
+            >
+              {area}
+            </span>
+          ))}
         </div>
       </div>
 
@@ -296,7 +336,7 @@ export default function DispatcherDashboard() {
           <div className="space-y-3">
             {failedShipments.length === 0 ? (
               <div className="py-8 text-center text-gray-400">
-                <p className="text-2xl mb-2">✅</p>
+                <p className="text-2xl mb-2">•</p>
                 <p className="text-sm font-medium">Không có đơn thất bại!</p>
               </div>
             ) : (

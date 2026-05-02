@@ -34,6 +34,7 @@ import AdminUsers from "./pages/admin/AdminUsers.jsx";
 import AdminFeedbacks from "./pages/admin/AdminFeedbacks.jsx";
 import AdminContacts from "./pages/admin/AdminContacts";
 import AdminNews from "./pages/admin/AdminNews.jsx";
+import AdminShipmentDetail from "./pages/admin/AdminShipmentDetail.jsx";
 
 
 import DispatcherDashboard from "./pages/dispatcher/DispatcherDashboard.jsx";
@@ -145,6 +146,7 @@ export default function App() {
           >
             <Route index element={<AdminDashboard />} />
             <Route path="shipments" element={<AdminShipments />} />
+            <Route path="shipments/:id" element={<AdminShipmentDetail />} />
             <Route path="drivers" element={<AdminDrivers />} />
             <Route path="customers" element={<AdminCustomers />} />
             <Route path="payments" element={<AdminPayments />} />

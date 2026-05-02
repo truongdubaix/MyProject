@@ -137,7 +137,7 @@ export default function Footer() {
               </li>
               <li className="flex items-center gap-3">
                 <FaEnvelope className="text-orange-500 shrink-0" />
-                <span>support@speedyship.vn</span>
+                <span>support@speedyship.com</span>
               </li>
             </ul>
           </div>
@@ -177,10 +177,10 @@ export default function Footer() {
             rights reserved.
           </p>
           <div className="flex gap-6">
-            <Link to="#" className="hover:text-white transition-colors">
+            <Link to="/policy/terms" className="hover:text-white transition-colors">
               Điều khoản sử dụng
             </Link>
-            <Link to="#" className="hover:text-white transition-colors">
+            <Link to="/policy/privacy" className="hover:text-white transition-colors">
               Chính sách bảo mật
             </Link>
             <Link to="#" className="hover:text-white transition-colors">

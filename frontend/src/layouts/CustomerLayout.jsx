@@ -69,7 +69,7 @@ export default function CustomerLayout() {
       case "/customer/support":
         return "Hỗ trợ khách hàng";
       case "/customer/invoices":
-        return "Xuất hóa đơn";
+        return "Xuất phiếu giao hàng";
       case "/customer/profile":
         return "Hồ sơ cá nhân";
       default:
@@ -162,7 +162,7 @@ export default function CustomerLayout() {
                 <Headphones size={18} /> <span>Hỗ trợ</span>
               </NavLink>
               <NavLink to="/customer/invoices" className={navLinkClasses}>
-                <FileText size={18} /> <span>Xuất hóa đơn</span>
+                <FileText size={18} /> <span>Xuất phiếu giao hàng</span>
               </NavLink>
             </nav>
           </div>
