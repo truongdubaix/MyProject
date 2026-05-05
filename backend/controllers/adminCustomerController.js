@@ -18,6 +18,7 @@ export const getAllCustomers = async (req, res) => {
   }
 };
 
+// Cập nhật trạng thái tài khoản khách hàng (active/blocked)
 export const updateCustomerStatus = async (req, res) => {
   try {
     const { id } = req.params;
@@ -29,6 +30,7 @@ export const updateCustomerStatus = async (req, res) => {
   }
 };
 
+// Xóa tài khoản khách hàng theo ID (admin)
 export const deleteCustomer = async (req, res) => {
   try {
     const { id } = req.params;

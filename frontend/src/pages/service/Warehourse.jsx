@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+﻿import React, { useEffect } from "react";
 import { Link } from "react-router-dom";
 import {
   FaNetworkWired,
@@ -25,7 +25,7 @@ export default function Warehouse() {
 
   return (
     <div className="font-sans bg-slate-50 text-slate-700">
-      {}
+      {/* Khối nội dung */}
       <section className="relative h-[450px] flex items-center justify-center overflow-hidden">
         <div className="absolute inset-0 z-0">
           <img
@@ -69,7 +69,7 @@ export default function Warehouse() {
         </div>
       </section>
 
-      {}
+      {/* Khối nội dung */}
       <section className="bg-white border-b border-gray-200">
         <div className="max-w-6xl mx-auto px-6">
           <div className="grid grid-cols-2 md:grid-cols-4 divide-x divide-gray-100">
@@ -92,7 +92,7 @@ export default function Warehouse() {
         </div>
       </section>
 
-      {}
+      {/* Khối nội dung */}
       <section className="py-20 px-6 max-w-7xl mx-auto">
         <div className="text-center mb-12">
           <h2 className="text-3xl font-extrabold text-[#113e48] mb-3">
@@ -145,7 +145,7 @@ export default function Warehouse() {
         </div>
       </section>
 
-      {}
+      {/* Khối nội dung */}
       <section className="py-10 px-6 max-w-7xl mx-auto space-y-20">
         <div className="grid lg:grid-cols-2 gap-12 items-center">
           <div className="relative" data-aos="fade-right">
@@ -200,7 +200,7 @@ export default function Warehouse() {
         </div>
       </section>
 
-      {}
+      {/* Khối nội dung */}
       <section className="py-20 bg-white mt-20 relative border-t border-gray-100">
         <div className="max-w-7xl mx-auto px-6">
           <div className="text-center mb-16">
@@ -215,7 +215,7 @@ export default function Warehouse() {
           </div>
 
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
-            {}
+            {/* Phần giao diện */}
             <div
               className="bg-slate-50 rounded-2xl p-6 border border-slate-100 hover:border-orange-200 hover:shadow-lg transition-all"
               data-aos="fade-up"
@@ -234,7 +234,7 @@ export default function Warehouse() {
               </p>
             </div>
 
-            {}
+            {/* Phần giao diện */}
             <div
               className="bg-slate-50 rounded-2xl p-6 border border-slate-100 hover:border-orange-200 hover:shadow-lg transition-all"
               data-aos="fade-up"
@@ -252,7 +252,7 @@ export default function Warehouse() {
               </p>
             </div>
 
-            {}
+            {/* Phần giao diện */}
             <div
               className="bg-slate-50 rounded-2xl p-6 border border-slate-100 hover:border-orange-200 hover:shadow-lg transition-all"
               data-aos="fade-up"
@@ -271,7 +271,7 @@ export default function Warehouse() {
               </p>
             </div>
 
-            {}
+            {/* Phần giao diện */}
             <div
               className="bg-slate-50 rounded-2xl p-6 border border-slate-100 hover:border-orange-200 hover:shadow-lg transition-all"
               data-aos="fade-up"
@@ -293,7 +293,7 @@ export default function Warehouse() {
         </div>
       </section>
 
-      {}
+      {/* Khối nội dung */}
       <section className="py-20 bg-[#113e48] text-center mt-20">
         <div className="max-w-3xl mx-auto px-6 text-white">
           <FaWarehouse className="text-5xl mx-auto mb-4 opacity-50" />

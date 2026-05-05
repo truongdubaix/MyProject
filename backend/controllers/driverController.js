@@ -160,6 +160,7 @@ export const getDriverHistory = async (req, res) => {
   }
 };
 
+// Tài xế cập nhật trạng thái giao hàng (picking/delivering/completed/failed)
 export const updateDriverShipmentStatus = async (req, res) => {
   try {
     const { shipment_id } = req.params;
@@ -210,6 +211,7 @@ export const updateDriverShipmentStatus = async (req, res) => {
   }
 };
 
+// Lấy hồ sơ chi tiết tài xế kèm thông tin xe theo user_id hoặc driver_id
 export const getDriverProfile = async (req, res) => {
   try {
     const { id } = req.params;
@@ -475,6 +477,7 @@ export const getDriverRatingStats = async (req, res) => {
   }
 };
 
+// Gán xe cho tài xế theo driver_id (admin hoặc nội bộ)
 export const updateDriverVehicle = async (req, res) => {
   try {
     const { id } = req.params;
@@ -496,6 +499,7 @@ export const updateDriverVehicle = async (req, res) => {
   }
 };
 
+// Lấy hồ sơ tài xế theo user_id — dùng để hiển thị trang cá nhân
 export const getDriverProfileByUser = async (req, res) => {
   try {
     const { userId } = req.params;
@@ -529,6 +533,7 @@ export const getDriverProfileByUser = async (req, res) => {
   }
 };
 
+// Cập nhật tọa độ GPS hiện tại của tài xế theo user_id
 export const updateDriverLocation = async (req, res) => {
   try {
     const { id } = req.params; // user_id

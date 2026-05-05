@@ -1,4 +1,4 @@
-
+﻿
 import { useEffect, useState } from "react";
 import API from "../../services/api";
 import toast, { Toaster } from "react-hot-toast";
@@ -124,7 +124,7 @@ export default function FailedShipmentsPanel() {
     <div className="min-h-screen bg-[#F8FAFC] p-4 lg:p-8 pb-20 space-y-6">
       <Toaster position="top-right" />
 
-      {}
+      {/* Phần giao diện */}
       <AnimatePresence>
         {actionModal && (
           <motion.div
@@ -143,7 +143,7 @@ export default function FailedShipmentsPanel() {
             >
               {actionModal.mode === "reschedule" ? (
                 <>
-                  {}
+                  {/* Phần giao diện */}
                   <div className="bg-gradient-to-r from-blue-500 to-blue-600 px-6 py-4 flex items-center justify-between">
                     <div className="flex items-center gap-3 text-white">
                       <div className="w-9 h-9 rounded-full bg-white/20 flex items-center justify-center">
@@ -167,7 +167,7 @@ export default function FailedShipmentsPanel() {
                   </div>
 
                   <div className="p-5 space-y-4">
-                    {}
+                    {/* Render điều kiện */}
                     {actionModal.shipment.failure_note && (
                       <div className="bg-red-50 border border-red-100 rounded-xl px-4 py-3 text-sm text-red-700">
                         <p className="font-bold text-xs text-red-400 mb-1">
@@ -177,7 +177,7 @@ export default function FailedShipmentsPanel() {
                       </div>
                     )}
 
-                    {}
+                    {/* Phần giao diện */}
                     <div>
                       <label className="text-sm font-bold text-gray-700 mb-1.5 block">
                         📅 Ngày giao lại
@@ -191,7 +191,7 @@ export default function FailedShipmentsPanel() {
                       />
                     </div>
 
-                    {}
+                    {/* Phần giao diện */}
                     <div>
                       <label className="text-sm font-bold text-gray-700 mb-1.5 block">
                         🚴 Phân công tài xế mới{" "}
@@ -246,7 +246,7 @@ export default function FailedShipmentsPanel() {
                 </>
               ) : (
                 <>
-                  {}
+                  {/* Phần giao diện */}
                   <div className="bg-gradient-to-r from-gray-700 to-gray-900 px-6 py-4 flex items-center justify-between">
                     <div className="flex items-center gap-3 text-white">
                       <div className="w-9 h-9 rounded-full bg-white/20 flex items-center justify-center">
@@ -337,7 +337,7 @@ export default function FailedShipmentsPanel() {
         )}
       </AnimatePresence>
 
-      {}
+      {/* Phần giao diện */}
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-bold text-gray-800 flex items-center gap-2">
@@ -356,7 +356,7 @@ export default function FailedShipmentsPanel() {
         </button>
       </div>
 
-      {}
+      {/* Render điều kiện */}
       {!loading && (
         <div className="grid grid-cols-3 gap-3">
           <div className="bg-white rounded-2xl p-4 shadow-sm border border-gray-100 text-center">
@@ -383,7 +383,7 @@ export default function FailedShipmentsPanel() {
         </div>
       )}
 
-      {}
+      {/* Phần giao diện */}
       <div className="space-y-3">
         {loading ? (
           [...Array(3)].map((_, i) => (
@@ -423,7 +423,7 @@ export default function FailedShipmentsPanel() {
                       : "border-orange-100"
                   }`}
                 >
-                  {}
+                  {/* Phần giao diện */}
                   <div className="flex items-start justify-between gap-3 mb-3">
                     <div className="flex items-center gap-2 flex-wrap">
                       {isExpressOrder && (
@@ -443,7 +443,7 @@ export default function FailedShipmentsPanel() {
                     </p>
                   </div>
 
-                  {}
+                  {/* Phần giao diện */}
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 mb-3 text-sm">
                     <div className="flex items-center gap-2 text-gray-600">
                       <User size={14} className="text-gray-400 shrink-0" />
@@ -466,7 +466,7 @@ export default function FailedShipmentsPanel() {
                     </div>
                   </div>
 
-                  {}
+                  {/* Render điều kiện */}
                   {s.failure_note && (
                     <div className="bg-red-50 border border-red-100 rounded-xl px-3 py-2 mb-3">
                       <p className="text-xs font-bold text-red-400 mb-0.5">
@@ -476,7 +476,7 @@ export default function FailedShipmentsPanel() {
                     </div>
                   )}
 
-                  {}
+                  {/* Phần giao diện */}
                   <div className="flex gap-2 pt-2 border-t border-gray-50">
                     <button
                       onClick={() => openReschedule(s)}

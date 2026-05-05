@@ -53,6 +53,7 @@ export const forgotPassword = async (req, res) => {
   }
 };
 
+// Xác thực OTP quên mật khẩu, trả về resetToken JWT 15 phút nếu hợp lệ
 export const verifyForgotOtp = async (req, res) => {
   const { email, otp } = req.body;
 

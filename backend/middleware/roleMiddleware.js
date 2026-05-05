@@ -1,3 +1,4 @@
+// Middleware kiểm tra quyền — cho phép truy cập nếu user có một trong các role được chỉ định
 export const hasRole =
   (...allowed) =>
   (req, res, next) => {

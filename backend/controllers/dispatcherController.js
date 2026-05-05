@@ -4,6 +4,7 @@ import {
   sendNotificationToCustomer,
 } from "../server.js";
 
+// Kiểm tra dispatcher có region_id hợp lệ, trả 403 nếu chưa được gán khu vực
 const ensureDispatcherRegion = (req, res) => {
   const regionId = req.user?.region_id;
   if (!regionId) {
@@ -47,6 +48,7 @@ export const getUnassignedShipments = async (req, res) => {
   }
 };
 
+// Lấy danh sách tài xế khả dụng trong khu vực của dispatcher
 export const getAvailableDrivers = async (req, res) => {
   try {
     const region_id = ensureDispatcherRegion(req, res);
@@ -409,6 +411,7 @@ export const getDispatcherDashboard = async (req, res) => {
   }
 };
 
+// Đổi tài xế cho một assignment đã tồn tại trong khu vực
 export const reassignDriver = async (req, res) => {
   try {
     const { id } = req.params;
@@ -447,6 +450,7 @@ export const reassignDriver = async (req, res) => {
   }
 };
 
+// Lấy chi tiết một đơn hàng kèm tài xế và xe, hỗ trợ cả admin và dispatcher
 export const getShipmentDetail = async (req, res) => {
   try {
     const { id } = req.params;
@@ -660,6 +664,7 @@ export const getFailedShipments = async (req, res) => {
   }
 };
 
+// Lên lịch giao lại đơn thất bại vào ngày mới, tùy chọn gán tài xế ngay
 export const rescheduleShipment = async (req, res) => {
   try {
     const { id } = req.params;
@@ -727,6 +732,7 @@ export const rescheduleShipment = async (req, res) => {
   }
 };
 
+// Hủy đơn hàng đang ở trạng thái thất bại và gửi thông báo cho khách hàng
 export const cancelFailedShipment = async (req, res) => {
   try {
     const { id } = req.params;

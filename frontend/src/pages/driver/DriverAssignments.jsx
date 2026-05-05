@@ -1,4 +1,4 @@
-
+﻿
 import { useEffect, useState, useMemo, useRef } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import API from "../../services/api";
@@ -280,7 +280,7 @@ export default function DriverAssignments() {
     <div className="min-h-screen bg-[#F8FAFC] p-4 lg:p-8 space-y-6 pb-24">
       <Toaster position="top-center" />
 
-      {}
+      {/* Phần giao diện */}
       <AnimatePresence>
         {failedModal && (
           <motion.div
@@ -297,7 +297,7 @@ export default function DriverAssignments() {
               className="bg-white rounded-2xl shadow-2xl w-full max-w-md overflow-hidden"
               onClick={(e) => e.stopPropagation()}
             >
-              {}
+              {/* Phần giao diện */}
               <div className="bg-gradient-to-r from-red-500 to-red-600 px-6 py-4 flex items-center justify-between">
                 <div className="flex items-center gap-3 text-white">
                   <div className="w-9 h-9 rounded-full bg-white/20 flex items-center justify-center">
@@ -318,7 +318,7 @@ export default function DriverAssignments() {
               <div className="p-5 space-y-4">
                 <p className="text-sm text-gray-600 font-medium">Chọn lý do thất bại:</p>
 
-                {}
+                {/* Phần giao diện */}
                 <div className="grid grid-cols-1 gap-2">
                   {FAILED_REASONS.map((reason) => (
                     <button
@@ -336,7 +336,7 @@ export default function DriverAssignments() {
                   ))}
                 </div>
 
-                {}
+                {/* Phần giao diện */}
                 <div>
                   <label className="text-xs font-bold text-gray-500 mb-1 block">Hoặc nhập lý do khác:</label>
                   <textarea
@@ -348,7 +348,7 @@ export default function DriverAssignments() {
                   />
                 </div>
 
-                {}
+                {/* Phần giao diện */}
                 <div className="flex gap-3 pt-1">
                   <button
                     onClick={() => setFailedModal(null)}
@@ -371,7 +371,7 @@ export default function DriverAssignments() {
         )}
       </AnimatePresence>
 
-      {}
+      {/* Phần giao diện */}
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
         <div>
           <h1 className="text-2xl font-bold text-[#113e48] flex items-center gap-2">
@@ -399,7 +399,7 @@ export default function DriverAssignments() {
         </div>
       </div>
 
-      {}
+      {/* Phần giao diện */}
       <div className="flex overflow-x-auto pb-2 gap-2 hide-scrollbar">
         {[
           { id: "all", label: "Tất cả" },
@@ -422,7 +422,7 @@ export default function DriverAssignments() {
         ))}
       </div>
 
-      {}
+      {/* Phần giao diện */}
       <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5">
         {loading ? (
           [...Array(6)].map((_, i) => (
@@ -461,7 +461,7 @@ export default function DriverAssignments() {
                       : 'bg-white border border-gray-100'
                   }`}
                 >
-                  {}
+                  {/* Render điều kiện */}
                   {a.service_type === 'fast' && (
                     <div className="absolute -top-2.5 right-4 z-10">
                       <span className="inline-flex items-center justify-center gap-1 min-w-[130px] px-3 py-1.5 rounded-full text-[10px] font-black bg-red-500 text-white shadow-lg shadow-red-500/30 animate-pulse uppercase tracking-wider">
@@ -478,10 +478,10 @@ export default function DriverAssignments() {
                       </span>
                     </div>
                   )}
-                  {}
+                  {/* Phần giao diện */}
                   <div className="flex justify-between items-start mb-4">
                     <div>
-                      {}
+                      {/* Phần giao diện */}
                       <div className={`text-lg font-bold group-hover:text-blue-600 transition-colors flex items-center gap-2 ${
                         a.service_type === 'fast' ? 'text-red-700' : 'text-[#113e48]'
                       }`}>
@@ -503,7 +503,7 @@ export default function DriverAssignments() {
                     </span>
                   </div>
 
-                  {}
+                  {/* Phần giao diện */}
                   <div className="space-y-4 mb-6 relative">
                     <div className="absolute left-[9px] top-3 bottom-8 w-[2px] bg-gray-100"></div>
 
@@ -542,9 +542,9 @@ export default function DriverAssignments() {
                     </div>
                   </div>
 
-                  {}
+                  {/* Phần giao diện */}
                   <div className="flex items-center gap-3 pt-4 border-t border-gray-50">
-                    {}
+                    {/* Phần giao diện */}
                     <a
                       href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(
                         a.delivery_address
@@ -557,7 +557,7 @@ export default function DriverAssignments() {
                       <Navigation2 size={18} /> Chỉ đường
                     </a>
 
-                    {}
+                    {/* Phần giao diện */}
                     <div className="flex-1 z-10">
                       <StatusDropdown
                         currentStatus={a.status}
@@ -589,7 +589,7 @@ export default function DriverAssignments() {
         )}
       </div>
 
-      {}
+      {/* Render điều kiện */}
       {!loading && filteredAssignments.length > PAGE_SIZE && (
         <div className="bg-white rounded-2xl shadow-sm border border-gray-100">
           <Pagination

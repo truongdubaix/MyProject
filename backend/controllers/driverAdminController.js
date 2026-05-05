@@ -1,6 +1,6 @@
 import db from "../config/db.js";
 
-// Lấy danh sách tất cả tài xế
+// Lấy danh sách tất cả tài xế kèm thông tin xe, sắp xếp mới nhất trước
 export const getAllDrivers = async (req, res) => {
   try {
     const [rows] = await db.query(`
@@ -23,7 +23,7 @@ export const getAllDrivers = async (req, res) => {
   }
 };
 
-// Lấy thông tin tài xế theo ID
+// Lấy thông tin chi tiết một tài xế theo ID kèm thông tin xe
 export const getDriverById = async (req, res) => {
   try {
     const [rows] = await db.query(
@@ -48,11 +48,12 @@ export const getDriverById = async (req, res) => {
   }
 };
 
-// Thêm tài xế mới
+// Thêm tài xế mới vào hệ thống, kiểm tra trùng email trước khi tạo
 export const createDriver = async (req, res) => {
   try {
     const { name, email, phone, status } = req.body;
 
+    // Kiểm tra email đã tồn tại chưa
     const [exist] = await db.query("SELECT id FROM drivers WHERE email = ?", [
       email,
     ]);
@@ -69,7 +70,7 @@ export const createDriver = async (req, res) => {
   }
 };
 
-// Cập nhật thông tin tài xế
+// Cập nhật thông tin cơ bản của tài xế (tên, email, SĐT, trạng thái)
 export const updateDriver = async (req, res) => {
   try {
     const { name, email, phone, status } = req.body;
@@ -83,12 +84,13 @@ export const updateDriver = async (req, res) => {
   }
 };
 
-// Xóa tài xế
+// Xóa tài xế và cập nhật trạng thái xe về available (dùng transaction)
 export const deleteDriver = async (req, res) => {
   const conn = await db.getConnection();
   try {
     await conn.beginTransaction();
 
+    // Giải phóng xe nếu tài xế đang sử dụng
     const [driver] = await conn.query(
       "SELECT vehicle_id FROM drivers WHERE id = ?",
       [req.params.id],
@@ -112,12 +114,12 @@ export const deleteDriver = async (req, res) => {
   }
 };
 
-// Cập nhật trạng thái tài xế (admin chỉ được đổi sang inactive hoặc free)
+// Cập nhật trạng thái tài xế — admin chỉ được đổi sang inactive hoặc free
 export const updateDriverStatus = async (req, res) => {
   try {
     const { status } = req.body;
 
-    // Admin chỉ được phép chuyển sang inactive (tạm nghỉ) hoặc free (sẵn sàng)
+    // Giới hạn trạng thái admin được phép thay đổi
     if (!["inactive", "free"].includes(status)) {
       return res.status(400).json({
         message:
@@ -125,7 +127,7 @@ export const updateDriverStatus = async (req, res) => {
       });
     }
 
-    // Nếu chuyển về free, kiểm tra tài xế phải đang ở trạng thái inactive
+    // Chỉ kích hoạt lại tài xế đang ở trạng thái inactive
     if (status === "free") {
       const [[driver]] = await db.query(
         "SELECT status FROM drivers WHERE id = ?",
@@ -149,6 +151,7 @@ export const updateDriverStatus = async (req, res) => {
   }
 };
 
+// Gán xe cho tài xế, giải phóng xe cũ trước khi gán xe mới (dùng transaction)
 export const assignVehicleToDriver = async (req, res) => {
   const { id } = req.params;
   const { vehicle_id } = req.body;
@@ -157,6 +160,7 @@ export const assignVehicleToDriver = async (req, res) => {
   try {
     await conn.beginTransaction();
 
+    // Giải phóng xe cũ nếu tài xế đang có xe
     const [current] = await conn.query(
       "SELECT vehicle_id FROM drivers WHERE id = ?",
       [id],
@@ -168,11 +172,13 @@ export const assignVehicleToDriver = async (req, res) => {
       );
     }
 
+    // Liên kết xe mới với tài xế
     await conn.query("UPDATE drivers SET vehicle_id = ? WHERE id = ?", [
       vehicle_id,
       id,
     ]);
 
+    // Đánh dấu xe mới là đang sử dụng
     await conn.query("UPDATE vehicles SET status = 'busy' WHERE id = ?", [
       vehicle_id,
     ]);
@@ -187,6 +193,7 @@ export const assignVehicleToDriver = async (req, res) => {
   }
 };
 
+// Lấy danh sách tất cả hồ sơ đăng ký tài xế, sắp xếp mới nhất trước
 export const getDriverApplications = async (req, res) => {
   try {
     const [rows] = await db.query(
@@ -198,7 +205,7 @@ export const getDriverApplications = async (req, res) => {
   }
 };
 
-// Duyệt đơn đăng ký tài xế
+// Duyệt hồ sơ tài xế: tạo bản ghi driver nếu email chưa tồn tại (dùng transaction)
 export const approveApplication = async (req, res) => {
   const { id } = req.params;
   const conn = await db.getConnection();
@@ -206,6 +213,7 @@ export const approveApplication = async (req, res) => {
   try {
     await conn.beginTransaction();
 
+    // Lấy thông tin hồ sơ cần duyệt
     const [apps] = await conn.query(
       "SELECT * FROM driver_applications WHERE id = ?",
       [id],
@@ -214,6 +222,7 @@ export const approveApplication = async (req, res) => {
       return res.status(404).json({ message: "Hồ sơ không tồn tại" });
     const app = apps[0];
 
+    // Nếu email đã tồn tại thì chỉ cập nhật trạng thái hồ sơ
     const [exist] = await conn.query("SELECT id FROM drivers WHERE email = ?", [
       app.email,
     ]);
@@ -228,11 +237,13 @@ export const approveApplication = async (req, res) => {
       });
     }
 
+    // Tạo tài khoản tài xế mới
     await conn.query(
       "INSERT INTO drivers (name, email, phone, status, created_at) VALUES (?, ?, ?, 'available', NOW())",
       [app.name, app.email, app.phone],
     );
 
+    // Cập nhật trạng thái hồ sơ thành approved
     await conn.query(
       "UPDATE driver_applications SET status = 'approved' WHERE id = ?",
       [id],
@@ -248,7 +259,7 @@ export const approveApplication = async (req, res) => {
   }
 };
 
-// Từ chối đơn đăng ký tài xế
+// Từ chối hồ sơ đăng ký tài xế, cập nhật status thành rejected
 export const rejectApplication = async (req, res) => {
   try {
     await db.query(

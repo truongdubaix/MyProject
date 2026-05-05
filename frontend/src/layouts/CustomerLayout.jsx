@@ -1,4 +1,4 @@
-import { NavLink, Outlet, useNavigate, useLocation } from "react-router-dom";
+﻿import { NavLink, Outlet, useNavigate, useLocation } from "react-router-dom";
 import { useState, useEffect } from "react";
 import CustomerNotifications from "../components/CustomerNotifications";
 import {
@@ -79,7 +79,7 @@ export default function CustomerLayout() {
 
   return (
     <div className="flex h-screen bg-[#F8FAFC] overflow-hidden font-sans">
-      {}
+      {/* Render điều kiện */}
       {isSidebarOpen && (
         <div
           className="fixed inset-0 bg-black/50 z-40 md:hidden transition-opacity"
@@ -87,7 +87,7 @@ export default function CustomerLayout() {
         />
       )}
 
-      {}
+      {/* Phần giao diện */}
       <aside
         className={`
           fixed inset-y-0 left-0 z-50 w-72 bg-[#113e48] text-white flex flex-col shadow-2xl 
@@ -96,17 +96,17 @@ export default function CustomerLayout() {
           ${isSidebarOpen ? "translate-x-0" : "-translate-x-full"}
         `}
       >
-        {}
+        {/* Phần giao diện */}
         <div className="h-16 md:h-20 flex items-center justify-between px-6 md:px-8 border-b border-white/10 shrink-0">
           <div
             className="flex items-center gap-2 cursor-pointer"
             onClick={() => navigate("/")}
           >
-            <div className="bg-orange-500 p-1.5 rounded-lg">
+            <div className="w-12 h-12 rounded-full bg-white flex items-center justify-center shadow-[0_0_0_3px_rgba(255,255,255,0.15)] shrink-0 overflow-hidden">
               <img
                 src="/assets/logo/logoSpeedyShip.png"
                 alt="Logo"
-                className="w-5 h-5 md:w-6 md:h-6 object-contain brightness-0 invert"
+                className="w-full h-full object-contain scale-125"
               />
             </div>
             <span className="text-lg md:text-xl font-extrabold tracking-tight">
@@ -114,7 +114,7 @@ export default function CustomerLayout() {
             </span>
           </div>
 
-          {}
+          {/* Nút hành động */}
           <button
             onClick={() => setIsSidebarOpen(false)}
             className="md:hidden p-2 bg-white/10 rounded-lg hover:bg-white/20 transition-colors text-white"
@@ -123,9 +123,9 @@ export default function CustomerLayout() {
           </button>
         </div>
 
-        {}
+        {/* Phần giao diện */}
         <div className="flex-1 overflow-y-auto py-6 px-4 space-y-6 custom-scrollbar">
-          {}
+          {/* Phần giao diện */}
           <div>
             <p className="px-4 mb-2 text-[10px] font-bold text-blue-200/50 uppercase tracking-widest">
               Quản lý vận đơn
@@ -146,7 +146,7 @@ export default function CustomerLayout() {
             </nav>
           </div>
 
-          {}
+          {/* Phần giao diện */}
           <div>
             <p className="px-4 mb-2 text-[10px] font-bold text-blue-200/50 uppercase tracking-widest">
               Tiện ích
@@ -167,7 +167,7 @@ export default function CustomerLayout() {
             </nav>
           </div>
 
-          {}
+          {/* Phần giao diện */}
           <div>
             <p className="px-4 mb-2 text-[10px] font-bold text-blue-200/50 uppercase tracking-widest">
               Cài đặt
@@ -180,7 +180,7 @@ export default function CustomerLayout() {
           </div>
         </div>
 
-        {}
+        {/* Phần giao diện */}
         <div className="p-4 bg-[#0d2f36] border-t border-white/5 shrink-0">
           <div className="flex items-center justify-between p-3 rounded-xl bg-white/5 border border-white/5 hover:bg-white/10 transition-colors cursor-pointer group">
             <div className="flex items-center gap-3 overflow-hidden">
@@ -205,11 +205,11 @@ export default function CustomerLayout() {
         </div>
       </aside>
 
-      {}
+      {/* Phần giao diện */}
       <div className="flex-1 flex flex-col min-w-0 h-screen overflow-hidden relative">
         <header className="h-16 bg-white shadow-sm border-b border-gray-100 flex items-center justify-between px-4 md:px-8 z-10 shrink-0">
           <div className="flex items-center gap-3">
-            {}
+            {/* Nút hành động */}
             <button
               onClick={() => setIsSidebarOpen(true)}
               className="md:hidden p-2 -ml-2 text-slate-600 hover:bg-slate-100 rounded-lg transition-colors focus:outline-none"

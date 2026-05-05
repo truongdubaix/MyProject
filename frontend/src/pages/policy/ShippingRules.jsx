@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+﻿import React, { useEffect } from "react";
 import { Link } from "react-router-dom";
 import {
   FaShieldAlt,
@@ -52,7 +52,7 @@ export default function ShippingRules() {
 
   return (
     <div className="font-sans bg-gray-50 text-slate-700">
-      {}
+      {/* Khối nội dung */}
       <section className="relative py-24 bg-[#113e48] text-white overflow-hidden">
         <div className="absolute inset-0 opacity-10 pointer-events-none">
           <svg className="w-full h-full" xmlns="http://www.w3.org/2000/svg">
@@ -87,10 +87,10 @@ export default function ShippingRules() {
         </div>
       </section>
 
-      {}
+      {/* Khối nội dung */}
       <section className="max-w-7xl mx-auto px-6 py-16">
         <div className="flex flex-col lg:flex-row gap-12">
-          {}
+          {/* Phần giao diện */}
           <div className="lg:w-1/4 shrink-0">
             <div className="bg-white rounded-2xl shadow-lg border border-gray-100 p-6 sticky top-24">
               <h3 className="text-lg font-bold text-[#113e48] mb-6 border-b border-gray-100 pb-4">
@@ -130,7 +130,7 @@ export default function ShippingRules() {
             </div>
           </div>
 
-          {}
+          {/* Phần giao diện */}
           <div className="lg:w-3/4">
             <div className="bg-white rounded-2xl shadow-xl shadow-[#113e48]/5 border border-gray-100 p-8 md:p-12">
               <div className="prose prose-lg max-w-none text-gray-600">
@@ -142,7 +142,7 @@ export default function ShippingRules() {
                   đây.
                 </p>
 
-                {}
+                {/* Phần giao diện */}
                 <div className="mb-10" data-aos="fade-up">
                   <h3 className="flex items-center gap-3 text-2xl font-bold text-[#113e48] mb-4">
                     <span className="w-8 h-8 rounded-lg bg-orange-100 text-orange-600 flex items-center justify-center text-sm">
@@ -190,7 +190,7 @@ export default function ShippingRules() {
                   </div>
                 </div>
 
-                {}
+                {/* Phần giao diện */}
                 <div className="mb-10" data-aos="fade-up">
                   <h3 className="flex items-center gap-3 text-2xl font-bold text-[#113e48] mb-4">
                     <span className="w-8 h-8 rounded-lg bg-orange-100 text-orange-600 flex items-center justify-center text-sm">
@@ -234,7 +234,7 @@ export default function ShippingRules() {
                   </div>
                 </div>
 
-                {}
+                {/* Phần giao diện */}
                 <div className="mb-8" data-aos="fade-up">
                   <h3 className="flex items-center gap-3 text-2xl font-bold text-[#113e48] mb-4">
                     <span className="w-8 h-8 rounded-lg bg-orange-100 text-orange-600 flex items-center justify-center text-sm">
@@ -244,7 +244,7 @@ export default function ShippingRules() {
                   </h3>
 
                   <div className="space-y-4">
-                    {}
+                    {/* Phần giao diện */}
                     <div className="border border-red-100 rounded-xl overflow-hidden">
                       <div className="bg-red-50 px-5 py-3 border-b border-red-100 flex items-center justify-between">
                         <span className="font-bold text-red-700 flex items-center gap-2">
@@ -266,7 +266,7 @@ export default function ShippingRules() {
                       </div>
                     </div>
 
-                    {}
+                    {/* Phần giao diện */}
                     <div className="border border-yellow-100 rounded-xl overflow-hidden">
                       <div className="bg-yellow-50 px-5 py-3 border-b border-yellow-100 flex items-center justify-between">
                         <span className="font-bold text-yellow-700 flex items-center gap-2">

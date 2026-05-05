@@ -25,6 +25,7 @@ export default function AdminLayout() {
   const username = localStorage.getItem("username") || "Administrator";
 
 
+  // Danh sách menu điều hướng sidebar admin
   const MENU_ITEMS = [
     {
       path: "/admin",
@@ -84,6 +85,7 @@ export default function AdminLayout() {
   };
 
 
+  // Hàm trả về class CSS cho NavLink, active thì nổi bật màu cam
   const navLinkClasses = ({ isActive }) => `
     relative flex items-center gap-3 px-4 py-3 text-sm font-medium rounded-xl transition-all duration-300 group
     ${
@@ -94,6 +96,7 @@ export default function AdminLayout() {
   `;
 
 
+  // Lấy tiêu đề trang dựa theo đường dẫn hiện tại
   const getPageTitle = () => {
     if (location.pathname.startsWith("/admin/shipments/")) {
       return "Chi tiết vận đơn";
@@ -104,6 +107,7 @@ export default function AdminLayout() {
     return currentItem ? currentItem.label : "Admin Control Panel";
   };
 
+  // Lấy icon trang cho header, hiển thị icon vận đơn khi xem chi tiết shipment
   const getPageIcon = () => {
     if (location.pathname.startsWith("/admin/shipments/")) {
       return <FileText size={22} className="text-orange-500" />;
@@ -113,7 +117,7 @@ export default function AdminLayout() {
 
   return (
     <div className="flex h-screen bg-[#F8FAFC] overflow-hidden font-sans">
-      {}
+      {/* Overlay mờ khi sidebar mở trên mobile */}
       {isSidebarOpen && (
         <div
           className="fixed inset-0 bg-black/50 z-30 lg:hidden"
@@ -121,7 +125,7 @@ export default function AdminLayout() {
         />
       )}
 
-      {}
+      {/* Sidebar điều hướng chính */}
       <aside
         className={`
         fixed lg:static inset-y-0 left-0 z-40 w-72 bg-[#113e48] text-white flex flex-col shadow-2xl transition-transform duration-300
@@ -130,17 +134,17 @@ export default function AdminLayout() {
         }
       `}
       >
-        {}
+        {/* Logo và tên thương hiệu */}
         <div className="h-20 flex items-center px-6 border-b border-white/10 bg-[#0d2f36]">
           <div
             className="flex items-center gap-3 cursor-pointer"
             onClick={() => navigate("/")}
           >
-            <div className="bg-orange-500 p-1.5 rounded-lg shadow-lg shadow-orange-500/20">
+            <div className="w-14 h-14 rounded-full bg-white flex items-center justify-center shadow-[0_0_0_3px_rgba(255,255,255,0.15)] shrink-0 overflow-hidden">
               <img
                 src="/assets/logo/logoSpeedyShip.png"
                 alt="Logo"
-                className="w-7 h-7 object-contain brightness-0 invert"
+                className="w-full h-full object-contain scale-125"
               />
             </div>
             <div>
@@ -154,7 +158,7 @@ export default function AdminLayout() {
           </div>
         </div>
 
-        {}
+        {/* Danh sách menu điều hướng */}
         <div className="flex-1 overflow-y-auto py-6 px-4 space-y-1 custom-scrollbar">
           <p className="px-4 mb-3 text-xs font-bold text-blue-200/50 uppercase tracking-widest">
             Hệ thống
@@ -175,7 +179,7 @@ export default function AdminLayout() {
           </nav>
         </div>
 
-        {}
+        {/* Thông tin admin và nút đăng xuất */}
         <div className="p-4 bg-[#0d2f36] border-t border-white/5">
           <div className="flex items-center justify-between p-3 rounded-xl bg-white/5 border border-white/5 hover:bg-white/10 transition-colors">
             <div className="flex items-center gap-3 overflow-hidden">
@@ -204,9 +208,9 @@ export default function AdminLayout() {
         </div>
       </aside>
 
-      {}
+      {/* Vùng nội dung chính bên phải sidebar */}
       <div className="flex-1 flex flex-col min-w-0">
-        {}
+        {/* Header thanh trên cùng: tiêu đề trang + nút thông báo + về trang chủ */}
         <header className="h-20 bg-white shadow-sm border-b border-gray-100 flex items-center justify-between px-6 lg:px-8 z-10">
           <div className="flex items-center gap-4">
             <button
@@ -227,7 +231,7 @@ export default function AdminLayout() {
           </div>
 
           <div className="flex items-center gap-3 sm:gap-6">
-            {}
+            {/* Nút thông báo bell với badge đỏ */}
             <button className="relative p-2 text-gray-400 hover:text-orange-500 hover:bg-orange-50 rounded-full transition-all">
               <Bell size={20} />
               <span className="absolute top-2 right-2 w-2 h-2 bg-red-500 rounded-full border border-white"></span>
@@ -245,7 +249,7 @@ export default function AdminLayout() {
           </div>
         </header>
 
-        {}
+        {/* Vùng render nội dung trang con qua Outlet */}
         <main className="flex-1 overflow-x-hidden overflow-y-auto bg-[#F8FAFC] p-6 lg:p-8 scroll-smooth">
           <div className="max-w-7xl mx-auto min-h-full">
             <Outlet />

@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+﻿import React, { useEffect } from "react";
 import { Link } from "react-router-dom";
 import {
   FaTruckMoving,
@@ -39,9 +39,9 @@ export default function RoadFreight() {
 
   return (
     <div className="font-sans bg-gray-50 text-slate-700">
-      {}
+      {/* Khối nội dung */}
       <section className="relative h-[60vh] min-h-[500px] flex items-center overflow-hidden">
-        {}
+        {/* Phần giao diện */}
         <div className="absolute inset-0 z-0">
           <img
             src="https://images.unsplash.com/photo-1519003722824-194d4455a60c?auto=format&fit=crop&w=1920&q=80"
@@ -82,7 +82,7 @@ export default function RoadFreight() {
         </div>
       </section>
 
-      {}
+      {/* Khối nội dung */}
       <section className="py-20 max-w-7xl mx-auto px-6">
         <div className="grid md:grid-cols-2 gap-16 items-center">
           <div data-aos="fade-right">
@@ -123,7 +123,7 @@ export default function RoadFreight() {
               alt="Warehouse"
               className="rounded-2xl shadow-2xl relative z-10 w-full object-cover h-[500px]"
             />
-            {}
+            {/* Phần giao diện */}
             <div className="absolute bottom-10 left-[-20px] z-20 bg-white p-6 rounded-xl shadow-xl border-l-4 border-orange-500 hidden md:block">
               <p className="font-bold text-[#113e48] text-lg">
                 Tỷ lệ giao đúng hẹn
@@ -136,7 +136,7 @@ export default function RoadFreight() {
         </div>
       </section>
 
-      {}
+      {/* Khối nội dung */}
       <section className="py-24 bg-gray-100">
         <div className="max-w-7xl mx-auto px-6">
           <div className="text-center mb-16" data-aos="fade-up">
@@ -188,7 +188,7 @@ export default function RoadFreight() {
         </div>
       </section>
 
-      {}
+      {/* Khối nội dung */}
       <section className="py-20 max-w-5xl mx-auto px-6">
         <div className="text-center mb-12">
           <h2 className="text-3xl font-extrabold text-[#113e48]">
@@ -243,7 +243,7 @@ export default function RoadFreight() {
         </p>
       </section>
 
-      {}
+      {/* Khối nội dung */}
       <section className="py-20 bg-orange-500 text-white text-center">
         <div className="max-w-4xl mx-auto px-6">
           <FaBoxOpen className="text-6xl mx-auto mb-6 opacity-90 animate-bounce" />

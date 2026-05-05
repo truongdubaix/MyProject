@@ -1,5 +1,6 @@
 import pool from "../config/db.js";
 
+// Khởi tạo hoặc lấy lại phiên chat active của khách hàng
 export const startChat = async (req, res) => {
   const { customer_id } = req.body;
   try {
@@ -25,6 +26,7 @@ export const startChat = async (req, res) => {
   }
 };
 
+// Lấy lịch sử tin nhắn của một phiên chat theo chatId
 export const getMessages = async (req, res) => {
   const { chatId } = req.params;
   try {
@@ -38,6 +40,7 @@ export const getMessages = async (req, res) => {
   }
 };
 
+// Lưu tin nhắn mới vào database (gọi nội bộ từ socket)
 export const saveMessage = async (chatId, senderId, role, content) => {
   try {
     await pool.query(
@@ -47,6 +50,7 @@ export const saveMessage = async (chatId, senderId, role, content) => {
   } catch (err) {}
 };
 
+// Kết thúc phiên chat, cập nhật trạng thái thành closed
 export const endChat = async (req, res) => {
   const { chatId } = req.params;
   try {

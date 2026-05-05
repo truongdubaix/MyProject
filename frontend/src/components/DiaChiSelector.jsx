@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+﻿import { useState, useEffect } from "react";
 import {
   Search,
   MapPin,
@@ -112,9 +112,8 @@ export default function DiaChiSelector({
           required={required}
         />
 
-        {}
+        {/* Phần giao diện */}
 
-        {}
         {suggestions.length > 0 && (
           <div className="absolute z-[100] w-full mt-2 bg-white border border-gray-100 rounded-2xl shadow-2xl max-h-80 overflow-y-auto animate-in fade-in zoom-in-95">
             {suggestions.map((s) => (
@@ -148,7 +147,7 @@ export default function DiaChiSelector({
         )}
       </div>
 
-      {}
+      {/* Nút hành động */}
       <button
         type="button"
         onClick={() => setShowManual(!showManual)}

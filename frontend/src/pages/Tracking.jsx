@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from "react";
+﻿import { useState, useEffect, useRef } from "react";
 import { useSearchParams, Link } from "react-router-dom";
 import API from "../services/api";
 import Map, {
@@ -331,7 +331,7 @@ export default function Tracking() {
 
   return (
     <div className="font-sans bg-slate-50 min-h-screen text-slate-700">
-      {}
+      {/* Khối nội dung */}
       <section className="relative pt-24 pb-32 bg-[#113e48] text-white overflow-hidden">
         <div
           className="absolute inset-0 opacity-10"
@@ -364,7 +364,7 @@ export default function Tracking() {
         </div>
       </section>
 
-      {}
+      {/* Khối nội dung */}
       <section className="-mt-16 relative z-20 px-6">
         <div
           className="max-w-3xl mx-auto bg-white p-6 rounded-3xl shadow-xl border border-gray-100"
@@ -439,13 +439,13 @@ export default function Tracking() {
         </div>
       </section>
 
-      {}
+      {/* Render điều kiện */}
       {shipment && statusInfo && (
         <section className="py-16 px-6 max-w-7xl mx-auto">
           <div className="grid lg:grid-cols-3 gap-8">
-            {}
+            {/* Phần giao diện */}
             <div className="lg:col-span-1 space-y-6" data-aos="fade-right">
-              {}
+              {/* Phần giao diện */}
               <div
                 className={`p-6 rounded-3xl shadow-lg border-l-8 ${
                   statusInfo.bg
@@ -465,7 +465,7 @@ export default function Tracking() {
                 </p>
               </div>
 
-              {}
+              {/* Phần giao diện */}
               <div className="bg-white p-6 rounded-3xl shadow-lg border border-gray-100">
                 <h3 className="text-lg font-bold text-[#113e48] mb-4 flex items-center gap-2">
                   <FaBoxOpen className="text-orange-500" /> Thông tin kiện hàng
@@ -511,7 +511,7 @@ export default function Tracking() {
               </div>
             </div>
 
-            {}
+            {/* Phần giao diện */}
             <div className="lg:col-span-2" data-aos="fade-left">
               <div className="bg-white p-2 rounded-3xl shadow-xl border border-gray-200 h-[600px] relative z-0 overflow-hidden">
                 <Map
@@ -527,7 +527,7 @@ export default function Tracking() {
                 >
                   <NavigationControl position="bottom-right" />
 
-                  {}
+                  {/* Render điều kiện */}
                   {routeGeoJSON && (
                     <Source id="route" type="geojson" data={routeGeoJSON}>
                       <Layer
@@ -544,7 +544,7 @@ export default function Tracking() {
                     </Source>
                   )}
 
-                  {}
+                  {/* Render điều kiện */}
                   {pickup && (
                     <Marker
                       longitude={pickup[1]}
@@ -571,7 +571,7 @@ export default function Tracking() {
                     </Marker>
                   )}
 
-                  {}
+                  {/* Render điều kiện */}
                   {delivery && (
                     <Marker
                       longitude={delivery[1]}
@@ -598,7 +598,7 @@ export default function Tracking() {
                     </Marker>
                   )}
 
-                  {}
+                  {/* Render điều kiện */}
                   {driverPos && (
                     <Marker
                       longitude={driverPos[1]}
@@ -638,7 +638,7 @@ export default function Tracking() {
                   )}
                 </Map>
 
-                {}
+                {/* Phần giao diện */}
                 <div className="absolute bottom-6 left-6 z-[1000] bg-white/90 backdrop-blur-sm p-4 rounded-2xl shadow-lg max-w-xs">
                   <div className="flex items-center gap-3">
                     <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center text-blue-600">
@@ -666,7 +666,7 @@ export default function Tracking() {
         </section>
       )}
 
-      {}
+      {/* Khối nội dung */}
       <section className="py-20 bg-white border-t border-gray-100 mt-10">
         <div className="max-w-4xl mx-auto px-6 text-center">
           <h2 className="text-2xl font-bold text-[#113e48] mb-4">

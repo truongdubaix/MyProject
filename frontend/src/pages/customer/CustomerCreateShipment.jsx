@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+﻿import { useState, useEffect } from "react";
 import API from "../../services/api";
 import toast from "react-hot-toast";
 import { useNavigate } from "react-router-dom";
@@ -311,7 +311,7 @@ export default function CustomerCreateShipment() {
 
   return (
     <div className="animate-in fade-in duration-500 pb-20 max-w-6xl mx-auto px-4">
-      {}
+      {/* Phần giao diện */}
       <div className="mb-8 text-center pt-6">
         <h1 className="text-3xl font-extrabold text-[#113e48]">
           Tạo đơn hàng mới
@@ -325,9 +325,9 @@ export default function CustomerCreateShipment() {
         onSubmit={handleSubmit}
         className="grid grid-cols-1 lg:grid-cols-3 gap-8"
       >
-        {}
+        {/* Phần giao diện */}
         <div className="lg:col-span-2 space-y-6">
-          {}
+          {/* Phần giao diện */}
           <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 relative">
             <div className="absolute top-0 left-0 w-1 h-full bg-blue-500"></div>
             <div className="flex justify-between items-center mb-4">
@@ -374,7 +374,7 @@ export default function CustomerCreateShipment() {
                 />
               </div>
             </div>
-            {}
+            {/* Phần giao diện */}
             <div className="mb-4 flex gap-4">
               <label
                 className={`flex-1 flex justify-center gap-2 p-3 rounded-xl border cursor-pointer ${pickupOption === "sender" ? "border-orange-500 bg-orange-50 font-bold" : "border-gray-200"}`}
@@ -419,7 +419,7 @@ export default function CustomerCreateShipment() {
                 <Package size={18} /> Gửi tại bưu cục
               </label>
             </div>
-            {}
+            {/* Phần giao diện */}
             {form.pickup_address ? (
               <div className="relative group">
                 <label className="text-xs font-bold text-gray-500 block mb-1 uppercase">
@@ -465,7 +465,7 @@ export default function CustomerCreateShipment() {
             )}
           </div>
 
-          {}
+          {/* Phần giao diện */}
           <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 relative ">
             <div className="absolute top-0 left-0 w-1 h-full bg-green-500"></div>
             <div className="flex justify-between items-center mb-4">
@@ -512,7 +512,7 @@ export default function CustomerCreateShipment() {
                 />
               </div>
             </div>
-            {}
+            {/* Phần giao diện */}
             {form.delivery_address ? (
               <div className="relative group">
                 <label className="text-xs font-bold text-gray-500 block mb-1 uppercase">
@@ -558,7 +558,7 @@ export default function CustomerCreateShipment() {
             )}
           </div>
 
-          {}
+          {/* Phần giao diện */}
           <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 relative overflow-hidden">
             <div className="absolute top-0 left-0 w-1 h-full bg-orange-500"></div>
             <h3 className="text-lg font-bold text-[#113e48] mb-4 flex items-center gap-2">
@@ -656,7 +656,7 @@ export default function CustomerCreateShipment() {
           </div>
         </div>
 
-        {}
+        {/* Phần giao diện */}
         <OrderSummarySidebar
           serviceType={serviceType}
           setServiceType={setServiceType}
@@ -667,7 +667,7 @@ export default function CustomerCreateShipment() {
         />
       </form>
 
-      {}
+      {/* Phần giao diện */}
       <LocationMapModal
         isOpen={activeMap !== null}
         onClose={() => setActiveMap(null)}
@@ -690,7 +690,7 @@ export default function CustomerCreateShipment() {
         }}
       />
 
-      {}
+      {/* Phần giao diện */}
       <AddressBookModal
         show={showAddressModal}
         onClose={() => setShowAddressModal(false)}

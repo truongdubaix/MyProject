@@ -1,6 +1,7 @@
 import db from "../config/db.js";
 import nodemailer from "nodemailer";
 
+// Cấu hình transporter gửi email phản hồi liên hệ qua Gmail
 const transporter = nodemailer.createTransport({
   service: "gmail",
   auth: {
@@ -89,6 +90,7 @@ export const createContact = async (req, res) => {
   }
 };
 
+// Giao yêu cầu liên hệ cho điều phối viên phụ trách xử lý
 export const assignDispatcher = async (req, res) => {
   try {
     const { id } = req.params;
@@ -190,6 +192,7 @@ export const updateContactStatus = async (req, res) => {
   }
 };
 
+// Lấy danh sách các yêu cầu liên hệ được giao cho một điều phối viên cụ thể
 export const getContactsByDispatcher = async (req, res) => {
   try {
     const { dispatcher_id } = req.params;

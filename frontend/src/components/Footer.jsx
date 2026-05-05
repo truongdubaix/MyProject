@@ -1,4 +1,4 @@
-import React from "react";
+﻿import React from "react";
 import { Link } from "react-router-dom";
 import {
   FaFacebookF,
@@ -16,16 +16,18 @@ export default function Footer() {
   return (
     <footer className="bg-[#0a1f26] text-white pt-20 pb-10 border-t border-gray-800 font-sans">
       <div className="max-w-7xl mx-auto px-6">
-        {}
+        {/* Phần giao diện */}
         <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-12 mb-16">
-          {}
+          {/* Phần giao diện */}
           <div data-aos="fade-up">
-            <div className="flex items-center gap-2 mb-6">
-              <img
-                src="/assets/logo/logoSpeedyShip.png"
-                alt="SpeedyShip Logo"
-                className="w-10 h-10 object-contain brightness-0 invert"
-              />
+            <div className="flex items-center gap-3 mb-6">
+              <div className="w-16 h-16 md:w-20 md:h-20 rounded-full bg-white overflow-hidden flex items-center justify-center shrink-0 shadow-[0_0_20px_rgba(255,255,255,0.15)]">
+                <img
+                  src="/assets/logo/logoSpeedyShip.png"
+                  alt="SpeedyShip Logo"
+                  className="w-full h-full object-contain scale-150"
+                />
+              </div>
               <span className="text-2xl font-extrabold tracking-tight">
                 SpeedyShip<span className="text-orange-500">VN</span>
               </span>
@@ -35,7 +37,7 @@ export default function Footer() {
               hàng triệu đơn hàng mỗi ngày với cam kết Nhanh chóng - An toàn -
               Minh bạch.
             </p>
-            {}
+            {/* Phần giao diện */}
             <div className="flex gap-3">
               {[FaFacebookF, FaTwitter, FaLinkedinIn, FaYoutube].map(
                 (Icon, idx) => (
@@ -51,7 +53,7 @@ export default function Footer() {
             </div>
           </div>
 
-          {}
+          {/* Phần giao diện */}
           <div data-aos="fade-up" data-aos-delay="100">
             <h4 className="text-lg font-bold text-white mb-5 uppercase tracking-wider">
               Liên kết nhanh
@@ -118,7 +120,7 @@ export default function Footer() {
             </ul>
           </div>
 
-          {}
+          {/* Phần giao diện */}
           <div data-aos="fade-up" data-aos-delay="200">
             <h4 className="text-lg font-bold text-white mb-6 uppercase tracking-wider">
               Liên hệ
@@ -142,7 +144,7 @@ export default function Footer() {
             </ul>
           </div>
 
-          {}
+          {/* Phần giao diện */}
           <div data-aos="fade-up" data-aos-delay="300">
             <h4 className="text-lg font-bold text-white mb-6 uppercase tracking-wider">
               Đăng ký nhận tin
@@ -166,10 +168,10 @@ export default function Footer() {
           </div>
         </div>
 
-        {}
+        {/* Phần giao diện */}
         <div className="border-t border-gray-800 my-8"></div>
 
-        {}
+        {/* Phần giao diện */}
         <div className="flex flex-col md:flex-row justify-between items-center text-xs text-gray-500 gap-4">
           <p>
             © {new Date().getFullYear()}{" "}

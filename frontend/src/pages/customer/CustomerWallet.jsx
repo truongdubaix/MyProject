@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from "react";
+﻿import { useState, useEffect, useRef } from "react";
 import API from "../../services/api";
 import Pagination from "../../components/Pagination";
 import toast from "react-hot-toast";
@@ -170,7 +170,7 @@ export default function CustomerWallet() {
 
   return (
     <div className="space-y-6 animate-in fade-in duration-500 pb-10">
-      {}
+      {/* Phần giao diện */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         <div className="md:col-span-2 bg-gradient-to-br from-[#113e48] to-[#0f2a30] p-8 rounded-3xl text-white shadow-2xl relative overflow-hidden">
           <div className="absolute top-0 right-0 w-64 h-64 bg-white/5 rounded-full blur-3xl translate-x-1/2 -translate-y-1/2"></div>
@@ -200,7 +200,7 @@ export default function CustomerWallet() {
           </div>
         </div>
 
-        {}
+        {/* Phần giao diện */}
         <div className="bg-white p-6 rounded-3xl shadow-sm border border-gray-100 flex flex-col justify-center">
           <div className="flex items-center gap-3 mb-6">
             <div className="p-3 bg-green-100 text-green-600 rounded-xl">
@@ -237,7 +237,7 @@ export default function CustomerWallet() {
         </div>
       </div>
 
-      {}
+      {/* Phần giao diện */}
       <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
         <div className="p-6 border-b border-gray-100 flex justify-between items-center">
           <h3 className="font-bold text-[#113e48] text-lg flex items-center gap-2">
@@ -330,7 +330,7 @@ export default function CustomerWallet() {
         />
       </div>
 
-      {}
+      {/* Render điều kiện */}
       {showInputModal && (
         <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/50 backdrop-blur-sm p-4 animate-in fade-in duration-200">
           <div className="bg-white w-full max-w-sm rounded-2xl shadow-2xl p-6 animate-in zoom-in-95 duration-200 relative">
@@ -397,11 +397,11 @@ export default function CustomerWallet() {
         </div>
       )}
 
-      {}
+      {/* Render điều kiện */}
       {showMomoPopup && (
         <div className="fixed inset-0 flex items-center justify-center bg-black/60 backdrop-blur-sm z-[9999] animate-in fade-in duration-200">
           <div className="bg-white rounded-2xl shadow-2xl p-2 w-full max-w-5xl h-[85vh] relative flex flex-col items-center">
-            {}
+            {/* Phần giao diện */}
             <div className="w-full flex justify-between items-center p-3 border-b border-gray-100 mb-2">
               <h3 className="text-lg font-bold text-pink-600 flex items-center gap-2">
                 <img
@@ -419,7 +419,7 @@ export default function CustomerWallet() {
               </button>
             </div>
 
-            {}
+            {/* Phần giao diện */}
             <div className="w-full h-full bg-gray-50 rounded-xl overflow-hidden relative">
               <iframe
                 src={momoUrl}
@@ -427,7 +427,7 @@ export default function CustomerWallet() {
                 className="w-full h-full border-none"
               ></iframe>
 
-              {}
+              {/* Phần giao diện */}
               <div className="absolute top-0 left-0 w-full h-full pointer-events-none flex items-center justify-center bg-white/50 -z-10">
                 <Loader2 className="animate-spin text-pink-500" />
               </div>

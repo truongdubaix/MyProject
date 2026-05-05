@@ -1,4 +1,4 @@
-import { Routes, Route, useLocation, Outlet } from "react-router-dom";
+﻿import { Routes, Route, useLocation, Outlet } from "react-router-dom";
 import Navbar from "./components/Navbar.jsx";
 import Footer from "./components/Footer.jsx";
 import ProtectedRoute from "./components/ProtectedRoute.jsx";
@@ -106,7 +106,7 @@ export default function App() {
       <div className="bg-gray-50 text-gray-800 min-h-screen flex flex-col relative font-sans">
         <ScrollToTop />
         <Routes>
-          {}
+          {/* Phần giao diện */}
           <Route element={<PublicLayout />}>
             <Route path="/" element={<Home />} />
             <Route path="/tracking" element={<Tracking />} />
@@ -123,19 +123,19 @@ export default function App() {
             <Route path="/apply-driver" element={<ApplyDriver />} />
             <Route path="/news/:id" element={<NewsDetail />} />
 
-            {}
+            {/* Phần giao diện */}
             <Route path="/policy/privacy" element={<PrivacyPolicy />} />
             <Route path="/policy/claims" element={<Claims />} />
             <Route path="/policy/terms" element={<Terms />} />
             <Route path="/policy/shipping-rules" element={<ShippingRules />} />
           </Route>
 
-          {}
+          {/* Phần giao diện */}
           <Route path="/logout" element={<Logout />} />
           <Route path="/unauthorized" element={<Unauthorized />} />
           <Route path="/forgot-password" element={<ForgotPassword />} />
 
-          {}
+          {/* Phần giao diện */}
           <Route
             path="/admin"
             element={
@@ -156,7 +156,7 @@ export default function App() {
             <Route path="news" element={<AdminNews />} />
           </Route>
 
-          {}
+          {/* Phần giao diện */}
           <Route
             path="/dispatcher"
             element={
@@ -174,7 +174,7 @@ export default function App() {
             <Route path="failed-orders" element={<FailedShipmentsPanel />} />
           </Route>
 
-          {}
+          {/* Phần giao diện */}
           <Route
             path="/driver/:id"
             element={
@@ -193,7 +193,7 @@ export default function App() {
             />
           </Route>
 
-          {}
+          {/* Phần giao diện */}
           <Route
             path="/customer"
             element={
@@ -204,14 +204,14 @@ export default function App() {
           >
             <Route index element={<CustomerDashboard />} />
 
-            {}
+            {/* Phần giao diện */}
             <Route path="create-order" element={<CustomerCreateShipment />} />
             <Route path="track" element={<CustomerTrack />} />
             <Route path="history" element={<CustomerHistory />} />
             <Route path="profile" element={<CustomerProfile />} />
             <Route path="history/:id" element={<CustomerShipmentDetail />} />
 
-            {}
+            {/* Phần giao diện */}
             <Route path="payment" element={<CustomerPayment />} />
             <Route path="payment-success" element={<PaymentResult />} />
             <Route path="payment-fail" element={<PaymentFail />} />
@@ -223,7 +223,7 @@ export default function App() {
             <Route path="invoices" element={<CustomerInvoice />} />
           </Route>
 
-          {}
+          {/* Phần giao diện */}
           <Route
             path="*"
             element={
@@ -246,7 +246,7 @@ export default function App() {
         </Routes>
       </div>
 
-      {}
+      {/* Render điều kiện */}
       {shouldShowChat && <ChatLayout />}
     </ChatProvider>
   );

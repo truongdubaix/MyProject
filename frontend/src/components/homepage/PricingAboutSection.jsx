@@ -1,4 +1,4 @@
-import React from "react";
+﻿import React from "react";
 import { Link } from "react-router-dom";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
@@ -9,7 +9,6 @@ import {
   faPaperPlane,
   faWarehouse,
 } from "@fortawesome/free-solid-svg-icons";
-
 
 const featuresData = [
   {
@@ -48,7 +47,7 @@ const statsData = [
 export default function PricingAboutSection() {
   return (
     <section className="py-24 bg-white overflow-hidden relative">
-      {}
+      {/* Phần giao diện */}
       <div className="absolute top-10 right-0 md:right-10 opacity-30 pointer-events-none animate-pulse">
         <div
           className="w-48 h-48"
@@ -61,7 +60,7 @@ export default function PricingAboutSection() {
 
       <div className="max-w-[1400px] mx-auto px-6 relative z-10">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
-          {}
+          {/* Phần giao diện */}
           <div>
             <div className="mb-10">
               <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-orange-100 text-orange-600 mb-4 border border-orange-200">
@@ -80,15 +79,15 @@ export default function PricingAboutSection() {
               </p>
             </div>
 
-            {}
+            {/* Phần giao diện */}
             <div className="space-y-4">
               {featuresData.map((item, index) => (
                 <div
                   key={index}
                   className="flex gap-5 group p-4 rounded-2xl hover:bg-slate-50 transition-all duration-300 relative overflow-hidden cursor-default"
                 >
-                  {}
-                  {}
+                  {/* Phần giao diện */}
+
                   <div className="absolute top-0 -left-[100%] w-full h-full bg-gradient-to-r from-transparent via-slate-400/10 to-transparent skew-x-[45deg] group-hover:left-[100%] transition-all duration-700 ease-in-out z-0"></div>
 
                   <div className="relative z-10 flex-shrink-0 w-14 h-14 rounded-xl bg-white border border-gray-100 shadow-lg text-orange-500 flex items-center justify-center text-xl transition-all duration-300 group-hover:bg-[#113e48] group-hover:text-white">
@@ -106,7 +105,7 @@ export default function PricingAboutSection() {
               ))}
             </div>
 
-            {}
+            {/* Phần giao diện */}
 
             <div className="mt-10">
               <Link to="/services/price-list">
@@ -116,72 +115,66 @@ export default function PricingAboutSection() {
                     <FontAwesomeIcon icon={faPaperPlane} />
                   </span>
 
-                  {}
-                  {}
+                  {/* Phần giao diện */}
+
                   <div className="absolute top-0 -left-[100%] w-full h-full bg-white/20 skew-x-[45deg] group-hover:left-[100%] transition-all duration-700 ease-in-out"></div>
                 </button>
               </Link>
             </div>
           </div>
 
-          {}
-          <div className="relative mt-12 lg:mt-0 h-full min-h-[500px] flex items-center justify-end px-4 lg:px-0">
-            <div className="relative w-full md:w-[90%] lg:pl-12">
-              {}
-              <div className="relative rounded-[40px] overflow-hidden shadow-2xl border-[6px] border-white z-10 group">
+          {/* Phần giao diện */}
+          <div className="relative mt-12 lg:mt-0 h-full w-full lg:w-[95%] mx-auto">
+            <div className="hidden sm:flex flex-col items-center justify-start relative w-full h-full px-3 sm:px-4 lg:px-0">
+              {/* Phần giao diện */}
+              <div className="relative w-full rounded-[30px] lg:rounded-[40px] overflow-hidden bg-white shadow-[0_20px_60px_rgba(17,62,72,0.15)] border-6 lg:border-8 border-white z-20 group transform hover:-translate-y-2 transition-all duration-500">
                 <img
-                  src="https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80"
-                  alt="Kho bãi Logistics"
-                  className="w-full h-auto object-cover transform group-hover:scale-105 transition-transform duration-700"
+                  src="/assets/img/pricing2.png"
+                  alt="bảng giá dịch vụ ngang"
+                  className="w-full h-auto object-contain bg-white"
                 />
-                {}
-                <div className="absolute inset-0 bg-[#113e48]/10 mix-blend-multiply"></div>
-
-                {}
-                {}
-                <div className="absolute top-0 -left-[100%] w-full h-full bg-white/20 skew-x-[45deg] group-hover:left-[100%] transition-all duration-700 ease-in-out z-20"></div>
+                <div className="absolute inset-0 bg-gradient-to-br from-[#113e48]/5 via-transparent to-[#113e48]/10 mix-blend-overlay pointer-events-none"></div>
+                <div className="absolute top-0 -left-[100%] w-full h-full bg-white/30 skew-x-[45deg] group-hover:left-[100%] transition-all duration-700 ease-in-out z-30"></div>
               </div>
 
-              {}
-              <div className="absolute -bottom-10 -right-4 md:-right-10 w-[60%] border-[6px] border-white rounded-[20px] shadow-2xl overflow-hidden z-20 hidden md:block animate-[bounce_3s_infinite]">
+              {/* Phần giao diện */}
+              <div className="relative w-[85%] lg:w-[75%] -mt-4 lg:-mt-6 rounded-[25px] lg:rounded-[30px] border-6 lg:border-8 border-white bg-white shadow-[0_25px_70px_rgba(17,62,72,0.3)] overflow-hidden z-30 group hover:-translate-y-1 transition-all duration-500">
                 <img
-                  src="https://images.unsplash.com/photo-1616401784845-180882ba9ba8?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80"
-                  alt="Nhân viên kiểm hàng"
-                  className="w-full h-full object-cover"
+                  src="/assets/img/pricing1.png"
+                  alt="bản giá dịch vụ dọc"
+                  className="w-full h-auto object-contain bg-white"
                 />
+                <div className="absolute inset-0 bg-gradient-to-t from-[#113e48]/10 via-transparent to-transparent pointer-events-none"></div>
               </div>
 
-              {}
-              <div className="absolute -top-10 -right-10 z-0 hidden lg:block pointer-events-none">
-                <div className="w-40 h-40 rounded-full border-2 border-dashed border-[#113e48]/20 flex items-center justify-center animate-[spin_10s_linear_infinite]">
-                  <div className="w-32 h-32 rounded-full bg-orange-500/5"></div>
+              {/* Phần giao diện */}
+              <div className="absolute top-1/4 -right-8 z-0 hidden lg:block pointer-events-none">
+                <div className="w-48 h-48 rounded-full border-[3px] border-dashed border-[#113e48]/25 flex items-center justify-center animate-[spin_15s_linear_infinite]">
+                  <div className="w-36 h-36 rounded-full bg-gradient-to-br from-orange-500/10 to-transparent"></div>
                 </div>
               </div>
+            </div>
 
-              {}
-              <div className="absolute top-1/2 -translate-y-1/2 -left-2 md:-left-8 z-30">
-                <div className="bg-[#113e48] text-white py-10 px-6 rounded-r-3xl rounded-l-xl shadow-[20px_20px_60px_rgba(0,0,0,0.3)] border-l-[6px] border-orange-500 flex flex-col gap-8 relative overflow-hidden group">
-                  {}
-                  <div className="absolute top-0 -left-[150%] w-full h-full bg-gradient-to-r from-transparent via-white/10 to-transparent skew-x-[45deg] animate-[shimmer_4s_infinite]"></div>
+            {/* Phần giao diện */}
+            <div className="sm:hidden flex flex-col gap-6 px-3 py-4">
+              {/* Phần giao diện */}
+              <div className="rounded-[30px] overflow-hidden shadow-[0_15px_40px_rgba(17,62,72,0.3)] border-6 border-white w-full group transform hover:-translate-y-2 transition-all duration-500 z-20">
+                <img
+                  src="/assets/img/pricing2.png"
+                  alt="banner giá dịch vụ ngang"
+                  className="w-full h-auto object-contain bg-white transform group-hover:scale-105 transition-transform duration-700 filter group-hover:brightness-110"
+                />
+                <div className="absolute inset-0 bg-gradient-to-br from-[#113e48]/5 via-transparent to-[#113e48]/10 mix-blend-overlay pointer-events-none"></div>
+              </div>
 
-                  {statsData.map((stat, idx) => (
-                    <div
-                      key={idx}
-                      className="flex flex-col items-center text-center relative z-10"
-                    >
-                      <h3 className="text-4xl font-black text-white mb-1 tracking-tight">
-                        {stat.number}
-                      </h3>
-                      <p className="text-[10px] font-bold text-gray-300 uppercase tracking-widest">
-                        {stat.label}
-                      </p>
-
-                      {idx !== statsData.length - 1 && (
-                        <div className="w-10 h-[1px] bg-gradient-to-r from-transparent via-orange-500/70 to-transparent mt-8"></div>
-                      )}
-                    </div>
-                  ))}
-                </div>
+              {/* Phần giao diện */}
+              <div className="rounded-[30px] border-6 border-white shadow-[0_25px_70px_rgba(17,62,72,0.3)] overflow-hidden w-4/5 mx-auto -mt-10 z-30 group hover:-translate-y-1 transition-all duration-500">
+                <img
+                  src="/assets/img/pricing1.png"
+                  alt="bản giá dịch vụ dọc"
+                  className="w-full h-auto object-contain bg-white filter group-hover:brightness-105 transition-all duration-500 transform group-hover:scale-105"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-[#113e48]/10 via-transparent to-transparent pointer-events-none"></div>
               </div>
             </div>
           </div>

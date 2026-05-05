@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+﻿import { useState, useEffect } from "react";
 import { useSearchParams, useNavigate } from "react-router-dom";
 import API from "../../services/api";
 import toast from "react-hot-toast";
@@ -79,11 +79,11 @@ export default function CustomerFeedback() {
         className="bg-white w-full max-w-lg rounded-3xl shadow-xl border border-gray-100 overflow-hidden relative"
         data-aos="zoom-in"
       >
-        {}
+        {/* Phần giao diện */}
         <div className="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-orange-400 to-orange-600"></div>
 
         <div className="p-8">
-          {}
+          {/* Nút hành động */}
           <button
             onClick={() => navigate(-1)}
             className="text-gray-400 hover:text-[#113e48] flex items-center gap-1 text-sm font-bold mb-6 transition-colors"
@@ -108,7 +108,7 @@ export default function CustomerFeedback() {
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-6">
-            {}
+            {/* Phần giao diện */}
             <div className="flex flex-col items-center gap-2">
               <p className="text-sm font-bold text-gray-400 uppercase tracking-wide">
                 Mức độ hài lòng
@@ -136,7 +136,7 @@ export default function CustomerFeedback() {
                 ))}
               </div>
 
-              {}
+              {/* Phần giao diện */}
               <div className="h-6 mt-1">
                 <span
                   className={`text-sm font-bold px-3 py-1 rounded-full transition-all duration-300 ${
@@ -152,7 +152,7 @@ export default function CustomerFeedback() {
               </div>
             </div>
 
-            {}
+            {/* Phần giao diện */}
             <div className="space-y-2">
               <label className="text-xs font-bold text-[#113e48] ml-1">
                 Nhận xét của bạn
@@ -166,7 +166,7 @@ export default function CustomerFeedback() {
               />
             </div>
 
-            {}
+            {/* Nút hành động */}
             <button
               type="submit"
               disabled={loading}
@@ -188,7 +188,7 @@ export default function CustomerFeedback() {
           </form>
         </div>
 
-        {}
+        {/* Phần giao diện */}
         <div className="bg-gray-50 p-4 text-center border-t border-gray-100">
           <p className="text-xs text-gray-400 flex items-center justify-center gap-1">
             <ThumbsUp size={12} /> Ý kiến của bạn giúp SpeedyShip tốt hơn mỗi

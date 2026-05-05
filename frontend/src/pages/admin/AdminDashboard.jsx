@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+﻿import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import API from "../../services/api";
 import {
@@ -79,7 +79,7 @@ export default function AdminDashboard() {
 
   return (
     <div className="space-y-8 animate-in fade-in duration-500">
-      {}
+      {/* Phần giao diện */}
       <div>
         <h1 className="text-2xl font-extrabold text-[#113e48] flex items-center gap-2">
           <Activity className="text-orange-500" /> Tổng quan hệ thống
@@ -89,7 +89,7 @@ export default function AdminDashboard() {
         </p>
       </div>
 
-      {}
+      {/* Phần giao diện */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
         <StatCard
           title="Tổng đơn hàng"
@@ -124,9 +124,9 @@ export default function AdminDashboard() {
           to="/admin/payments"
         />
       </div>
-      {}
+      {/* Phần giao diện */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-        {}
+        {/* Phần giao diện */}
         <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
           <h2 className="text-lg font-bold text-[#113e48] mb-6 flex items-center gap-2">
             <span className="w-1 h-6 bg-blue-500 rounded-full"></span>
@@ -165,14 +165,14 @@ export default function AdminDashboard() {
                   radius={[0, 4, 4, 0]}
                   label={{ position: "right", fill: "#6B7280", fontSize: 12 }}
                 >
-                  {}
+                  {/* Phần giao diện */}
                 </Bar>
               </BarChart>
             </ResponsiveContainer>
           </div>
         </div>
 
-        {}
+        {/* Phần giao diện */}
         <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
           <h2 className="text-lg font-bold text-[#113e48] mb-6 flex items-center gap-2">
             <span className="w-1 h-6 bg-green-500 rounded-full"></span>
@@ -229,7 +229,7 @@ export default function AdminDashboard() {
         </div>
       </div>
 
-      {}
+      {/* Phần giao diện */}
       <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
         <div className="flex items-center justify-between mb-6">
           <h2 className="text-lg font-bold text-[#113e48] flex items-center gap-2">

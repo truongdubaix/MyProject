@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from "react";
+﻿import { useState, useEffect, useRef } from "react";
 import API from "../../services/api";
 import toast from "react-hot-toast";
 import {
@@ -278,7 +278,7 @@ export default function CustomerTrack() {
 
   return (
     <div className="min-h-screen bg-[#F8FAFC] pb-20 font-sans animate-in fade-in duration-500">
-      {}
+      {/* Phần giao diện */}
       <div className="bg-[#113e48] pt-10 pb-24 px-4 relative overflow-hidden">
         <div className="absolute top-0 right-0 w-64 h-64 bg-white/5 rounded-full blur-3xl translate-x-1/2 -translate-y-1/2"></div>
         <div className="absolute bottom-0 left-0 w-48 h-48 bg-orange-500/10 rounded-full blur-2xl -translate-x-1/2 translate-y-1/2"></div>
@@ -321,16 +321,16 @@ export default function CustomerTrack() {
         </div>
       </div>
 
-      {}
+      {/* Phần giao diện */}
       <div className="max-w-6xl mx-auto px-4 -mt-16 relative z-20">
         {shipment ? (
           <div
             className="grid grid-cols-1 lg:grid-cols-3 gap-6"
             data-aos="fade-up"
           >
-            {}
+            {/* Phần giao diện */}
             <div className="lg:col-span-1 space-y-6">
-              {}
+              {/* Phần giao diện */}
               <div className="bg-white p-6 rounded-2xl shadow-lg border border-gray-100">
                 <div className="flex justify-between items-center mb-4">
                   <span className="text-sm font-bold text-gray-400">
@@ -353,7 +353,7 @@ export default function CustomerTrack() {
                 </p>
               </div>
 
-              {}
+              {/* Phần giao diện */}
               {shipment.driver_name ? (
                 <div className="bg-white p-6 rounded-2xl shadow-lg border border-gray-100 flex items-center gap-4">
                   <div className="w-14 h-14 rounded-full bg-gray-100 flex items-center justify-center text-2xl border-2 border-white shadow-sm">
@@ -389,7 +389,7 @@ export default function CustomerTrack() {
                 </div>
               )}
 
-              {}
+              {/* Phần giao diện */}
               <div className="bg-white p-6 rounded-2xl shadow-lg border border-gray-100 space-y-6">
                 <div className="flex gap-4 relative">
                   <div className="flex flex-col items-center">
@@ -427,7 +427,7 @@ export default function CustomerTrack() {
               </div>
             </div>
 
-            {}
+            {/* Phần giao diện */}
             <div className="lg:col-span-2 h-[500px] lg:h-auto bg-white rounded-2xl shadow-lg border border-gray-100 overflow-hidden relative z-0">
               <Map
                 ref={mapRef}
@@ -442,7 +442,7 @@ export default function CustomerTrack() {
               >
                 <NavigationControl position="bottom-right" />
 
-                {}
+                {/* Render điều kiện */}
                 {routeGeoJSON && (
                   <Source id="route" type="geojson" data={routeGeoJSON}>
                     <Layer
@@ -458,7 +458,7 @@ export default function CustomerTrack() {
                   </Source>
                 )}
 
-                {}
+                {/* Render điều kiện */}
                 {waypoints[0] && (
                   <Marker
                     longitude={waypoints[0][1]}
@@ -483,7 +483,7 @@ export default function CustomerTrack() {
                   </Marker>
                 )}
 
-                {}
+                {/* Render điều kiện */}
                 {waypoints[1] && (
                   <Marker
                     longitude={waypoints[1][1]}
@@ -508,7 +508,7 @@ export default function CustomerTrack() {
                   </Marker>
                 )}
 
-                {}
+                {/* Render điều kiện */}
                 {driverPos && (
                   <Marker
                     longitude={driverPos[1]}
@@ -533,7 +533,7 @@ export default function CustomerTrack() {
                   </Marker>
                 )}
 
-                {}
+                {/* Render điều kiện */}
                 {popupInfo && (
                   <Popup
                     anchor="top"
@@ -555,7 +555,7 @@ export default function CustomerTrack() {
                 )}
               </Map>
 
-              {}
+              {/* Phần giao diện */}
               <div className="lg:hidden absolute top-4 left-4 right-4 bg-white/90 backdrop-blur p-3 rounded-xl shadow-lg border border-gray-100 z-[40]">
                 <p className="text-xs font-bold text-gray-500 uppercase">
                   Trạng thái hiện tại

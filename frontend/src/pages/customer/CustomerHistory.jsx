@@ -1,4 +1,4 @@
-import { useEffect, useState, useRef } from "react";
+﻿import { useEffect, useState, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import API from "../../services/api";
 import toast, { Toaster } from "react-hot-toast";
@@ -210,7 +210,7 @@ export default function CustomerHistory() {
     <div className="animate-in fade-in duration-500 space-y-6 pb-10">
       <Toaster position="top-right" />
 
-      {}
+      {/* Phần giao diện */}
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 bg-white p-5 rounded-2xl shadow-sm border border-gray-100">
         <div>
           <h1 className="text-xl font-extrabold text-[#113e48] flex items-center gap-2">
@@ -222,7 +222,7 @@ export default function CustomerHistory() {
         </div>
 
         <div className="flex flex-col sm:flex-row gap-3 w-full md:w-auto">
-          {}
+          {/* Phần giao diện */}
           <div className="relative group">
             <Search
               className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-orange-500 transition-colors"
@@ -237,12 +237,12 @@ export default function CustomerHistory() {
             />
           </div>
 
-          {}
+          {/* Phần giao diện */}
           <StatusFilterDropdown value={filterStatus} onChange={(v) => { setFilterStatus(v); setPage(1); }} />
         </div>
       </div>
 
-      {}
+      {/* Phần giao diện */}
       <div className="bg-white border border-gray-100 rounded-2xl shadow-sm overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full text-sm text-left">
@@ -346,7 +346,7 @@ export default function CustomerHistory() {
           </table>
         </div>
 
-        {}
+        {/* Phần giao diện */}
         <Pagination
           currentPage={page}
           totalPages={totalPages}

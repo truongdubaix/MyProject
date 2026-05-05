@@ -1,4 +1,4 @@
-import { useEffect, useState, useRef, useMemo, useCallback } from "react";
+﻿import { useEffect, useState, useRef, useMemo, useCallback } from "react";
 import API from "../../services/api";
 import toast from "react-hot-toast";
 import {
@@ -228,7 +228,7 @@ export default function AdminNews() {
     <div className="space-y-6 animate-in fade-in duration-500 font-sans relative">
       {!isModalOpen ? (
         <>
-          {}
+          {/* Phần giao diện */}
           <div className="bg-white p-5 rounded-xl shadow-sm border border-gray-100 flex flex-col sm:flex-row justify-between items-center gap-4">
         <div>
           <h1 className="text-xl font-bold text-[#113e48] flex items-center gap-2">
@@ -260,7 +260,7 @@ export default function AdminNews() {
         </div>
       </div>
 
-      {}
+      {/* Phần giao diện */}
       <div className="bg-white border border-gray-100 rounded-xl shadow-sm overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full text-sm text-left">
@@ -350,8 +350,8 @@ export default function AdminNews() {
         </>
       ) : (
         <div className="bg-white rounded-2xl shadow-sm border border-gray-100 flex flex-col relative animate-in slide-in-from-right-8 fade-in-0 duration-500 min-h-[80vh]">
-          {}
-            {}
+          {/* Phần giao diện */}
+
             <div className="flex justify-between items-center p-5 border-b border-gray-100 bg-white/95 backdrop-blur z-10 rounded-t-2xl shrink-0">
               <h2 className="text-xl font-bold text-[#113e48] flex items-center gap-2">
                 <Newspaper className="text-orange-500" />
@@ -365,7 +365,7 @@ export default function AdminNews() {
               </button>
             </div>
 
-            {}
+            {/* Form nhập liệu */}
             <form onSubmit={handleSubmit} className="p-6 flex flex-col gap-6">
               
               <div className="space-y-1">
@@ -408,7 +408,7 @@ export default function AdminNews() {
                 </div>
               </div>
 
-              {}
+              {/* Render điều kiện */}
               {imagePreview && (
                 <div className="w-full bg-gray-100 rounded-xl overflow-hidden border border-gray-200 shadow-sm relative group flex justify-center py-4">
                   <img src={imagePreview} alt="Preview" className="max-w-full h-auto max-h-[400px] object-contain" />
@@ -431,7 +431,7 @@ export default function AdminNews() {
 
               <div className="space-y-1 flex-1 flex flex-col min-h-[300px]">
                 <label className="text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">Nội dung chi tiết (Rich Text)</label>
-                {}
+                {/* Phần giao diện */}
                 <div className="flex-1 border border-gray-200 rounded-xl overflow-hidden bg-white hover:border-orange-300 transition-colors focus-within:ring-2 focus-within:ring-orange-500/20 focus-within:border-orange-500 flex flex-col">
                   <ReactQuill
                     ref={quillRef}
@@ -446,7 +446,7 @@ export default function AdminNews() {
                 </div>
               </div>
 
-              {}
+              {/* Phần giao diện */}
               <style dangerouslySetInnerHTML={{__html: `
                 .quill-editor .ql-container {
                    font-family: inherit;

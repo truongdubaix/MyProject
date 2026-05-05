@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+﻿import React, { useEffect } from "react";
 import { Link } from "react-router-dom";
 import {
   FaCalculator,
@@ -25,7 +25,7 @@ export default function PriceList() {
 
   return (
     <div className="font-sans bg-slate-50 text-slate-700">
-      {}
+      {/* Khối nội dung */}
       <section className="relative h-[350px] flex items-center justify-center overflow-hidden bg-[#113e48] text-white">
         <div
           className="absolute inset-0 opacity-10"
@@ -60,15 +60,15 @@ export default function PriceList() {
         </div>
       </section>
 
-      {}
+      {/* Khối nội dung */}
       <section className="py-24 px-4 md:px-6 max-w-7xl mx-auto -mt-16 relative z-20">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-          {}
+          {/* Phần giao diện */}
           <div
             className="bg-white rounded-3xl shadow-xl border border-blue-100 overflow-hidden flex flex-col"
             data-aos="fade-right"
           >
-            {}
+            {/* Phần giao diện */}
             <div className="bg-[#113e48] p-6 text-white flex items-center justify-between relative overflow-hidden">
               <div className="absolute -right-10 -top-10 text-white/10 text-9xl">
                 <FaCity />
@@ -88,7 +88,7 @@ export default function PriceList() {
               </div>
             </div>
 
-            {}
+            {/* Phần giao diện */}
             <div className="p-6 flex-grow">
               <div className="overflow-x-auto rounded-xl border border-gray-200 mb-6">
                 <table className="w-full text-left border-collapse">
@@ -146,7 +146,7 @@ export default function PriceList() {
                 </table>
               </div>
 
-              {}
+              {/* Phần giao diện */}
               <div className="p-4 bg-blue-50/80 rounded-xl border border-blue-100 text-sm text-blue-900 flex gap-3">
                 <FaInfoCircle className="mt-0.5 shrink-0 text-lg text-blue-600" />
                 <div>
@@ -164,12 +164,12 @@ export default function PriceList() {
             </div>
           </div>
 
-          {}
+          {/* Phần giao diện */}
           <div
             className="bg-white rounded-3xl shadow-xl border border-orange-100 overflow-hidden flex flex-col"
             data-aos="fade-left"
           >
-            {}
+            {/* Phần giao diện */}
             <div className="bg-orange-600 p-6 text-white flex items-center justify-between relative overflow-hidden">
               <div className="absolute -right-10 -top-10 text-white/10 text-9xl">
                 <FaRoute />
@@ -189,7 +189,7 @@ export default function PriceList() {
               </div>
             </div>
 
-            {}
+            {/* Phần giao diện */}
             <div className="p-6 flex-grow">
               <div className="overflow-x-auto rounded-xl border border-gray-200 mb-6">
                 <table className="w-full text-left border-collapse">
@@ -241,7 +241,7 @@ export default function PriceList() {
                 </table>
               </div>
 
-              {}
+              {/* Phần giao diện */}
               <div className="p-4 bg-orange-50/80 rounded-xl border border-orange-100 text-sm text-orange-900 flex gap-3">
                 <FaWeightHanging className="mt-0.5 shrink-0 text-lg text-orange-600" />
                 <div>
@@ -263,7 +263,7 @@ export default function PriceList() {
         </div>
       </section>
 
-      {}
+      {/* Khối nội dung */}
       <section className="py-16 bg-white border-t border-gray-100">
         <div className="max-w-6xl mx-auto px-6">
           <h2 className="text-2xl md:text-3xl font-extrabold text-[#113e48] mb-10 text-center uppercase tracking-wider">
@@ -271,7 +271,7 @@ export default function PriceList() {
           </h2>
 
           <div className="grid md:grid-cols-3 gap-8">
-            {}
+            {/* Phần giao diện */}
             <div
               className="bg-slate-50 p-6 rounded-2xl border border-slate-100 hover:border-blue-300 hover:shadow-md transition-all group"
               data-aos="fade-up"
@@ -293,7 +293,7 @@ export default function PriceList() {
               </ul>
             </div>
 
-            {}
+            {/* Phần giao diện */}
             <div
               className="bg-slate-50 p-6 rounded-2xl border border-slate-100 hover:border-orange-300 hover:shadow-md transition-all group"
               data-aos="fade-up"
@@ -315,7 +315,7 @@ export default function PriceList() {
               </ul>
             </div>
 
-            {}
+            {/* Phần giao diện */}
             <div
               className="bg-slate-50 p-6 rounded-2xl border border-slate-100 hover:border-green-300 hover:shadow-md transition-all group"
               data-aos="fade-up"
@@ -340,7 +340,7 @@ export default function PriceList() {
         </div>
       </section>
 
-      {}
+      {/* Khối nội dung */}
       <section className="py-20 bg-gradient-to-r from-[#113e48] to-slate-900 text-center text-white">
         <div className="max-w-3xl mx-auto px-6">
           <h2 className="text-3xl md:text-4xl font-extrabold mb-6 leading-tight">

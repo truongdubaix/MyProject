@@ -27,6 +27,7 @@ export const getAllVehicles = async (req, res) => {
   }
 };
 
+// Lấy danh sách xe chưa được gán tài xế và đang ở trạng thái available
 export const getAvailableVehicles = async (req, res) => {
   try {
     const [rows] = await db.query(`

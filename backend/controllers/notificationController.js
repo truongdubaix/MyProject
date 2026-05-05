@@ -1,5 +1,6 @@
 import db from "../config/db.js";
 
+// Lấy danh sách thông báo của tài xế (theo user_id và driver_id)
 export const getDriverNotifications = async (req, res) => {
   try {
     const { id } = req.params;
@@ -21,6 +22,7 @@ export const getDriverNotifications = async (req, res) => {
   }
 };
 
+// Lấy danh sách thông báo của điều phối viên theo receiver_id
 export const getDispatcherNotifications = async (req, res) => {
   try {
     const { id } = req.params;
@@ -34,6 +36,7 @@ export const getDispatcherNotifications = async (req, res) => {
   }
 };
 
+// Đánh dấu một thông báo là đã đọc theo ID
 export const markNotificationRead = async (req, res) => {
   try {
     const { id } = req.params;
@@ -44,6 +47,7 @@ export const markNotificationRead = async (req, res) => {
   }
 };
 
+// Lấy danh sách thông báo của khách hàng, giới hạn 50 bản ghi mới nhất
 export const getCustomerNotifications = async (req, res) => {
   try {
     const { id } = req.params;
@@ -57,6 +61,7 @@ export const getCustomerNotifications = async (req, res) => {
   }
 };
 
+// Đánh dấu tất cả thông báo chưa đọc của khách hàng là đã đọc
 export const markAllCustomerRead = async (req, res) => {
   try {
     const { id } = req.params;

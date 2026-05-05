@@ -1,4 +1,4 @@
-import { Swiper, SwiperSlide } from "swiper/react";
+﻿import { Swiper, SwiperSlide } from "swiper/react";
 import { Autoplay, Pagination, Navigation, EffectFade } from "swiper/modules";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
@@ -95,21 +95,21 @@ export default function HeroBanner() {
         modules={[Autoplay, Pagination, Navigation, EffectFade]}
         className="h-full"
       >
-        {}
+        {/* Phần giao diện */}
         <SwiperSlide>
           <section className="relative w-full h-full md:aspect-[21/9] bg-black overflow-hidden">
-            {}
+            {/* Hình ảnh minh họa */}
             <img
               src="/assets/banners/banner1.png"
               className="absolute inset-0 w-full h-full object-cover object-center"
               alt="Banner"
             />
 
-            {}
+            {/* Phần giao diện */}
             <div className="absolute inset-0 bg-gradient-to-b from-black/70 via-transparent to-black/60" />
 
-            {}
-            {}
+            {/* Phần giao diện */}
+
             <div className="absolute top-0 left-0 w-full z-30 flex flex-col items-center pt-24 md:pt-14 px-4 text-center">
               <p className="uppercase tracking-[0.3em] text-xs md:text-sm text-blue-300 font-bold mb-3 drop-shadow-md">
                 SpeedyShip Logistics
@@ -122,12 +122,12 @@ export default function HeroBanner() {
                 Trực Tuyến.
               </h1>
 
-              {}
+              {/* Phần giao diện */}
               <p className="text-gray-100 text-sm md:text-lg max-w-xl mt-3 drop-shadow-md font-medium">
                 Tạo đơn trong giây lát — Cập nhật trạng thái từng Km.
               </p>
 
-              {}
+              {/* Phần giao diện */}
               <div className="flex flex-row gap-4 mt-6">
                 <button
                   onClick={handleCreateShipment}
@@ -144,10 +144,10 @@ export default function HeroBanner() {
               </div>
             </div>
 
-            {}
-            {}
+            {/* Phần giao diện */}
+
             <div className="absolute bottom-[10%] w-full flex justify-center z-40 px-4">
-              {}
+              {/* Phần giao diện */}
               <div className="w-full max-w-[350px]">
                 <TrackingMiniPanel
                   trackingCode={trackingCode}
@@ -163,7 +163,7 @@ export default function HeroBanner() {
           </section>
         </SwiperSlide>
 
-        {}
+        {/* Phần giao diện */}
         <SwiperSlide>
           <section className="relative w-full h-full md:aspect-[21/9] bg-black overflow-hidden flex items-center justify-center md:block">
             <img
@@ -173,7 +173,7 @@ export default function HeroBanner() {
             />
             <div className="absolute inset-0 bg-gradient-to-r from-black/20 via-black/10 to-transparent" />
 
-            {}
+            {/* Phần giao diện */}
             <div
               className="
               relative md:absolute md:right-[1%] md:bottom-[50%] md:right-2 md:-translate-y-1/2
@@ -193,7 +193,7 @@ export default function HeroBanner() {
           </section>
         </SwiperSlide>
 
-        {}
+        {/* Phần giao diện */}
         <SwiperSlide>
           <section className="relative w-full h-full md:aspect-[21/9] overflow-hidden flex items-center justify-center md:block">
             <img
@@ -225,7 +225,7 @@ export default function HeroBanner() {
           </section>
         </SwiperSlide>
 
-        {}
+        {/* Phần giao diện */}
         <SwiperSlide>
           <section className="relative w-full h-full md:aspect-[21/9] overflow-hidden flex items-center justify-center md:block">
             <img
@@ -253,7 +253,7 @@ export default function HeroBanner() {
           </section>
         </SwiperSlide>
 
-        {}
+        {/* Phần giao diện */}
         <SwiperSlide>
           <section className="relative w-full h-full md:aspect-[21/9] bg-black overflow-hidden flex items-center justify-center md:block">
             <img

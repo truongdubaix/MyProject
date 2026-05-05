@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+﻿import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
 import API from "../../services/api";
@@ -284,7 +284,7 @@ export default function AdminShipments() {
 
   return (
     <div className="space-y-6 animate-in fade-in duration-500 font-sans">
-      {}
+      {/* Phần giao diện */}
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-white p-5 rounded-xl border border-gray-100 shadow-sm">
         <div>
           <h1 className="text-xl font-bold text-[#113e48] flex items-center gap-2">
@@ -357,7 +357,7 @@ export default function AdminShipments() {
         </div>
       </div>
 
-      {}
+      {/* Phần giao diện */}
       <div className="bg-white border border-gray-100 rounded-xl shadow-sm overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full text-sm text-left">
@@ -410,7 +410,7 @@ export default function AdminShipments() {
                     onClick={() => navigate(`/admin/shipments/${s.id}`)}
                     className="hover:bg-gray-50/50 transition-colors group cursor-pointer"
                   >
-                    {}
+                    {/* Phần giao diện */}
                     <td className="px-6 py-4">
                       <button
                         type="button"
@@ -430,7 +430,7 @@ export default function AdminShipments() {
                       )}
                     </td>
 
-                    {}
+                    {/* Phần giao diện */}
                     <td className="px-6 py-4 max-w-[200px]">
                       <div className="flex items-center gap-2 mb-1">
                         <User size={14} className="text-gray-400" />
@@ -461,7 +461,7 @@ export default function AdminShipments() {
                       </div>
                     </td>
 
-                    {}
+                    {/* Phần giao diện */}
                     <td className="px-6 py-4 max-w-[200px]">
                       <div className="flex items-center gap-2 mb-1">
                         <User size={14} className="text-gray-400" />
@@ -492,12 +492,12 @@ export default function AdminShipments() {
                       </div>
                     </td>
 
-                    {}
+                    {/* Phần giao diện */}
                     <td className="px-6 py-4 text-center">
                       {getStatusBadge(s.status)}
                     </td>
 
-                    {}
+                    {/* Phần giao diện */}
                     <td className="px-6 py-4 text-right">
                       <span className="font-bold text-[#113e48]">
                         {Number(s.cod_amount).toLocaleString("vi-VN")}
@@ -505,7 +505,7 @@ export default function AdminShipments() {
                       <span className="text-xs text-gray-400 ml-1">₫</span>
                     </td>
 
-                    {}
+                    {/* Phần giao diện */}
                     <td className="px-6 py-4 text-center">
                       <div
                         className="flex items-center justify-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity"
@@ -551,7 +551,7 @@ export default function AdminShipments() {
           </table>
         </div>
 
-        {}
+        {/* Phần giao diện */}
         <Pagination
           currentPage={page}
           totalPages={totalPages}
@@ -559,11 +559,11 @@ export default function AdminShipments() {
         />
       </div>
 
-      {}
+      {/* Render điều kiện */}
       {showForm && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-3 bg-[#113e48]/50 backdrop-blur-sm animate-in fade-in duration-200">
           <div className="bg-white rounded-2xl shadow-2xl w-full max-w-5xl overflow-hidden animate-in zoom-in-95 duration-200 flex flex-col max-h-[95vh]">
-            {}
+            {/* Phần giao diện */}
             <div className="px-6 py-4 border-b border-gray-100 flex justify-between items-center bg-gray-50 shrink-0">
               <div>
                 <h3 className="text-lg font-bold text-[#113e48]">
@@ -581,13 +581,13 @@ export default function AdminShipments() {
               </button>
             </div>
 
-            {}
+            {/* Form nhập liệu */}
             <form
               onSubmit={handleSubmit}
               className="p-6 overflow-y-auto custom-scrollbar flex-1"
             >
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                {}
+                {/* Phần giao diện */}
                 <div className="space-y-4">
                   <div className="flex items-center gap-2 text-[#113e48] font-bold border-b pb-2 mb-2">
                     <div className="w-6 h-6 rounded-full bg-orange-100 text-orange-600 flex items-center justify-center text-xs">
@@ -635,13 +635,13 @@ export default function AdminShipments() {
                     </div>
                   </div>
 
-                  {}
+                  {/* Phần giao diện */}
                   <DiaChiSelector
                     label="Địa chỉ lấy hàng"
                     onChange={handlePickupAddressChange}
 
                   />
-                  {}
+                  {/* Phần giao diện */}
                   <input
                     name="pickup_address"
                     placeholder="Chi tiết số nhà/đường..."
@@ -651,7 +651,7 @@ export default function AdminShipments() {
                   />
                 </div>
 
-                {}
+                {/* Phần giao diện */}
                 <div className="space-y-4">
                   <div className="flex items-center gap-2 text-[#113e48] font-bold border-b pb-2 mb-2">
                     <div className="w-6 h-6 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center text-xs">
@@ -687,7 +687,7 @@ export default function AdminShipments() {
                     </div>
                   </div>
 
-                  {}
+                  {/* Phần giao diện */}
                   <DiaChiSelector
                     label="Địa chỉ giao hàng"
                     onChange={handleDeliveryAddressChange}
@@ -702,7 +702,7 @@ export default function AdminShipments() {
                 </div>
               </div>
 
-              {}
+              {/* Phần giao diện */}
               <div className="mt-6 pt-4 border-t border-dashed border-gray-200">
                 <div className="flex items-center gap-2 text-[#113e48] font-bold mb-4">
                   <div className="w-6 h-6 rounded-full bg-green-100 text-green-600 flex items-center justify-center text-xs">
@@ -812,7 +812,7 @@ export default function AdminShipments() {
               </div>
             </form>
 
-            {}
+            {/* Phần giao diện */}
             <div className="px-6 py-4 border-t border-gray-100 flex justify-end gap-3 bg-gray-50 shrink-0">
               <button
                 type="button"

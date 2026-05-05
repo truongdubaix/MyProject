@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+﻿import { useEffect, useState } from "react";
 import API from "../../services/api";
 import toast from "react-hot-toast";
 import {
@@ -138,7 +138,7 @@ export default function AdminContacts() {
 
   return (
     <div className="space-y-6 animate-in fade-in duration-500 font-sans">
-      {}
+      {/* Phần giao diện */}
       <div className="bg-white p-5 rounded-xl shadow-sm border border-gray-100 flex flex-col sm:flex-row justify-between items-center gap-4">
         <div>
           <h1 className="text-xl font-bold text-[#113e48] flex items-center gap-2">
@@ -166,7 +166,7 @@ export default function AdminContacts() {
         </div>
       </div>
 
-      {}
+      {/* Phần giao diện */}
       <div className="bg-white border border-gray-100 rounded-xl shadow-sm overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full text-sm text-left">
@@ -274,7 +274,7 @@ export default function AdminContacts() {
           </table>
         </div>
 
-        {}
+        {/* Phần giao diện */}
         <Pagination
           currentPage={page}
           totalPages={totalPages}
@@ -282,7 +282,7 @@ export default function AdminContacts() {
         />
       </div>
 
-      {}
+      {/* Render điều kiện */}
       {showAssignModal && (
         <div className="fixed inset-0 bg-black/40 flex justify-center items-center z-50 backdrop-blur-sm animate-in fade-in">
           <div className="bg-white p-6 rounded-2xl shadow-2xl w-full max-w-sm">
@@ -330,11 +330,11 @@ export default function AdminContacts() {
         </div>
       )}
 
-      {}
+      {/* Render điều kiện */}
       {showDetailModal && (
         <div className="fixed inset-0 bg-black/40 flex justify-center items-center z-50 backdrop-blur-sm animate-in fade-in">
           <div className="bg-white p-0 rounded-2xl shadow-2xl w-full max-w-lg overflow-hidden">
-            {}
+            {/* Phần giao diện */}
             <div className="bg-gray-50 px-6 py-4 border-b border-gray-100 flex justify-between items-center">
               <h2 className="text-lg font-bold text-[#113e48] flex items-center gap-2">
                 <MessageSquare size={18} className="text-orange-500" /> Chi tiết
@@ -348,7 +348,7 @@ export default function AdminContacts() {
               </button>
             </div>
 
-            {}
+            {/* Phần giao diện */}
             <div className="p-6 space-y-4">
               <div className="flex items-start gap-4">
                 <div className="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 font-bold shrink-0">
@@ -378,9 +378,9 @@ export default function AdminContacts() {
                 </p>
               </div>
 
-              {}
+              {/* Phần giao diện */}
               <div className="flex flex-col gap-4 pt-4 border-t border-dashed mt-4">
-                {}
+                {/* Phần giao diện */}
                 <div className="flex items-center gap-2 text-sm">
                   <span className="font-bold text-[#113e48]">
                     Trạng thái xử lý:
@@ -388,7 +388,7 @@ export default function AdminContacts() {
                   {getStatusBadge(selectedContact?.status)}
                 </div>
 
-                {}
+                {/* Render điều kiện */}
                 {selectedContact?.note && (
                   <div className="flex flex-col gap-1 bg-yellow-50 p-3 rounded-lg border border-yellow-100">
                     <span className="text-xs font-bold text-red-500 uppercase">
@@ -402,7 +402,7 @@ export default function AdminContacts() {
               </div>
             </div>
 
-            {}
+            {/* Phần giao diện */}
             <div className="px-6 py-4 bg-gray-50 border-t border-gray-100 flex justify-end">
               <button
                 onClick={() => setShowDetailModal(false)}

@@ -2,6 +2,7 @@ import db from "../config/db.js";
 import crypto from "crypto";
 import axios from "axios";
 
+// Lấy danh sách tất cả giao dịch thanh toán kèm thông tin đơn hàng và khách hàng
 export const getAllPayments = async (req, res) => {
   try {
     const [rows] = await db.query(`
@@ -36,6 +37,7 @@ export const createPayment = async (req, res) => {
   }
 };
 
+// Tạo yêu cầu thanh toán MoMo cho đơn hàng, sinh link redirect và lưu vào database
 export const createMomoPayment = async (req, res) => {
   try {
     const { shipment_id, customer_id, amount } = req.body;
@@ -99,6 +101,7 @@ export const createMomoPayment = async (req, res) => {
   }
 };
 
+// Tạo yêu cầu nạp tiền ví qua MoMo, tạo giao dịch pending trong transactions
 export const createWalletDepositMomo = async (req, res) => {
   try {
     const { wallet_id, amount } = req.body;
@@ -155,6 +158,7 @@ export const createWalletDepositMomo = async (req, res) => {
   }
 };
 
+// Nhận IPN callback từ MoMo, cập nhật trạng thái thanh toán và số dư ví
 export const momoIPN = async (req, res) => {
   try {
     const { orderId, resultCode } = req.body;
@@ -210,6 +214,7 @@ export const momoIPN = async (req, res) => {
   }
 };
 
+// Cập nhật trạng thái giao dịch thanh toán (admin)
 export const updatePaymentStatus = async (req, res) => {
   try {
     const { id } = req.params;
@@ -221,6 +226,7 @@ export const updatePaymentStatus = async (req, res) => {
   }
 };
 
+// Xóa bản ghi thanh toán theo ID (admin)
 export const deletePayment = async (req, res) => {
   try {
     const { id } = req.params;
@@ -231,6 +237,7 @@ export const deletePayment = async (req, res) => {
   }
 };
 
+// Thanh toán đơn hàng bằng số dư ví, kiểm tra đủ tiền và trừ số dư (dùng transaction)
 export const payShipmentByWallet = async (req, res) => {
   const { shipment_id, user_id, amount } = req.body;
   let connection;

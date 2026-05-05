@@ -1,4 +1,4 @@
-import React from "react";
+﻿import React from "react";
 import { useNavigate, Link } from "react-router-dom";
 
 // Phần đầu trang
@@ -26,7 +26,7 @@ export default function Header() {
   return (
     <header className="w-full border-b bg-white sticky top-0 z-50 shadow">
       <div className="max-w-6xl mx-auto px-4 py-3 flex items-center justify-between">
-        {}
+        {/* Tiêu đề nội dung */}
         <h1
           onClick={() => navigate("/")}
           className="font-extrabold text-xl cursor-pointer select-none"
@@ -34,7 +34,7 @@ export default function Header() {
           🚚 <span className="text-blue-600">SpeedyShip</span>
         </h1>
 
-        {}
+        {/* Phần giao diện */}
         <div className="flex items-center gap-3">
           {token && user?.name ? (
             <>

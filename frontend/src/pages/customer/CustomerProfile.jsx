@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+﻿import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import API from "../../services/api";
 import toast from "react-hot-toast";
@@ -197,7 +197,7 @@ export default function CustomerProfile() {
 
   return (
     <div className="min-h-screen bg-[#F8FAFC] pb-20 font-sans relative">
-      {}
+      {/* Phần giao diện */}
       <div className="h-60 bg-gradient-to-r from-[#113e48] to-[#0f2a30] relative overflow-hidden">
         <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] opacity-10"></div>
         <div className="absolute top-0 right-0 w-64 h-64 bg-white/5 rounded-full blur-3xl translate-x-1/2 -translate-y-1/2"></div>
@@ -205,9 +205,9 @@ export default function CustomerProfile() {
 
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 -mt-24 relative z-10">
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          {}
+          {/* Phần giao diện */}
           <div className="lg:col-span-1 space-y-6">
-            {}
+            {/* Phần giao diện */}
             <div
               className="bg-white rounded-3xl shadow-xl p-6 text-center border border-gray-100 relative overflow-visible"
               data-aos="fade-up"
@@ -255,7 +255,7 @@ export default function CustomerProfile() {
                     Điểm tích lũy
                   </p>
                   <p className="text-xl font-extrabold text-orange-500 mt-1">
-                    {}
+                    {/* Phần giao diện */}
                     {Math.floor(
                       Number(profile.wallet_balance) / 1000
                     ).toLocaleString()}
@@ -264,7 +264,7 @@ export default function CustomerProfile() {
               </div>
             </div>
 
-            {}
+            {/* Phần giao diện */}
             <div
               className="bg-gradient-to-br from-[#1e293b] to-[#0f172a] rounded-3xl p-6 text-white shadow-2xl relative overflow-hidden group"
               data-aos="fade-up"
@@ -304,7 +304,7 @@ export default function CustomerProfile() {
             </div>
           </div>
 
-          {}
+          {/* Phần giao diện */}
           <div className="lg:col-span-2" data-aos="fade-left">
             <div className="bg-white rounded-3xl shadow-xl border border-gray-100 p-8 h-full">
               <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
@@ -349,7 +349,7 @@ export default function CustomerProfile() {
                 className={isEditing ? "animate-in fade-in duration-300" : ""}
               >
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6">
-                  {}
+                  {/* Phần giao diện */}
                   <div className="space-y-2">
                     <label className="text-sm font-bold text-gray-700">
                       Họ và tên
@@ -374,7 +374,7 @@ export default function CustomerProfile() {
                     </div>
                   </div>
 
-                  {}
+                  {/* Phần giao diện */}
                   <div className="space-y-2">
                     <label className="text-sm font-bold text-gray-700">
                       Số điện thoại
@@ -399,7 +399,7 @@ export default function CustomerProfile() {
                     </div>
                   </div>
 
-                  {}
+                  {/* Phần giao diện */}
                   <div className="space-y-2 md:col-span-2">
                     <label className="text-sm font-bold text-gray-700 flex justify-between">
                       Email
@@ -420,14 +420,14 @@ export default function CustomerProfile() {
                     </div>
                   </div>
 
-                  {}
+                  {/* Phần giao diện */}
                   <div className="space-y-2 md:col-span-2">
                     <div className="flex justify-between items-end">
                       <label className="text-sm font-bold text-gray-700">
                         Địa chỉ giao hàng mặc định
                       </label>
 
-                      {}
+                      {/* Render điều kiện */}
                       {isEditing && (
                         <button
                           type="button"
@@ -477,7 +477,7 @@ export default function CustomerProfile() {
         </div>
       </div>
 
-      {}
+      {/* Render điều kiện */}
       {showPassModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm animate-in fade-in duration-200">
           <div className="bg-white rounded-3xl shadow-2xl w-full max-w-md overflow-hidden animate-in zoom-in-95 duration-200">
@@ -572,11 +572,11 @@ export default function CustomerProfile() {
         </div>
       )}
 
-      {}
+      {/* Render điều kiện */}
       {showAddressModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm animate-in fade-in duration-200">
           <div className="bg-white rounded-3xl shadow-2xl w-full max-w-lg overflow-hidden animate-in zoom-in-95 duration-200 flex flex-col max-h-[80vh]">
-            {}
+            {/* Phần giao diện */}
             <div className="bg-[#113e48] p-5 text-white flex justify-between items-center relative shrink-0">
               <h3 className="text-lg font-bold flex items-center gap-2">
                 <BookUser size={20} /> Chọn từ sổ địa chỉ
@@ -589,7 +589,7 @@ export default function CustomerProfile() {
               </button>
             </div>
 
-            {}
+            {/* Phần giao diện */}
             <div className="p-4 overflow-y-auto flex-1 bg-gray-50/50">
               {loadingAddresses ? (
                 <div className="flex flex-col items-center justify-center py-10 text-gray-400">

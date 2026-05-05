@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+﻿import { useState, useEffect } from "react";
 import Map, { Marker, NavigationControl, GeolocateControl } from "react-map-gl";
 import { MapPinOff } from "lucide-react";
 import "mapbox-gl/dist/mapbox-gl.css";
@@ -158,7 +158,7 @@ export default function MapPicker({ defaultPos, onConfirm, onCancel }) {
         </Marker>
       </Map>
 
-      {}
+      {/* Phần giao diện */}
       <div className="bg-white p-4 border-t flex justify-between items-center z-10">
         <div className="flex flex-col">
           <span className="text-[10px] text-gray-400 font-bold uppercase tracking-wider">

@@ -11,12 +11,14 @@ const DEFAULT_FAQ_SUGGESTIONS = [
   "Chính sách đền bù khi hàng hư hỏng như thế nào?",
 ];
 
+// Trả về danh sách câu hỏi FAQ gợi ý cho chatbot
 export const getFaqSuggestions = async (_req, res) => {
   return res.json({
     suggestions: DEFAULT_FAQ_SUGGESTIONS,
   });
 };
 
+// Xử lý tin nhắn chatbot: tra cứu đơn, trả lời FAQ cứng, hoặc chuyển sang Groq AI
 export const askBot = async (req, res) => {
   try {
     const { message } = req.body;

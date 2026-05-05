@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from "react";
+﻿import { useState, useEffect, useRef } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import API from "../../services/api";
 import toast from "react-hot-toast";
@@ -171,7 +171,7 @@ export default function CustomerPayment() {
   return (
     <div className="min-h-screen bg-[#F8FAFC] py-10 px-4 flex items-center justify-center animate-in fade-in duration-500 relative">
       <div className="max-w-4xl w-full grid grid-cols-1 md:grid-cols-3 gap-8">
-        {}
+        {/* Phần giao diện */}
         <div className="md:col-span-2 space-y-6">
           <button
             onClick={() => navigate(-1)}
@@ -186,7 +186,7 @@ export default function CustomerPayment() {
             </h2>
 
             <div className="space-y-4">
-              {}
+              {/* Phần giao diện */}
               <div
                 onClick={() => setPaymentMethod("Wallet")}
                 className={`p-4 rounded-xl border-2 cursor-pointer transition-all flex items-center justify-between group ${
@@ -228,7 +228,7 @@ export default function CustomerPayment() {
                 </div>
               </div>
 
-              {}
+              {/* Phần giao diện */}
               <div
                 onClick={() => setPaymentMethod("Momo")}
                 className={`p-4 rounded-xl border-2 cursor-pointer transition-all flex items-center justify-between group ${
@@ -261,7 +261,7 @@ export default function CustomerPayment() {
                 </div>
               </div>
 
-              {}
+              {/* Phần giao diện */}
               <div
                 onClick={() => setPaymentMethod("COD")}
                 className={`p-4 rounded-xl border-2 cursor-pointer transition-all flex items-center justify-between group ${
@@ -297,7 +297,7 @@ export default function CustomerPayment() {
           </div>
         </div>
 
-        {}
+        {/* Phần giao diện */}
         <div className="md:col-span-1">
           <div className="bg-white p-6 rounded-2xl shadow-lg border border-blue-100 sticky top-10">
             <h3 className="text-lg font-bold text-[#113e48] mb-4 flex items-center gap-2">
@@ -325,7 +325,7 @@ export default function CustomerPayment() {
               </div>
             </div>
 
-            {}
+            {/* Render điều kiện */}
             {paymentMethod === "Wallet" && walletBalance < Number(amount) && (
               <div className="mb-4 p-3 bg-red-50 border border-red-100 rounded-lg text-xs text-red-600 font-medium text-center">
                 Số dư ví không đủ. Vui lòng nạp thêm.
@@ -364,7 +364,7 @@ export default function CustomerPayment() {
         </div>
       </div>
 
-      {}
+      {/* Render điều kiện */}
       {showMomoPopup && (
         <div className="fixed inset-0 flex items-center justify-center bg-black/60 backdrop-blur-sm z-[9999]">
           <div className="bg-white rounded-2xl shadow-2xl p-2 w-full max-w-5xl h-[85vh] relative flex flex-col items-center">

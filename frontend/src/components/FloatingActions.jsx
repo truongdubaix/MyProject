@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+﻿import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
@@ -50,7 +50,7 @@ export default function FloatingActions({ onOpenChatBubble, onOpenChatTop }) {
   return (
 
     <div className="fixed bottom-6 right-6 z-[9999] flex flex-col items-end gap-5">
-      {}
+      {/* Phần giao diện */}
       <AnimatePresence>
         {!open && showNotice && (
           <motion.div
@@ -81,11 +81,11 @@ export default function FloatingActions({ onOpenChatBubble, onOpenChatTop }) {
         )}
       </AnimatePresence>
 
-      {}
+      {/* Phần giao diện */}
       <AnimatePresence>
         {open && (
           <>
-            {}
+            {/* Phần giao diện */}
             <motion.div
               custom={2}
               variants={itemVariants}
@@ -116,7 +116,7 @@ export default function FloatingActions({ onOpenChatBubble, onOpenChatTop }) {
               </button>
             </motion.div>
 
-            {}
+            {/* Phần giao diện */}
             <motion.div
               custom={1}
               variants={itemVariants}
@@ -150,7 +150,7 @@ export default function FloatingActions({ onOpenChatBubble, onOpenChatTop }) {
         )}
       </AnimatePresence>
 
-      {}
+      {/* Phần giao diện */}
       <motion.button
         onClick={() => setOpen(!open)}
         whileHover={{ scale: 1.05 }}
@@ -169,7 +169,7 @@ export default function FloatingActions({ onOpenChatBubble, onOpenChatTop }) {
           }
         `}
       >
-        {}
+        {/* Phần giao diện */}
         <motion.div
           initial={false}
           animate={{ rotate: open ? 180 : 0 }}
@@ -179,12 +179,12 @@ export default function FloatingActions({ onOpenChatBubble, onOpenChatTop }) {
           <FontAwesomeIcon icon={open ? faXmark : faCommentDots} />
         </motion.div>
 
-        {}
+        {/* Render điều kiện */}
         {!open && (
           <span className="absolute inset-0 rounded-full border-2 border-white/30 animate-[ping_2s_infinite] opacity-50 pointer-events-none"></span>
         )}
 
-        {}
+        {/* Render điều kiện */}
         {!open && (
           <div className="absolute top-0 -left-[100%] w-full h-full bg-white/20 skew-x-[45deg] group-hover:left-[100%] transition-all duration-700 ease-in-out"></div>
         )}

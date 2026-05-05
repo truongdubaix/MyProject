@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+﻿import { useEffect, useState } from "react";
 import API from "../../services/api";
 import toast from "react-hot-toast";
 import {
@@ -289,7 +289,7 @@ export default function AdminDrivers() {
 
   return (
     <div className="space-y-6 animate-in fade-in duration-500 font-sans">
-      {}
+      {/* Phần giao diện */}
       <div className="bg-white p-2 rounded-xl shadow-sm border border-gray-100 flex flex-wrap gap-2 w-fit">
         <button
           onClick={() => {
@@ -333,9 +333,9 @@ export default function AdminDrivers() {
         </button>
       </div>
 
-      {}
+      {/* Phần giao diện */}
       <div className="bg-white border border-gray-100 rounded-xl shadow-sm overflow-hidden">
-        {}
+        {/* Render điều kiện */}
         {tab === "drivers" && (
           <>
             <div className="p-5 border-b border-gray-100 flex flex-col sm:flex-row justify-between items-center gap-4 bg-gray-50/50">
@@ -474,7 +474,7 @@ export default function AdminDrivers() {
               </table>
             </div>
 
-            {}
+            {/* Phần giao diện */}
             <Pagination
               currentPage={driverPage}
               totalPages={totalDriverPages}
@@ -483,7 +483,7 @@ export default function AdminDrivers() {
           </>
         )}
 
-        {}
+        {/* Render điều kiện */}
         {tab === "vehicles" && (
           <>
             <div className="p-5 border-b border-gray-100 flex flex-col sm:flex-row justify-between items-center gap-4 bg-gray-50/50">
@@ -587,7 +587,7 @@ export default function AdminDrivers() {
               </table>
             </div>
 
-            {}
+            {/* Phần giao diện */}
             <Pagination
               currentPage={vehiclePage}
               totalPages={totalVehiclePages}
@@ -596,7 +596,7 @@ export default function AdminDrivers() {
           </>
         )}
 
-        {}
+        {/* Render điều kiện */}
         {tab === "applications" && (
           <div className="overflow-x-auto">
             <table className="w-full text-sm text-left">
@@ -671,8 +671,8 @@ export default function AdminDrivers() {
         )}
       </div>
 
-      {}
-      {}
+      {/* Phần giao diện */}
+
       {showDriverForm && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40 backdrop-blur-sm">
           <div className="bg-white rounded-xl shadow-2xl w-full max-w-md p-6">

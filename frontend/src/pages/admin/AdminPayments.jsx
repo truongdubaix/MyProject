@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+﻿import { useEffect, useState } from "react";
 import API from "../../services/api";
 import toast from "react-hot-toast";
 import { CreditCard, Search, Trash2, DollarSign, Wallet } from "lucide-react";
@@ -99,7 +99,7 @@ export default function AdminPayments() {
 
   return (
     <div className="space-y-6 animate-in fade-in duration-500 font-sans">
-      {}
+      {/* Phần giao diện */}
       <div className="bg-white p-5 rounded-xl shadow-sm border border-gray-100 flex flex-col sm:flex-row justify-between items-center gap-4">
         <div>
           <h1 className="text-xl font-bold text-[#113e48] flex items-center gap-2">
@@ -128,7 +128,7 @@ export default function AdminPayments() {
         </div>
       </div>
 
-      {}
+      {/* Phần giao diện */}
       <div className="bg-white border border-gray-100 rounded-xl shadow-sm overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full text-sm text-left">
@@ -213,7 +213,7 @@ export default function AdminPayments() {
           </table>
         </div>
 
-        {}
+        {/* Phần giao diện */}
         <Pagination
           currentPage={page}
           totalPages={totalPages}

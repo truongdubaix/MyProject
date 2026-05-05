@@ -1,4 +1,4 @@
-import { useEffect, useState, useRef } from "react";
+﻿import { useEffect, useState, useRef } from "react";
 import API from "../../services/api";
 import Pagination from "../../components/Pagination";
 import toast, { Toaster } from "react-hot-toast";
@@ -686,7 +686,7 @@ export default function CustomerInvoice() {
     <div className="animate-in fade-in duration-500 space-y-6 pb-10">
       <Toaster position="top-right" />
 
-      {}
+      {/* Phần giao diện */}
       <div
         className="relative z-30 flex flex-col md:flex-row justify-between items-start md:items-center gap-4 bg-white p-5 rounded-2xl shadow-sm border border-gray-100"
         data-aos="fade-up"
@@ -701,7 +701,7 @@ export default function CustomerInvoice() {
         </div>
 
         <div className="flex flex-col sm:flex-row gap-3 w-full md:w-auto">
-          {}
+          {/* Phần giao diện */}
           <div className="relative group">
             <Search
               className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-orange-500 transition-colors"
@@ -716,10 +716,10 @@ export default function CustomerInvoice() {
             />
           </div>
 
-          {}
+          {/* Phần giao diện */}
           <StatusFilterDropdown value={filterStatus} onChange={(v) => { setFilterStatus(v); setPage(1); }} />
 
-          {}
+          {/* Nút hành động */}
           <button
             onClick={exportAll}
             className="flex items-center gap-2 bg-[#113e48] hover:bg-[#1a5c6a] text-white px-4 py-2.5 rounded-xl text-sm font-bold transition-colors shadow-sm"
@@ -729,7 +729,7 @@ export default function CustomerInvoice() {
         </div>
       </div>
 
-      {}
+      {/* Phần giao diện */}
       <div
         className="relative z-10 bg-white border border-gray-100 rounded-2xl shadow-sm overflow-hidden"
         data-aos="fade-up"
@@ -797,7 +797,7 @@ export default function CustomerInvoice() {
                     </td>
                     <td className="px-6 py-4 text-center">
                       <div className="flex justify-start gap-2 w-[72px] mx-auto">
-                        {}
+                        {/* Nút hành động */}
                         <button
                           onClick={() =>
                             setPreviewData(
@@ -809,7 +809,7 @@ export default function CustomerInvoice() {
                         >
                           <Eye size={16} />
                         </button>
-                        {}
+                        {/* Nút hành động */}
                         <button
                           onClick={() => generatePDF(s)}
                           disabled={downloading === s.id}
@@ -837,7 +837,7 @@ export default function CustomerInvoice() {
         />
       </div>
 
-      {}
+      {/* Render điều kiện */}
       {previewData && (
         <div className="fixed inset-0 z-[70] flex items-center justify-center p-4 sm:p-6">
           <button
@@ -867,17 +867,17 @@ export default function CustomerInvoice() {
             </div>
           </div>
 
-          {}
+          {/* Phần giao diện */}
           <div className="p-5 space-y-4 max-h-[75vh] overflow-y-auto">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-              {}
+              {/* Phần giao diện */}
               <div className="bg-blue-50 p-3 rounded-xl border border-blue-100">
                 <p className="text-[10px] font-bold text-blue-600 uppercase mb-1">Người gửi</p>
                 <p className="font-bold text-[#113e48] text-sm">{previewData.sender_name}</p>
                 <p className="text-xs text-gray-500">{previewData.sender_phone}</p>
                 <p className="text-xs text-gray-400 mt-1 line-clamp-2">{previewData.pickup_address}</p>
               </div>
-              {}
+              {/* Phần giao diện */}
               <div className="bg-green-50 p-3 rounded-xl border border-green-100">
                 <p className="text-[10px] font-bold text-green-600 uppercase mb-1">Người nhận</p>
                 <p className="font-bold text-[#113e48] text-sm">{previewData.receiver_name}</p>
@@ -886,7 +886,7 @@ export default function CustomerInvoice() {
               </div>
             </div>
 
-            {}
+            {/* Phần giao diện */}
             {previewData.driver_name ? (
               <div className="bg-orange-50 p-4 rounded-xl border border-orange-100 flex items-center gap-4">
                 <div className="w-12 h-12 rounded-full bg-orange-200 flex items-center justify-center text-orange-700 font-bold text-xl">

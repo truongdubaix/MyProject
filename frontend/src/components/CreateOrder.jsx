@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+﻿import React, { useState, useEffect } from "react";
 import axios from "axios";
 import OrderSummarySidebar from "./OrderSummarySidebar";
 
@@ -62,9 +62,9 @@ export default function CreateOrder() {
 
   return (
     <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 p-6">
-      {}
+      {/* Phần giao diện */}
       <div className="lg:col-span-2 space-y-6">
-        {}
+        {/* Phần giao diện */}
         <div className="bg-white p-6 rounded-xl border border-gray-100">
           <h3 className="font-bold mb-4">Mô phỏng Input Địa Chỉ</h3>
 
@@ -108,11 +108,11 @@ export default function CreateOrder() {
           </div>
         </div>
 
-        {}
+        {/* Phần giao diện */}
       </div>
 
-      {}
-      {}
+      {/* Phần giao diện */}
+
       <OrderSummarySidebar
         serviceType={serviceType}
         setServiceType={setServiceType}

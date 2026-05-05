@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+﻿import { useState, useEffect } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { motion } from "framer-motion";
 import API from "../services/api";
@@ -102,10 +102,10 @@ export default function ForgotPassword() {
   return (
 
     <div className="min-h-screen flex flex-col bg-gray-50 font-sans">
-      {}
+      {/* Thanh điều hướng */}
       <Navbar />
 
-      {}
+      {/* Phần giao diện */}
       <div className="flex-grow flex items-center justify-center p-4 sm:p-8">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -113,14 +113,14 @@ export default function ForgotPassword() {
           transition={{ duration: 0.5 }}
           className="bg-white w-full max-w-5xl rounded-3xl shadow-2xl flex overflow-hidden min-h-[600px] border border-gray-100"
         >
-          {}
+          {/* Phần giao diện */}
           <div className="w-full md:w-1/2 p-8 md:p-12 bg-white flex flex-col justify-center relative">
             <div className="mb-8">
-              <Link to="/" className="inline-block mb-6">
+              <Link to="/" className="inline-block mb-8 flex justify-center md:justify-start">
                 <img
                   src="/assets/logo/logoSpeedyShip.png"
                   alt="SpeedyShip Logo"
-                  className="w-16 h-16 object-contain hover:scale-105 transition-transform"
+                  className="w-32 h-32 md:w-40 md:h-40 object-contain hover:scale-105 transition-transform drop-shadow-lg"
                 />
               </Link>
               <h1 className="text-2xl font-extrabold text-[#113e48] mb-2">
@@ -133,7 +133,7 @@ export default function ForgotPassword() {
               </p>
             </div>
 
-            {}
+            {/* Render điều kiện */}
             {message.text && (
               <motion.div
                 initial={{ opacity: 0, height: 0 }}
@@ -149,7 +149,7 @@ export default function ForgotPassword() {
               </motion.div>
             )}
 
-            {}
+            {/* Phần giao diện */}
             {step === 1 ? (
               <form onSubmit={handleSendOtp} className="space-y-5">
                 <div className="space-y-1">
@@ -278,13 +278,13 @@ export default function ForgotPassword() {
               </Link>
             </div>
 
-            {}
+            {/* Phần giao diện */}
             <div className="border-t border-gray-100 pt-6 mt-auto">
               <PartnerCarousel />
             </div>
           </div>
 
-          {}
+          {/* Phần giao diện */}
           <div className="hidden md:flex w-1/2 relative bg-[#113e48] flex-col justify-center p-12 text-white overflow-hidden">
             <div className="absolute top-0 right-0 w-64 h-64 bg-white/5 rounded-full blur-3xl translate-x-1/2 -translate-y-1/2"></div>
             <div className="absolute bottom-0 left-0 w-64 h-64 bg-orange-500/10 rounded-full blur-3xl -translate-x-1/2 translate-y-1/2"></div>
@@ -346,7 +346,7 @@ export default function ForgotPassword() {
         </motion.div>
       </div>
 
-      {}
+      {/* Phần giao diện */}
       <Footer />
     </div>
   );

@@ -1,4 +1,4 @@
-import React from "react";
+﻿import React from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faCheck,
@@ -8,7 +8,6 @@ import {
   faHandHoldingDollar,
   faHeadset,
 } from "@fortawesome/free-solid-svg-icons";
-
 
 const commitmentList = [
   {
@@ -24,7 +23,6 @@ const commitmentList = [
     desc: "Dịch vụ cam kết tuân thủ tiến độ và đảm bảo thời gian giao nhận chính xác.",
   },
 ];
-
 
 const featureCards = [
   {
@@ -51,7 +49,7 @@ const featureCards = [
 const CommitmentSection = () => {
   return (
     <section className="py-24 bg-white overflow-hidden relative font-sans">
-      {}
+      {/* Phần giao diện */}
       <div className="absolute top-10 left-0 opacity-30 pointer-events-none">
         <div
           className="w-48 h-48"
@@ -63,9 +61,9 @@ const CommitmentSection = () => {
       </div>
 
       <div className="max-w-[1400px] mx-auto px-6 relative z-10">
-        {}
+        {/* Phần giao diện */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center mb-24">
-          {}
+          {/* Phần giao diện */}
           <div>
             <div className="mb-10">
               <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-orange-100 text-orange-600 mb-4 border border-orange-200">
@@ -125,12 +123,12 @@ const CommitmentSection = () => {
             </div>
           </div>
 
-          {}
+          {/* Phần giao diện */}
           <div className="relative h-full min-h-[500px] flex gap-4">
             <div className="w-1/2 relative flex flex-col justify-end">
               <div className="relative h-[85%] w-full overflow-hidden rounded-lg shadow-md group cursor-pointer">
                 <img
-                  src="https://vantaidongnai.com.vn/wp-content/uploads/xe-tai-cho-hang-quan-10-da-dang-tai-trong-phuc-vu-24-7-nkp-logistics-anh-4.webp"
+                  src="/assets/img/Commitment1.png"
                   alt="Kỹ sư Logistics"
                   className="w-full h-full object-cover transform group-hover:scale-105 transition-transform duration-700"
                 />
@@ -150,7 +148,7 @@ const CommitmentSection = () => {
             <div className="w-1/2 relative">
               <div className="h-full w-full overflow-hidden rounded-lg shadow-md group cursor-pointer relative">
                 <img
-                  src="https://vantaidongnai.com.vn/wp-content/uploads/dich-vu-thue-xe-tai-dong-nai-giao-hang-lien-tinh-noi-tinh-gia-tot-nhat-anh-dai-dien.webp"
+                  src="/assets/img/Commitment2.png"
                   alt="Tàu vận chuyển Container"
                   className="w-full h-full object-cover transform group-hover:scale-105 transition-transform duration-700"
                 />
@@ -161,10 +159,9 @@ const CommitmentSection = () => {
           </div>
         </div>
 
-        {}
+        {/* Phần giao diện */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8 items-start">
           {featureCards.map((card, index) => {
-
             const isHighlight = card.highlight;
             const themeClass = isHighlight ? "orange" : "teal";
 
@@ -181,7 +178,7 @@ const CommitmentSection = () => {
                   }
                 `}
               >
-                {}
+                {/* Phần giao diện */}
                 <div
                   className={`
                   w-14 h-14 bg-white rounded-full flex items-center justify-center shadow-sm text-2xl transition-colors duration-300 shrink-0
@@ -195,7 +192,7 @@ const CommitmentSection = () => {
                   <FontAwesomeIcon icon={card.icon} />
                 </div>
 
-                {}
+                {/* Phần giao diện */}
                 <div>
                   <h4
                     className={`

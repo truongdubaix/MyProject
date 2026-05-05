@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+﻿import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
 import API from "../../services/api";
 import {
@@ -127,7 +127,7 @@ export default function AdminUsers() {
 
   return (
     <div className="space-y-6 animate-in fade-in duration-500 font-sans">
-      {}
+      {/* Phần giao diện */}
       <div className="bg-white p-5 rounded-xl shadow-sm border border-gray-100 flex flex-col sm:flex-row justify-between items-center gap-4">
         <div>
           <h1 className="text-xl font-bold text-[#113e48] flex items-center gap-2">
@@ -155,7 +155,7 @@ export default function AdminUsers() {
         </div>
       </div>
 
-      {}
+      {/* Phần giao diện */}
       <div className="bg-white border border-gray-100 rounded-xl shadow-sm overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full text-sm text-left">
@@ -213,10 +213,10 @@ export default function AdminUsers() {
                         </div>
                       </td>
 
-                      {}
+                      {/* Phần giao diện */}
                       <td className="px-6 py-4 text-center">
                         <div className="relative inline-flex items-center justify-center">
-                          {}
+                          {/* Phần giao diện */}
                           <div className="absolute left-2 pointer-events-none text-gray-500">
                             {roleStyle.icon}
                           </div>
@@ -242,7 +242,7 @@ export default function AdminUsers() {
                             ))}
                           </select>
 
-                          {}
+                          {/* Phần giao diện */}
                           <div className="absolute right-2 pointer-events-none text-gray-500 opacity-60">
                             ▼
                           </div>
@@ -288,7 +288,7 @@ export default function AdminUsers() {
           </table>
         </div>
 
-        {}
+        {/* Phần giao diện */}
         <Pagination
           currentPage={page}
           totalPages={totalPages}
